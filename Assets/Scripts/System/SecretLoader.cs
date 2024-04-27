@@ -3,32 +3,31 @@ using System.IO;
 
 public class Secret
 {
-    public string server_ip;
-    public string server_port;
+    public string m_serverIp;
+    public string m_serverPort;
 }
 
 public class SecretLoader : MonoBehaviour
 {
 #region PrivateVariables
-    private string secret_path = "Assets/secret.json";
-    private string json_string;
+    private string secretPath = "Assets/secret.json";
+    private string jsonString;
 #endregion
 
 #region PublicVariables
-    public static string server_ip;
-    public static int server_port;
+    public static string s_serverIp = "localhost";
+    public static int s_serverPort = 30303;
 #endregion
 
 #region PrivateMethod
     private void Start()
     {
-        json_string = File.ReadAllText(secret_path);
-        Secret secret = JsonUtility.FromJson<Secret>(json_string);
+        jsonString = File.ReadAllText(secretPath);
+        Secret secret = JsonUtility.FromJson<Secret>(jsonString);
+        s_serverIp = secret.m_serverIp;
+        s_serverPort = int.Parse(secret.m_serverPort);
 
-        server_ip = secret.server_ip;
-        server_port = int.Parse(secret.server_port);
-
-        Debug.LogFormat("Secret Loader: Server IP: {0}, Server Port: {1}", server_ip, server_port);
+        Debug.LogFormat("[SecretLoader] {0}:{1}", s_serverIp, s_serverPort);
     }
-#endregion
+    #endregion
 }
