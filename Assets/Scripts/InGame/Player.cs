@@ -2,36 +2,41 @@ using UnityEngine;
 using TMPro;
 using Cinemachine;
 
+/* Player.cs
+ * - 플레이어의 이동, 회전, 속도 조절
+ * - 플레이어 스크립트는 여러 개 생성되기에 여기서 입력 처리를 하지 않는다.
+ */
 public class Player : MonoBehaviour
 {
 #region PrivateVariables
-    private int index = 0;
+    private float currentSteerAngle;
+    //private bool isDrifting;
+    private float motorForce = 1000f;
+    private float brakeForce = 3000f;
+    private float maxSteerAngle = 20f;
+
+    public WheelCollider frontLeftWheelCollider;
+    public WheelCollider frontRightWheelCollider;
+    public WheelCollider backLeftWheelCollider;
+    public WheelCollider backRightWheelCollider;
+
+    private int playerId = 0;
     private bool isMe = false;
-    private float rotSpeed = 4.0f;
-    private float moveSpeed = 4.0f;
     private string nickName = string.Empty;
     private GameObject playerModelObject;
-    private Transform cameraTransform;
-    private Animator anim;
-    private float smoothRotationTime;   //target 각도로 회전하는데 걸리는 시간
-    private float smoothMoveTime;   //target 속도로 바뀌는데 걸리는 시간
-    private float rotationVelocity;
 #endregion
 
 #region PublicVariables
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
-    [field: SerializeField] public bool isRotate { get; private set; }
     public GameObject nameObject;
-    public GameObject joystick;
+    public bool isBraking = false; 
 #endregion
 
 
 #region PrivateMethod
     private void Awake()
     {
-        anim = GetComponent<Animator>();
-        cameraTransform = Camera.main.transform;
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
     }
     private void Start()
@@ -50,32 +55,81 @@ public class Player : MonoBehaviour
             tmp = Vector3.Normalize(tmp);
             SetMoveVector(tmp);
         }
-        if (isMove)
-        {
-            Move();
-            // anim.SetBool("IsWalk", true);
-        }
-        else
-        {
-            // anim.SetBool("IsWalk", false);
-        }
-        if (isRotate)
-        {
-            Rotate();
-        }
     }
     private Vector3 GetNameUIPos()
     {
         return this.transform.position + (Vector3.up * 2.0f);
     }
+
+    private void FixedUpdate()
+    {
+        HandleMotor();
+        CheckRotate();
+        HandleSteering();
+    }
+
+
+    private void HandleMotor()//엔진 속도 조절
+    {
+        //추가 사항 : max 속도 제한, AddForce로 속도 조절
+        frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
+        frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
+
+        if (isBraking)//Space 누르고 있을 때
+            ApplyBraking();
+        else
+            ApplyRestart();
+
+
+        //if(isDrifting)
+        //    Drift();
+
+    }
+
+    private void ApplyBraking()//브레이크
+    {
+        frontLeftWheelCollider.brakeTorque = brakeForce;
+        frontRightWheelCollider.brakeTorque = brakeForce;
+    }
+    
+    private void ApplyRestart()//브레이크가 풀렸을 때 엔진 다시 켜기
+    {
+        frontLeftWheelCollider.brakeTorque = 0;
+        frontRightWheelCollider.brakeTorque = 0;
+        frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
+        frontRightWheelCollider.motorTorque = moveVector.z * motorForce; 
+    }
+
+    private void CheckRotate()//차량이 절대값 19도 이상으로 기울지 않게
+    {
+        if (transform.rotation.z > 0.33f)
+        {
+            transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, 0.33f);
+
+        }
+        if (transform.rotation.z < -0.33f)
+        {
+            transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, -0.33f);
+
+        }
+    }
+
+    private void HandleSteering()//방향 조정은 전륜만 조정
+    {
+        currentSteerAngle = maxSteerAngle * moveVector.x;
+        frontLeftWheelCollider.steerAngle = currentSteerAngle;
+        frontRightWheelCollider.steerAngle = currentSteerAngle;
+
+    }
 #endregion
 
 
 #region PublicMethod
-    public void Initialize(bool _isMe, int _index, string _nickName)
+    // 내 플레이어와 다른 플레이어 객체 초기화
+    public void Initialize(bool _isMe, int _playerId, string _nickName)
     {
         this.isMe = _isMe;
-        this.index = _index;
+        this.playerId = _playerId;
         this.nickName = _nickName;
 
         playerModelObject = this.gameObject;
@@ -92,7 +146,6 @@ public class Player : MonoBehaviour
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
-        this.isRotate = false;
     }
     public void SetMoveVector(float move)
     {
@@ -110,58 +163,6 @@ public class Player : MonoBehaviour
         {
             isMove = true;
         }
-    }
-
-    public void Move()
-    {
-        Move(moveVector);
-    }
-    public void Move(Vector3 var)
-    {
-        // 회전
-        if (var.Equals(Vector3.zero))
-        {
-            isRotate = false;
-        }
-        else
-        {
-            if (Quaternion.Angle(playerModelObject.transform.rotation, Quaternion.LookRotation(var)) > Quaternion.kEpsilon)
-            {
-                isRotate = true;
-            }
-            else
-            {
-                isRotate = false;
-            }
-        }
-
-        // 움직임을 멈췄을 때 다시 처음 각도로 돌아가는 걸 막기 위함
-        if (var != Vector3.zero)
-        {
-            float rotation = Mathf.Atan2(var.x, var.z) * Mathf.Rad2Deg + cameraTransform.eulerAngles.y;
-            transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(transform.eulerAngles.y, rotation, ref rotationVelocity, smoothRotationTime);
-        }
-        // 이동
-        var pos = gameObject.transform.position + playerModelObject.transform.forward * moveSpeed * Time.deltaTime;
-        SetPosition(pos);
-    }
-
-    public void Rotate()
-    {
-        if (moveVector.Equals(Vector3.zero))
-        {
-            isRotate = false;
-            return;
-        }
-        if (Quaternion.Angle(playerModelObject.transform.rotation, Quaternion.LookRotation(moveVector)) < Quaternion.kEpsilon)
-        {
-            isRotate = false;
-            return;
-        }
-
-        Quaternion targetRotation = Quaternion.LookRotation(moveVector, Vector3.up);
-        
-        playerModelObject.transform.rotation = Quaternion.Slerp(playerModelObject.transform.rotation, targetRotation, Time.deltaTime * rotSpeed);
     }
 
     public void SetPosition(Vector3 pos)
@@ -186,4 +187,18 @@ public class Player : MonoBehaviour
         return gameObject.transform.rotation.eulerAngles;
     }
 #endregion
+    /* 드리프트 하려면 후륜을 멈추게 한다.-> 관성 때문에 자동차가 미끄러진다.
+     * stiffness를 조절한다.
+     */
+
+    //private void Drift()
+    //{
+    //    Drifting();
+    //}
+
+
+    //private void Drifting()
+    //{
+
+    //}
 }

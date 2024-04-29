@@ -2,6 +2,10 @@ using System;
 using System.Collections;
 using UnityEngine;
 
+/* GameManager.cs
+ * - 게임 전체적인 상태를 관리
+ * - 인게임 내에서 코루틴 업데이트 실행으로 플레이어 입력 처리
+ */
 public class GameManager : MonoBehaviour
 {
 
@@ -13,7 +17,7 @@ public class GameManager : MonoBehaviour
 #endregion
 
 #region PublicVariables
-    public static event Action InGame = delegate { };
+    public static event Action InGame = delegate { }; // 인게임에서 실행되는 함수들
     public enum GameState { Login, MatchLobby, Ready, Start, InGame, Over, Result, Reconnect };
 #endregion
 
@@ -45,6 +49,7 @@ public class GameManager : MonoBehaviour
         isCreate = true;
     }
 
+    // 인게임에서 실행되는 코루틴
     private IEnumerator InGameUpdate()
     {
         while (true)
@@ -55,7 +60,7 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
             InGame();
-            yield return new WaitForSeconds(.1f); // 1초 단위
+            yield return new WaitForSeconds(0.01f); // 1초 단위
         }
     }
 #endregion

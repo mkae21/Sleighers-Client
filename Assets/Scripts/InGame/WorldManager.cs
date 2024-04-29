@@ -3,14 +3,18 @@ using System.Net.Sockets;
 using UnityEngine;
 using Protocol;
 using Reader;
-
+/* WorldManager.cs
+ * - 인게임 내의 모든 것을 관리
+ * - 인게임 내에서 프로토콜 수신 및 처리
+ * - 인게임 내에서 플레이어 생성 및 삭제
+ */
 public class WorldManager : MonoBehaviour
 {
 #region PrivateVariables
     private NetworkStream stream = null;
     private GameObject playerPrefab;
     private Dictionary<int, Player> players;
-    private int myPlayerIndex;
+    private int myPlayerId;
 #endregion
 
 #region PublicVariables
@@ -20,8 +24,10 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region PrivateMethod
+    // 애플리케이션 종료 시
     private void OnApplicationQuit()
     {
+        Debug.Log("OnApplicationQuit");
         ServerManager.Instance().SetIsConnect(false);
         if (stream != null)
             stream.Close();
@@ -37,15 +43,15 @@ public class WorldManager : MonoBehaviour
         stream = ServerManager.Instance().GetStream();
         players = new Dictionary<int, Player>();
         InitializeGame();
+        GameManager.InGame += SyncPosition;
     }
     private void Update()
     {
         if (stream.DataAvailable)
-        {
             OnReceive();
-        }
     }
-    public bool InitializeGame()
+    // 인게임 초기화
+    private bool InitializeGame()
     {
 
         if (!playerPool)
@@ -59,60 +65,103 @@ public class WorldManager : MonoBehaviour
 
         return true;
     }
+    // 내 위치를 서버에 보내서 모든 플레이어에게 동기화
+    private void SyncPosition()
+    {
+        PlayerMoveMessage playerMoveMessage = new PlayerMoveMessage(Type.SyncPosition, myPlayerId, players[myPlayerId].transform.position);
+        byte[] data = new byte[1024];
+        ByteWriter bw = new ByteWriter(data);
+        bw.WriteBytes(bw.PlayerMoveMessageToByte(playerMoveMessage));
+        ServerManager.Instance().SendMessage(data);
+    }
 
+    // 서버로부터 데이터 받을 시 처리
     private void OnReceive()
     {
+        // byte[] data = new byte[1024];
+        // int bytesRead = stream.Read(data, 0, data.Length);
+        // Debug.Log("[OnReceive] 데이터 수신 : " + bytesRead);
+        // if (bytesRead <= 0)
+        // {
+        //     Debug.LogWarning("[OnReceive] 데이터 <= 0");
+        //     data = null; // 메모리 명시적 해제
+        //     return;
+        // }
+
         byte[] data = new byte[1024];
         int bytesRead = stream.Read(data, 0, data.Length);
         ByteReader br = new ByteReader(data);
-        Protocol.Type type = (Protocol.Type)br.ReadInt();
+        Protocol.Type type = (Protocol.Type)br.ReadByte();
         Debug.Log("[OnReceive] 프로토콜 : " + type);
         
         switch(type)
         {
-            case Protocol.Type.s_NewUser:
-                int newId = br.ReadInt();
-                ProcessNewPlayer(newId);
+            case Protocol.Type.PlayerMove:
+                ProcessPlayerMoveEvent(br);
                 break;
-
-            case Protocol.Type.s_PlayerConnect:
-                myPlayerIndex = br.ReadInt();
-                InputManager.instance.playerIndex = myPlayerIndex;
-                int totalPlayerNumber = br.ReadInt();
-                ProcessPlayerConnect(br, totalPlayerNumber, myPlayerIndex);
+            case Protocol.Type.OtherPlayerConnect:
+                ProcessOtherPlayerConnectEvent(br);
                 break;
-                
-            case Protocol.Type.s_PlayerPosition:
-                int userIndex = br.ReadInt();
-                Vector3 moveVector = br.ReadVector3();
-                ProcessPlayerKeyEvent(userIndex, moveVector);
+            case Protocol.Type.LoadGameScene:
+                ProcessLoadGameSceneEvent(br);
+                break;
+            case Protocol.Type.PlayerDisconnect:
+                ProcessPlayerDisconnectEvent(br);
+                break;
+            case Protocol.Type.SyncPosition:
+                ProcessSyncPositionEvent(br);
+                break;
+            default:
+                Debug.LogWarning("[OnReceive] 알 수 없는 프로토콜");
                 break;
         }
     }
-
-    private void ProcessNewPlayer(int _newId)
+#region 프로토콜 처리
+    private void ProcessPlayerMoveEvent(ByteReader br)
     {
-        GameObject newInstance = Instantiate(playerPrefab, playerPool.transform.position, Quaternion.identity, playerPool.transform);
-        players.Add(_newId, newInstance.GetComponent<Player>());
+        int userId = br.ReadInt();
+        Vector3 movePosition = br.ReadVector3();
+        players[userId].SetMoveVector(movePosition);
     }
-    private void ProcessPlayerConnect(ByteReader _br, int _totalPlayerNumber, int _playerIndex)
+    private void ProcessOtherPlayerConnectEvent(ByteReader br)
     {
-        GameObject myPlayer = Instantiate(playerPrefab, startingPoints[0].transform.position, Quaternion.identity, playerPool.transform);
-        myPlayer.GetComponent<Player>().Initialize(true, _playerIndex, "Player" + _playerIndex);
-        players.Add(_playerIndex, myPlayer.GetComponent<Player>());
+        int newId = br.ReadInt();
+        GameObject newInstance = Instantiate(playerPrefab, startingPoints[0].transform.position, Quaternion.identity, playerPool.transform);
+        players.Add(newId, newInstance.GetComponent<Player>());
+    }
+    private void ProcessLoadGameSceneEvent(ByteReader br)
+    {
+        myPlayerId = br.ReadInt();
+        int totalPlayerCount = br.ReadInt();
+        InputManager.instance.playerId = myPlayerId;
 
-        for (int i = 0; i < _totalPlayerNumber; i++)
+        GameObject myPlayer = Instantiate(playerPrefab, startingPoints[0].transform.position, Quaternion.identity, playerPool.transform);
+        myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId);
+        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
+        Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
+        for (int i = 0; i < totalPlayerCount; i++)
         {
-            int userIndex = _br.ReadInt();
-            GameObject otherPlayer = Instantiate(playerPrefab, startingPoints[i + 1].transform.position, Quaternion.identity, playerPool.transform);
+            int userIndex = br.ReadInt();
+            Vector3 otherPlayerPosition = br.ReadVector3();
+            
+            GameObject otherPlayer = Instantiate(playerPrefab, otherPlayerPosition, Quaternion.identity, playerPool.transform);
             otherPlayer.GetComponent<Player>().Initialize(false, userIndex, "Player" + userIndex);
             players.Add(userIndex, otherPlayer.GetComponent<Player>());
         }
     }
-    private void ProcessPlayerKeyEvent(int userIndex, Vector3 moveVector)
+    private void ProcessPlayerDisconnectEvent(ByteReader br)
     {
-        players[userIndex].SetMoveVector(moveVector);
+        int userId = br.ReadInt();
+        Destroy(players[userId].gameObject);
+        players.Remove(userId);
     }
+    private void ProcessSyncPositionEvent(ByteReader br)
+    {
+        int userId = br.ReadInt();
+        Vector3 syncPosition = br.ReadVector3();
+        players[userId].transform.position = syncPosition;
+    }
+#endregion
 
 
 #endregion
@@ -120,7 +169,11 @@ public class WorldManager : MonoBehaviour
 #region PublicMethod
     public Player GetMyPlayer()
     {
-        return players[myPlayerIndex];
+        return players[myPlayerId];
+    }
+    public Player GetMyPlayerFromId(int _id)
+    {
+        return players[_id];
     }
 #endregion
 }

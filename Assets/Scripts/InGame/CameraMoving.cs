@@ -13,7 +13,6 @@ public class CameraMoving : MonoBehaviour
     private bool isFirstPersonView = false;
 #endregion
 
-    // Start is called before the first frame update
 #region PrivateMethod
     private void Start()
     {
@@ -21,8 +20,6 @@ public class CameraMoving : MonoBehaviour
         blendListCamera.m_Instructions[1].m_VirtualCamera = vCam2;
         blendListCamera.m_Instructions[0].m_Hold = 1.0f;
     }
-
-    // Update is called once per frame
     private void Update()
     {
         //tab키로 가상 카메라 전환

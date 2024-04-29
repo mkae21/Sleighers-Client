@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Net.Sockets;
 
+/* ServeManager.cs
+ * - 서버와의 통신을 관리
+ */
 public class ServerManager : MonoBehaviour
 {
 #region PrivateVariables
@@ -13,7 +16,6 @@ public class ServerManager : MonoBehaviour
 #endregion
 
 #region PublicVariables
-
 #endregion
 
 #region PrivateMethod
@@ -63,6 +65,7 @@ public class ServerManager : MonoBehaviour
     {
         if (isConnect)
         {
+            Debug.LogFormat("[ServerManager] Send Message : {0}", message.Length);
             stream.Write(message, 0, message.Length);
         }
     }
