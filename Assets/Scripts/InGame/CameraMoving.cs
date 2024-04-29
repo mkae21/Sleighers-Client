@@ -1,22 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
-using Unity.VisualScripting;
 
 public class CameraMoving : MonoBehaviour
 {
-    #region PublicVariables
+#region PublicVariables
     public CinemachineBlendListCamera blendListCamera;
     public CinemachineVirtualCamera vCam1;
     public CinemachineVirtualCamera vCam2;
-    #endregion
+#endregion
 
-    #region PrivateVariables
+#region PrivateVariables
     private bool isFirstPersonView = false;
-    #endregion
+#endregion
 
     // Start is called before the first frame update
+#region PrivateMethod
     private void Start()
     {
         blendListCamera.m_Instructions[0].m_VirtualCamera = vCam1;
@@ -37,4 +35,5 @@ public class CameraMoving : MonoBehaviour
             blendListCamera.m_Instructions[0].m_Hold = isFirstPersonView ? 0.0f : 1.0f;
         }
     }
+#endregion
 }
