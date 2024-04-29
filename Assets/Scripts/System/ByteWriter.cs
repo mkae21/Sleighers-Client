@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Protocol;
 
 namespace Reader
 {
@@ -97,6 +98,15 @@ namespace Reader
         {
             m_DataSource[m_Cursor] = b;
             m_Cursor++;
+        }
+        public byte[] PlayerMoveMessageToByte(PlayerMoveMessage msg)
+        {
+            byte[] data = new byte[1024];
+            ByteWriter bw = new ByteWriter(data);
+            bw.WriteByte((byte)msg.type);
+            bw.WriteInt(msg.playerId);
+            bw.WriteVector3(msg.position);
+            return data;
         }
     }
 }

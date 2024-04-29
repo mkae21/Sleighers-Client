@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
             InGame();
-            yield return new WaitForSeconds(.1f); // 1초 단위
+            yield return new WaitForSeconds(0.01f); // 1초 단위
         }
     }
 #endregion
