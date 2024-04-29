@@ -2,14 +2,15 @@ using UnityEngine;
 using TMPro;
 using Cinemachine;
 
+/* Player.cs
+ * - 플레이어의 이동, 회전, 속도 조절
+ * - 플레이어 스크립트는 여러 개 생성되기에 여기서 입력 처리를 하지 않는다.
+ */
 public class Player : MonoBehaviour
 {
 #region PrivateVariables
-    //Input setting 변수들 저장
-
     private float currentSteerAngle;
     //private bool isDrifting;
-
     private float motorForce = 1000f;
     private float brakeForce = 3000f;
     private float maxSteerAngle = 20f;
@@ -18,7 +19,6 @@ public class Player : MonoBehaviour
     public WheelCollider frontRightWheelCollider;
     public WheelCollider backLeftWheelCollider;
     public WheelCollider backRightWheelCollider;
-
 
     private int playerId = 0;
     private bool isMe = false;
@@ -125,6 +125,7 @@ public class Player : MonoBehaviour
 
 
 #region PublicMethod
+    // 내 플레이어와 다른 플레이어 객체 초기화
     public void Initialize(bool _isMe, int _playerId, string _nickName)
     {
         this.isMe = _isMe;

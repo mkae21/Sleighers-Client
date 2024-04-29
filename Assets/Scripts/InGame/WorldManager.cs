@@ -3,7 +3,11 @@ using System.Net.Sockets;
 using UnityEngine;
 using Protocol;
 using Reader;
-
+/* WorldManager.cs
+ * - 인게임 내의 모든 것을 관리
+ * - 인게임 내에서 프로토콜 수신 및 처리
+ * - 인게임 내에서 플레이어 생성 및 삭제
+ */
 public class WorldManager : MonoBehaviour
 {
 #region PrivateVariables
@@ -20,6 +24,7 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region PrivateMethod
+    // 애플리케이션 종료 시
     private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
@@ -45,6 +50,7 @@ public class WorldManager : MonoBehaviour
         if (stream.DataAvailable)
             OnReceive();
     }
+    // 인게임 초기화
     private bool InitializeGame()
     {
 
@@ -59,6 +65,7 @@ public class WorldManager : MonoBehaviour
 
         return true;
     }
+    // 내 위치를 서버에 보내서 모든 플레이어에게 동기화
     private void SyncPosition()
     {
         PlayerMoveMessage playerMoveMessage = new PlayerMoveMessage(Type.SyncPosition, myPlayerId, players[myPlayerId].transform.position);
@@ -68,6 +75,7 @@ public class WorldManager : MonoBehaviour
         ServerManager.Instance().SendMessage(data);
     }
 
+    // 서버로부터 데이터 받을 시 처리
     private void OnReceive()
     {
         // byte[] data = new byte[1024];
@@ -108,7 +116,7 @@ public class WorldManager : MonoBehaviour
                 break;
         }
     }
-
+#region 프로토콜 처리
     private void ProcessPlayerMoveEvent(ByteReader br)
     {
         int userId = br.ReadInt();
@@ -153,6 +161,7 @@ public class WorldManager : MonoBehaviour
         Vector3 syncPosition = br.ReadVector3();
         players[userId].transform.position = syncPosition;
     }
+#endregion
 
 
 #endregion
