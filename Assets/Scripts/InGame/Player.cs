@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using Cinemachine;
 
 public class Player : MonoBehaviour
 {
@@ -31,12 +32,13 @@ public class Player : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         cameraTransform = Camera.main.transform;
+        nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
     }
     private void Start()
     {
         // 서버 인스턴스가 없으면 인게임 테스트용으로 초기화
         if (ServerManager.Instance() == null)
-            Initialize(true, 0, "TestPlayer", 0);
+            Initialize(true, 0, "TestPlayer");
     }
     private void Update()
     {
@@ -51,11 +53,11 @@ public class Player : MonoBehaviour
         if (isMove)
         {
             Move();
-            anim.SetBool("IsWalk", true);
+            // anim.SetBool("IsWalk", true);
         }
         else
         {
-            anim.SetBool("IsWalk", false);
+            // anim.SetBool("IsWalk", false);
         }
         if (isRotate)
         {
@@ -70,14 +72,14 @@ public class Player : MonoBehaviour
 
 
 #region PublicMethod
-    public void Initialize(bool isMe, int index, string nickName, float rot)
+    public void Initialize(bool _isMe, int _index, string _nickName)
     {
-        this.isMe = isMe;
-        this.index = index;
-        this.nickName = nickName;
+        this.isMe = _isMe;
+        this.index = _index;
+        this.nickName = _nickName;
 
         playerModelObject = this.gameObject;
-        playerModelObject.transform.rotation = Quaternion.Euler(0, rot, 0);
+        playerModelObject.transform.rotation = Quaternion.Euler(0, 0, 0);
 
         nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, playerModelObject.transform);
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
@@ -85,14 +87,13 @@ public class Player : MonoBehaviour
 
         if (this.isMe)
         {
-            // Camera.main.GetComponentInParent<MainCamera>().target = this.transform;
+            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = this.transform;
         }
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
         this.isRotate = false;
     }
-#region Movement
     public void SetMoveVector(float move)
     {
         SetMoveVector(this.transform.forward * move);
@@ -185,7 +186,4 @@ public class Player : MonoBehaviour
         return gameObject.transform.rotation.eulerAngles;
     }
 #endregion
-
-#endregion
-
 }

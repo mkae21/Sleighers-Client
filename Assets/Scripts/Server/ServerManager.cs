@@ -1,19 +1,13 @@
-using System.Collections.Generic;
 using UnityEngine;
-using System;
-using System.Threading;
-using System.Linq;
-using System.Text;
-using System.Net;
 using System.Net.Sockets;
 
 public class ServerManager : MonoBehaviour
 {
-
-
 #region PrivateVariables
+    private TcpClient client;
+    private NetworkStream stream;
+    private bool isConnect = false;
     private static ServerManager instance = null;
-    private Socket socket;
     private string serverIP = string.Empty;
     private int serverPort = 0;
 #endregion
@@ -38,35 +32,18 @@ public class ServerManager : MonoBehaviour
     {
         serverIP = SecretLoader.s_serverIp;
         serverPort = SecretLoader.s_serverPort;
-        Debug.LogFormat("[ServerManager] Init - {0}:{1}", serverIP, serverPort);
-        // 서버에 연결
-        try
+
+        client = new TcpClient(serverIP, serverPort);
+        if (client.Connected)
         {
-            using (TcpClient client = new TcpClient(serverIP, serverPort))
-            {
-                InfiniteLoopDetector.Run();
-                // client가 서버에 잘 접속이 되었는지 확인
-                Debug.LogFormat("서버에 연결 {0}", client.Connected ? "성공" : "실패");
-                using (NetworkStream stream = client.GetStream())
-                {
-                   // 메시지 전송
-                   string message = "Hello from Unity - JJM!";
-                   byte[] data = Encoding.UTF8.GetBytes(message);
-                   stream.Write(data, 0, data.Length);
-
-                   // 응답 수신
-                   byte[] buffer = new byte[1024];
-                   int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                   string responseData = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-                   // 응답 메시지 표시
-                   Debug.LogFormat("Received: {0}", responseData);
-                }
-            }
+            Debug.LogFormat("[ServerManager] 서버 접속 성공 {0}:{1}", serverIP, serverPort);
+            stream = client.GetStream();
+            isConnect = true;
         }
-        catch (Exception e)
+        else
         {
-            Debug.LogError("Error: " + e.Message);
+            Debug.LogError("[ServerManager] 서버 접속 실패");
+            isConnect = false;
         }
     }
 #endregion
@@ -76,11 +53,38 @@ public class ServerManager : MonoBehaviour
     {
         if (instance == null)
         {
-            Debug.LogError("ServerManager Instace is Null");
+            Debug.LogError("[ServerManager] 인스턴스가 존재하지 않습니다.");
             return null;
         }
 
         return instance;
+    }
+    public void SendMessage(byte[] message)
+    {
+        if (isConnect)
+        {
+            stream.Write(message, 0, message.Length);
+        }
+    }
+    public NetworkStream GetStream()
+    {
+        return stream;
+    }
+    public TcpClient GetTcpClient()
+    {
+        return client;
+    }
+    public void CloseTcpClient()
+    {
+        client.Close();
+    }
+    public bool GetIsConnect()
+    {
+        return isConnect;
+    }
+    public void SetIsConnect(bool _isConnect)
+    {
+        isConnect = _isConnect;
     }
 #endregion
 
