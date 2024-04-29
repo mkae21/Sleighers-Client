@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SledControl : MonoBehaviour
-{   
+{
+    #region PrivateVariables
     //Input setting 변수들 저장
     private const string HORIZONTAL = "Horizontal";
     private const string VERTICAL = "Vertical";
@@ -25,9 +24,10 @@ public class SledControl : MonoBehaviour
     [SerializeField] private WheelCollider backRightWheelCollider;
 
 
-    /* 드리프트 하려면 후륜을 멈추게 한다.-> 관성 때문에 자동차가 미끄러진다.
-     * stiffness를 조절한다.
-     */
+    #endregion
+
+
+    #region PrivateMethod
     private void FixedUpdate()
     {
         GetInput();
@@ -86,9 +86,15 @@ public class SledControl : MonoBehaviour
     private void CheckRotate()//차량이 절대값 19도 이상으로 기울지 않게
     {
         if (transform.rotation.z > 0.33f)
+        {
             transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, 0.33f);
+
+        }
         if (transform.rotation.z < -0.33f)
+        {
             transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, -0.33f);
+
+        }
     }
 
     private void HandleSteering()//방향 조정은 전륜만 조정
@@ -98,6 +104,11 @@ public class SledControl : MonoBehaviour
         frontRightWheelCollider.steerAngle = currentSteerAngle;
 
     }
+    #endregion
+
+    /* 드리프트 하려면 후륜을 멈추게 한다.-> 관성 때문에 자동차가 미끄러진다.
+     * stiffness를 조절한다.
+     */
 
     //private void Drift()
     //{
