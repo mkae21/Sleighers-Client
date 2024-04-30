@@ -99,13 +99,14 @@ namespace Reader
             m_DataSource[m_Cursor] = b;
             m_Cursor++;
         }
-        public byte[] PlayerMoveMessageToByte(PlayerMoveMessage msg)
+        public byte[] PlayerSyncMessageToByte(PlayerSyncMessage msg)
         {
             byte[] data = new byte[1024];
             ByteWriter bw = new ByteWriter(data);
             bw.WriteByte((byte)msg.type);
             bw.WriteInt(msg.playerId);
             bw.WriteVector3(msg.position);
+            bw.WriteVector3(msg.rotation);
             return data;
         }
     }

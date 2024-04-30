@@ -121,6 +121,13 @@ public class Player : MonoBehaviour
         frontRightWheelCollider.steerAngle = currentSteerAngle;
 
     }
+    private void OnTriggerEnter(Collider other) {
+        if (other.gameObject.tag == "Finish")
+        {
+            WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
+            Debug.LogFormat("플레이어 {0} 도착", playerId);
+        }
+    }
 #endregion
 
 

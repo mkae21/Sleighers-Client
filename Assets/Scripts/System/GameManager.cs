@@ -12,12 +12,14 @@ public class GameManager : MonoBehaviour
 #region PrivateVariables
     private static bool isCreate = false;
     private static GameManager instance;
+    private IEnumerator ReadyUpdateCoroutine;
     private IEnumerator InGameUpdateCoroutine;
     private GameState gameState;
 #endregion
 
 #region PublicVariables
-    public static event Action InGame = delegate { }; // 인게임에서 실행되는 함수들
+    public static event Action Ready = delegate { }; // Ready 상태에서 실행되는 함수들
+    public static event Action InGame = delegate { }; // InGame 상태에서 실행되는 함수들
     public enum GameState { Login, MatchLobby, Ready, Start, InGame, Over, Result, Reconnect };
 #endregion
 
@@ -33,6 +35,8 @@ public class GameManager : MonoBehaviour
         // 게임중 슬립모드 해제
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
+        ReadyUpdateCoroutine = ReadyUpdate();
+
         InGameUpdateCoroutine = InGameUpdate();
 
         DontDestroyOnLoad(this.gameObject);
@@ -45,8 +49,22 @@ public class GameManager : MonoBehaviour
             DestroyImmediate(gameObject, true);
             return;
         }
-        ChangeState(GameState.InGame); // TODO: 일단 바로 시작. 나중에 바꿔야 함
+        ChangeState(GameState.Ready); // TODO: 일단 바로 시작. 나중에 바꿔야 함
         isCreate = true;
+    }  
+    // Ready 상태에서 실행되는 코루틴
+    private IEnumerator ReadyUpdate()
+    {
+        while (true)
+        {
+            if (gameState != GameState.Ready)
+            {
+                StopCoroutine(ReadyUpdateCoroutine);
+                yield return null;
+            }
+            Ready();
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     // 인게임에서 실행되는 코루틴
@@ -60,7 +78,7 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
             InGame();
-            yield return new WaitForSeconds(0.01f); // 1초 단위
+            yield return new WaitForSeconds(0.01f);
         }
     }
 #endregion
@@ -81,12 +99,16 @@ public class GameManager : MonoBehaviour
         gameState = state;
         switch (gameState)
         {
+            case GameState.Ready:
+                StartCoroutine(ReadyUpdateCoroutine);
+                break;
+
             case GameState.InGame:
-                // 코루틴 시작
                 StartCoroutine(InGameUpdateCoroutine);
                 break;
+
             default:
-                Debug.Log("알수없는 스테이트입니다. 확인해주세요.");
+                Debug.Log("[GameManager] 알 수 없는 상태입니다.");
                 break;
         }
     }
