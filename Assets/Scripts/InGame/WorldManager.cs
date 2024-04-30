@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using UnityEngine;
 using Protocol;
 using Reader;
+using Unity.VisualScripting.Dependencies.Sqlite;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
@@ -50,7 +51,7 @@ public class WorldManager : MonoBehaviour
         players = new Dictionary<int, Player>();
         sessionInfo = new SessionInfo();
         InitializeGame();
-        GameManager.InGame += SendSyncPositionEvent;
+        GameManager.InGame += SendGameSyncEvent;
     }
     private void Update()
     {
@@ -77,49 +78,71 @@ public class WorldManager : MonoBehaviour
     // 서버로부터 받는 데이터 처리 핸들러
     private void OnReceive()
     {
-        byte[] data = new byte[1024];
-        _ = stream.Read(data, 0, data.Length);
-        ByteReader br = new ByteReader(data);
-        Protocol.Type type = (Protocol.Type)br.ReadByte();
+        byte[] sizeData = new byte[4];
+        stream.Read(sizeData, 0, sizeData.Length);
+        ByteReader br = new ByteReader(sizeData);
 
-        if (type != Protocol.Type.SyncPosition)
-            Debug.Log("[OnReceive] 프로토콜 : " + type);
+        int jsonSize = br.ReadInt();
+        byte[] data = new byte[jsonSize];
+        int size = stream.Read(data, 0, data.Length);
+
+        Debug.LogFormat("[OnReceive] 데이터 크기 : {0}", size);
         
-        switch(type)
+        if (size == 0)
         {
+            Debug.Log("[OnReceive] 빈 데이터가 브로드캐스킹 되었습니다.");
+            return;
+        }
+        Message msg = DataParser.ReadJsonData<Message>(data);
+        // if (msg == null)
+        //     return;
+        // if (ServerManager.Instance().IsHost() == true) // TODO: 내가 보낸 데이터면 이라는 조건 추가
+        //     return;
+        // if (players == null)
+        //     return;
+        Debug.LogFormat("[OnReceive] 받은 데이터 타입 : {0}", msg.type);
+        switch(msg.type)
+        {
+            case Protocol.Type.Key:
+                KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                ReceiveKeyEvent(keyMessage);
+                break;
             case Protocol.Type.PlayerMove:
-                ReceivePlayerMoveEvent(br);
+                PlayerMoveMessage moveMessage = DataParser.ReadJsonData<PlayerMoveMessage>(data);
+                ReceivePlayerMoveEvent(moveMessage);
                 break;
 
-            case Protocol.Type.PlayerReconnect:
-                break;
+            // case Protocol.Type.PlayerReconnect:
+            //     break;
 
-            case Protocol.Type.PlayerDisconnect:
-                ReceivePlayerDisconnectEvent(br);
-                break;
+            // case Protocol.Type.PlayerDisconnect:
+            //     ReceivePlayerDisconnectEvent(br);
+            //     break;
 
-            case Protocol.Type.OtherPlayerConnect:
-                ReceiveOtherPlayerConnectEvent(br);
-                break;
+            // case Protocol.Type.OtherPlayerConnect:
+            //     ReceiveOtherPlayerConnectEvent(br);
+            //     break;
 
-            case Protocol.Type.OtherPlayerReconnect:
-                break;
+            // case Protocol.Type.OtherPlayerReconnect:
+            //     break;
 
-            case Protocol.Type.SyncPosition:
-                ReceiveSyncPositionEvent(br);
+            case Protocol.Type.GameSync:
+                GameSyncMessage syncMessage = DataParser.ReadJsonData<GameSyncMessage>(data);
+                ReceiveGameSyncEvent(syncMessage);
                 break;
 
             case Protocol.Type.LoadGameScene:
-                ReceiveLoadGameSceneEvent(br);
+                LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
+                ReceiveLoadGameSceneEvent(loadMessage);
                 break;
 
-            case Protocol.Type.GameStartCountDown:
-                ReceiveGameStartCountDownEvent(br);
-                break;
+            // case Protocol.Type.GameStartCountDown:
+            //     ReceiveGameStartCountDownEvent(br);
+            //     break;
 
-            case Protocol.Type.GameStart:
-                ReceiveGameStartEvent(br);
-                break;
+            // case Protocol.Type.GameStart:
+            //     ReceiveGameStartEvent(br);
+            //     break;
 
             case Protocol.Type.PlayerGoal:
                 break;
@@ -127,22 +150,57 @@ public class WorldManager : MonoBehaviour
             case Protocol.Type.GameEndCountDown:
                 break;
 
-            case Protocol.Type.GameEnd:
-                ReceiveGameEndEvent(br);
-                break;
+            // case Protocol.Type.GameEnd:
+            //     ReceiveGameEndEvent(br);
+            //     break;
 
             default:
                 Debug.LogWarning("[OnReceive] 알 수 없는 프로토콜");
                 break;
         }
     }
-#region Receive 프로토콜 처리
-    // 플레이어 이동 이벤트 처리
-    private void ReceivePlayerMoveEvent(ByteReader br)
+    public void OnRecieveForLocal(KeyMessage keyMessage)
     {
-        int userId = br.ReadInt();
-        Vector3 movePosition = br.ReadVector3();
-        players[userId].SetMoveVector(movePosition);
+        ReceiveKeyEvent(keyMessage);
+    }
+#region Receive 프로토콜 처리
+    // 키 입력 이벤트 처리
+    private void ReceiveKeyEvent(KeyMessage keyMessage)
+    {
+        if (ServerManager.Instance().IsHost() == false)
+            return;
+        bool isMove = false;
+        int keyData = keyMessage.keyData;
+        int id = keyMessage.playerId;
+
+        Vector3 moveVector = Vector3.zero;
+        Vector3 playerPos = players[id].GetPosition();
+        if ((keyData & KeyEventCode.MOVE) == KeyEventCode.MOVE)
+        {
+            moveVector = new Vector3(keyMessage.x, keyMessage.y, keyMessage.z);
+            moveVector = Vector3.Normalize(moveVector);
+            isMove = true;
+        }
+
+        if (isMove)
+        {
+            players[id].SetMoveVector(moveVector);
+            PlayerMoveMessage msg = new PlayerMoveMessage(id, playerPos, moveVector);
+            ServerManager.Instance().SendDataToInGame<PlayerMoveMessage>(msg);
+        }
+    }
+    // 플레이어 이동 이벤트 처리
+    private void ReceivePlayerMoveEvent(PlayerMoveMessage msg)
+    {
+        if (ServerManager.Instance().IsHost() == true)
+            return;
+        Vector3 moveVecotr = new Vector3(msg.xDir, msg.yDir, msg.zDir);
+        // moveVector가 같으면 방향 & 이동량 같으므로 적용 굳이 안함
+        if (!moveVecotr.Equals(players[msg.playerId].moveVector))
+        {
+            players[msg.playerId].SetPosition(msg.xPos, msg.yPos, msg.zPos);
+            players[msg.playerId].SetMoveVector(moveVecotr);
+        }
     }
     // 다른 플레이어 접속 이벤트 처리
     private void ReceiveOtherPlayerConnectEvent(ByteReader br)
@@ -153,12 +211,13 @@ public class WorldManager : MonoBehaviour
         sessionInfo.totalPlayerCount++;
     }
     // 게임 씬 로드 이벤트 처리
-    private void ReceiveLoadGameSceneEvent(ByteReader br)
+    private void ReceiveLoadGameSceneEvent(LoadGameSceneMessage msg)
     {
-        myPlayerId = br.ReadInt();
-        int totalPlayerCount = br.ReadInt();
+        myPlayerId = msg.playerId;
+        int totalPlayerCount = msg.userCount;
         sessionInfo.totalPlayerCount = totalPlayerCount + 1;
         InputManager.instance.playerId = myPlayerId;
+        List<int> userList = msg.userList;
 
         GameObject myPlayer = Instantiate(playerPrefab, startingPoints[totalPlayerCount].transform.position, startingPoints[0].transform.rotation, playerPool.transform);
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId);
@@ -166,7 +225,7 @@ public class WorldManager : MonoBehaviour
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
         for (int i = 0; i < totalPlayerCount; i++)
         {
-            int userIndex = br.ReadInt();            
+            int userIndex = userList[i];
             GameObject otherPlayer = Instantiate(playerPrefab, startingPoints[i].transform.position, Quaternion.identity, playerPool.transform);
             otherPlayer.GetComponent<Player>().Initialize(false, userIndex, "Player" + userIndex);
             players.Add(userIndex, otherPlayer.GetComponent<Player>());
@@ -192,13 +251,19 @@ public class WorldManager : MonoBehaviour
         players.Remove(userId);
     }
     // 플레이어 위치 및 회전 동기화 이벤트 처리
-    private void ReceiveSyncPositionEvent(ByteReader br)
+    private void ReceiveGameSyncEvent(GameSyncMessage msg)
     {
-        int userId = br.ReadInt();
-        Vector3 syncPosition = br.ReadVector3();
-        Vector3 syncRotation = br.ReadVector3();
-        players[userId].transform.position = syncPosition;
-        players[userId].transform.rotation = Quaternion.Euler(syncRotation);
+        int id = 0;
+        if (players == null)
+            return;
+
+        foreach (var player in players)
+        {
+            var y = player.Value.GetPosition().y;
+            player.Value.SetPosition(new Vector3(msg.xPos[id], y, msg.zPos[id]));
+            id++;
+        }
+        // ServerManager.Instance().SetHostSession(syncMessage.host);
     }
     // 게임 종료 이벤트 처리
     private void ReceiveGameEndEvent(ByteReader br)
@@ -210,15 +275,22 @@ public class WorldManager : MonoBehaviour
 
 #region Send 프로토콜 처리
     // 내 위치와 회전을 서버에 보내서 모든 플레이어에게 동기화
-    private void SendSyncPositionEvent()
+    private void SendGameSyncEvent()
     {
-        Transform myPlayer = players[myPlayerId].gameObject.transform;
-        PlayerSyncMessage playerSyncMessage = new PlayerSyncMessage(Protocol.Type.SyncPosition, myPlayerId, myPlayer.position, myPlayer.rotation.eulerAngles);
-        byte[] data = new byte[1024];
-        ByteWriter bw = new ByteWriter(data);
-        byte[] message = bw.PlayerSyncMessageToByte(playerSyncMessage);
-        bw.WriteBytes(message);
-        ServerManager.Instance().SendMessage(data);
+        int numOfClient = players.Count;
+
+        float[] xPos = new float[numOfClient];
+        float[] zPos = new float[numOfClient];
+        bool[] online = new bool[numOfClient];
+        int index = 0;
+        foreach (var player in players)
+        {
+            xPos[index] = player.Value.GetPosition().x;
+            zPos[index] = player.Value.GetPosition().z;
+            index++;
+        }
+        GameSyncMessage msg = new GameSyncMessage(myPlayerId, numOfClient, xPos, zPos, online);
+        ServerManager.Instance().SendDataToInGame(msg);
     }
     // 게임 시작 이벤트를 서버에 알림
     private void SendGameStartEvent()
@@ -230,7 +302,7 @@ public class WorldManager : MonoBehaviour
         byte[] data = new byte[1024];
         ByteWriter bw = new ByteWriter(data);
         bw.WriteByte((byte)Protocol.Type.GameStart);
-        ServerManager.Instance().SendMessage(data);
+        ServerManager.Instance().SendDataToInGame(data);
     }
     // 내 플레이어가 골인했음을 서버에 알림
     private void SendPlayerGoalEvent()
@@ -240,7 +312,7 @@ public class WorldManager : MonoBehaviour
         ByteWriter bw = new ByteWriter(data);
         bw.WriteByte((byte)Protocol.Type.PlayerGoal);
         bw.WriteInt(myPlayerId);
-        ServerManager.Instance().SendMessage(data);
+        ServerManager.Instance().SendDataToInGame(data);
     }
     // 임시 서버 리셋
     private void SendResetServerEvent()
@@ -249,7 +321,7 @@ public class WorldManager : MonoBehaviour
         byte[] data = new byte[1024];
         ByteWriter bw = new ByteWriter(data);
         bw.WriteByte((byte)Protocol.Type.ResetServer);
-        ServerManager.Instance().SendMessage(data);
+        ServerManager.Instance().SendDataToInGame(data);
     }
 #endregion
 
@@ -277,8 +349,8 @@ public class WorldManager : MonoBehaviour
             case Protocol.Type.OtherPlayerReconnect:
                 break;
 
-            case Protocol.Type.SyncPosition:
-                SendSyncPositionEvent();
+            case Protocol.Type.GameSync:
+                SendGameSyncEvent();
                 break;
 
             case Protocol.Type.LoadGameScene:

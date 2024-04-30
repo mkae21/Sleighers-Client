@@ -49,9 +49,20 @@ public class InputManager : MonoBehaviour
         if (!Input.GetButton("Jump"))
             WorldManager.instance.GetMyPlayer().isBraking = false;
 
+        int keyCode = 0;
+        keyCode |= KeyEventCode.MOVE;
+        if (keyCode <= 0)
+            return;
+
         Vector3 moveVector = new Vector3(h, 0, v);
         moveVector = Vector3.Normalize(moveVector);
-        WorldManager.instance.GetMyPlayer().SetMoveVector(moveVector);
+
+
+        KeyMessage msg = new KeyMessage(playerId, keyCode, moveVector);
+        if (ServerManager.Instance().IsHost())
+            ServerManager.Instance().AddMsgToLocalQueue(msg);
+        else
+            ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
     }
 
 #endregion
