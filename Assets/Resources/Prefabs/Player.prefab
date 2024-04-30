@@ -78,13 +78,13 @@ WheelCollider:
   m_Center: {x: 0, y: 0, z: 0}
   m_Radius: 0.23
   m_SuspensionSpring:
-    spring: 90000
-    damper: 9000
+    spring: 130000
+    damper: 12000
     targetPosition: 0.5
-  m_SuspensionDistance: 0.3
+  m_SuspensionDistance: 0.4
   m_ForceAppPointDistance: 0
   m_Mass: 20
-  m_WheelDampingRate: 0.25
+  m_WheelDampingRate: 6
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
     m_ExtremumValue: 1
@@ -149,13 +149,13 @@ WheelCollider:
   m_Center: {x: 0, y: 0, z: 0}
   m_Radius: 0.23
   m_SuspensionSpring:
-    spring: 90000
-    damper: 9000
+    spring: 130000
+    damper: 12000
     targetPosition: 0.5
-  m_SuspensionDistance: 0.3
+  m_SuspensionDistance: 0.4
   m_ForceAppPointDistance: 0
   m_Mass: 20
-  m_WheelDampingRate: 0.25
+  m_WheelDampingRate: 6
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
     m_ExtremumValue: 1
@@ -220,13 +220,13 @@ WheelCollider:
   m_Center: {x: 0, y: 0, z: 0}
   m_Radius: 0.23
   m_SuspensionSpring:
-    spring: 90000
-    damper: 9000
+    spring: 130000
+    damper: 12000
     targetPosition: 0.5
-  m_SuspensionDistance: 0.3
+  m_SuspensionDistance: 0.4
   m_ForceAppPointDistance: 0
   m_Mass: 20
-  m_WheelDampingRate: 0.25
+  m_WheelDampingRate: 6
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
     m_ExtremumValue: 1
@@ -291,13 +291,13 @@ WheelCollider:
   m_Center: {x: 0, y: 0, z: 0}
   m_Radius: 0.23
   m_SuspensionSpring:
-    spring: 90000
-    damper: 9000
+    spring: 130000
+    damper: 12000
     targetPosition: 0.5
-  m_SuspensionDistance: 0.3
+  m_SuspensionDistance: 0.4
   m_ForceAppPointDistance: 0
   m_Mass: 20
-  m_WheelDampingRate: 0.25
+  m_WheelDampingRate: 6
   m_ForwardFriction:
     m_ExtremumSlip: 0.4
     m_ExtremumValue: 1
@@ -348,14 +348,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8146030753936195174}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0.03197927, w: 0.9994886}
   m_LocalPosition: {x: 152.8, y: 26.44, z: 91.61}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9030905875234529185}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -3.665}
 --- !u!33 &4544036893303674355
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -471,8 +471,9 @@ MonoBehaviour:
   frontRightWheelCollider: {fileID: 7385474265868569234}
   backLeftWheelCollider: {fileID: 2542384390064026226}
   backRightWheelCollider: {fileID: 1840430385901336569}
+  poPoint: {fileID: 0}
+  nePoint: {fileID: 0}
   <moveVector>k__BackingField: {x: 0, y: 0, z: 0}
   <isMove>k__BackingField: 0
-  <isRotate>k__BackingField: 0
   nameObject: {fileID: 6711063065380186699, guid: 288abb305934d2b4cba29bea79a9c247, type: 3}
   isBraking: 0

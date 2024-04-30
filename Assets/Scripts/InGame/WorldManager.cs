@@ -6,7 +6,7 @@ using Reader;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
- * - 인게임 내에서 플레이어 생성 및 삭제
+ * - 인게임 내에서 플레이어 생성 및 삭제2
  */
 public class WorldManager : MonoBehaviour
 {

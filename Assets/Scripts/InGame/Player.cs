@@ -8,35 +8,38 @@ using Cinemachine;
  */
 public class Player : MonoBehaviour
 {
-#region PrivateVariables
+    #region PrivateVariables
+    private Rigidbody rb;
     private float currentSteerAngle;
     //private bool isDrifting;
     private float motorForce = 1000f;
     private float brakeForce = 3000f;
-    private float maxSteerAngle = 20f;
+    private float maxSteerAngle = 15f;
+    private int playerId = 0;
+    private bool isMe = false;
+    private string nickName = string.Empty;
+    private GameObject playerModelObject;
+    #endregion
 
+    #region PublicVariables
     public WheelCollider frontLeftWheelCollider;
     public WheelCollider frontRightWheelCollider;
     public WheelCollider backLeftWheelCollider;
     public WheelCollider backRightWheelCollider;
 
-    private int playerId = 0;
-    private bool isMe = false;
-    private string nickName = string.Empty;
-    private GameObject playerModelObject;
-#endregion
-
-#region PublicVariables
+    public GameObject poPoint;
+    public GameObject nePoint;
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
-    public bool isBraking = false; 
-#endregion
+    public bool isBraking = false;
+    #endregion
 
 
-#region PrivateMethod
+    #region PrivateMethod
     private void Awake()
     {
+        rb = GetComponent<Rigidbody>();
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
     }
     private void Start()
@@ -91,28 +94,58 @@ public class Player : MonoBehaviour
         frontLeftWheelCollider.brakeTorque = brakeForce;
         frontRightWheelCollider.brakeTorque = brakeForce;
     }
-    
+
     private void ApplyRestart()//브레이크가 풀렸을 때 엔진 다시 켜기
     {
         frontLeftWheelCollider.brakeTorque = 0;
         frontRightWheelCollider.brakeTorque = 0;
         frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
-        frontRightWheelCollider.motorTorque = moveVector.z * motorForce; 
+        frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
     }
 
-    private void CheckRotate()//차량이 절대값 19도 이상으로 기울지 않게
+    // private void CheckRotate()//차량이 절대값 19도 이상으로 기울지 않게, nePoint와 poPoint를 이용하여 회전 각도 제한
+    // {
+
+    //     if (transform.rotation.z > 0.33f)
+    //     {
+    //         Debug.Log("힘주는 중");
+    //         Vector3 forceStabilization = -transform.up * 1000f;
+    //         rb.AddForceAtPosition(forceStabilization, poPoint.transform.position, ForceMode.Force);
+    //     }
+    //     if (transform.rotation.z < -0.33f)
+    //     {
+    //         Debug.Log("힘주는 중");
+    //         Vector3 forceStabilization = -transform.up * 1000f;
+    //         rb.AddForceAtPosition(forceStabilization, nePoint.transform.position, ForceMode.Force);
+    //     }
+    // }
+
+    private void CheckRotate()
     {
-        if (transform.rotation.z > 0.33f)
-        {
-            transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, 0.33f);
+        float zRotation = transform.eulerAngles.z;
 
+        // 360도 체계에서 각도 조정
+        if (zRotation > 180)
+        {
+            zRotation -= 360;
         }
-        if (transform.rotation.z < -0.33f)
-        {
-            transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, -0.33f);
 
+        // 차량이 너무 오른쪽으로 기울었을 때
+        if (zRotation > 8)
+        {
+            Debug.Log("힘주는 중 - 오른쪽 기울기");
+            Vector3 forceStabilization = -transform.up * 5000f;
+            rb.AddForceAtPosition(forceStabilization, poPoint.transform.position, ForceMode.Force);
+        }
+        // 차량이 너무 왼쪽으로 기울었을 때
+        else if (zRotation < -8)
+        {
+            Debug.Log("힘주는 중 - 왼쪽 기울기");
+            Vector3 forceStabilization = -transform.up * 5000f;
+            rb.AddForceAtPosition(forceStabilization, nePoint.transform.position, ForceMode.Force);
         }
     }
+
 
     private void HandleSteering()//방향 조정은 전륜만 조정
     {
@@ -131,7 +164,7 @@ public class Player : MonoBehaviour
 #endregion
 
 
-#region PublicMethod
+    #region PublicMethod
     // 내 플레이어와 다른 플레이어 객체 초기화
     public void Initialize(bool _isMe, int _playerId, string _nickName)
     {
@@ -193,7 +226,7 @@ public class Player : MonoBehaviour
     {
         return gameObject.transform.rotation.eulerAngles;
     }
-#endregion
+    #endregion
     /* 드리프트 하려면 후륜을 멈추게 한다.-> 관성 때문에 자동차가 미끄러진다.
      * stiffness를 조절한다.
      */
