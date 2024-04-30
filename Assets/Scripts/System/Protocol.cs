@@ -15,8 +15,10 @@ namespace Protocol
         LoadGameScene = 50, // 인게임 씬 로드
         GameStartCountDown, // 게임 시작 전 카운트 다운
         GameStart, // 게임 시작
+        PlayerGoal, // 플레이어 골인
         GameEndCountDown, // 1등 도착 후 카운트 다운 시작
         GameEnd, // 게임 종료
+        ResetServer = 100, // 서버 리셋
     }
     public class Message
     {
@@ -26,20 +28,17 @@ namespace Protocol
             this.type = type;
         }
     }
-    public class PlayerMoveMessage : Message
+    public class PlayerSyncMessage : Message
     {
         public int playerId;
         public Vector3 position;
-        public PlayerMoveMessage(int _playerId, Vector3 _position) : base(Type.PlayerMove)
-        {
-            this.playerId = _playerId;
-            this.position = _position;
-        }
-        public PlayerMoveMessage(Protocol.Type _type, int _playerId, Vector3 _position) : base(_type)
+        public Vector3 rotation;
+        public PlayerSyncMessage(Protocol.Type _type, int _playerId, Vector3 _position, Vector3 _rotation) : base(_type)
         {
             this.type = _type;
             this.playerId = _playerId;
             this.position = _position;
+            this.rotation = _rotation;
         }
     }
 }

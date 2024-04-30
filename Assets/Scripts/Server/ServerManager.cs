@@ -65,7 +65,6 @@ public class ServerManager : MonoBehaviour
     {
         if (isConnect)
         {
-            Debug.LogFormat("[ServerManager] Send Message : {0}", message.Length);
             stream.Write(message, 0, message.Length);
         }
     }
