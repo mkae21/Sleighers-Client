@@ -67,7 +67,7 @@ public class WorldManager : MonoBehaviour
         }
         Debug.Log("[World Manager] 게임 초기화 진행");
 
-        playerPrefab = Resources.Load("Prefabs/Player") as GameObject;
+        playerPrefab = Resources.Load("Prefabs/Player2") as GameObject;
 
         return true;
     }
@@ -98,7 +98,7 @@ public class WorldManager : MonoBehaviour
             return;
         if (players == null)
             return;
-        Debug.LogFormat("[OnReceive] 받은 데이터 타입 : {0}", msg.type);
+        Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
         switch(msg.type)
         {
             case Protocol.Type.Key:
@@ -106,8 +106,7 @@ public class WorldManager : MonoBehaviour
                 ReceiveKeyEvent(keyMessage);
                 break;
             case Protocol.Type.PlayerBreak:
-                PlayerBreakMessage breakMessage = DataParser.ReadJsonData<PlayerBreakMessage>(data);
-                ReceivePlayerBreakEvent(breakMessage);
+                ReceivePlayerBreakEvent(msg);
                 break;
             case Protocol.Type.PlayerMove:
                 PlayerMoveMessage moveMessage = DataParser.ReadJsonData<PlayerMoveMessage>(data);
@@ -172,8 +171,6 @@ public class WorldManager : MonoBehaviour
     {
         if (ServerManager.Instance().IsHost() == false)
             return;
-        bool isMove = false;
-        bool isBreak = false;
         int keyData = keyMessage.keyData;
         int id = keyMessage.id;
 
@@ -183,32 +180,24 @@ public class WorldManager : MonoBehaviour
         {
             playerDir = keyMessage.position;
             playerDir = Vector3.Normalize(playerDir);
-            isMove = true;
-        }
-        else if ((keyData & KeyEventCode.BREAK) == KeyEventCode.BREAK)
-        {
-            isBreak = true;
-        }
 
-        if (isMove)
-        {
             players[id].SetMoveVector(playerDir);
             PlayerMoveMessage msg = new PlayerMoveMessage(id, playerPos, playerDir);
             ServerManager.Instance().SendDataToInGame<PlayerMoveMessage>(msg);
         }
-        if (isBreak)
+        else if ((keyData & KeyEventCode.BREAK) == KeyEventCode.BREAK)
         {
             players[id].IsBraking = true;
-            PlayerBreakMessage msg = new PlayerBreakMessage(id);
-            ServerManager.Instance().SendDataToInGame<PlayerBreakMessage>(msg);
+            Message msg = new Message(Protocol.Type.PlayerBreak, id);
+            ServerManager.Instance().SendDataToInGame<Message>(msg);
         }
+        Debug.LogFormat("[OnReceive] ReceiveKeyEvent : {0} / {1}", keyMessage.type, keyData);
     }
     // 플레이어 이동 이벤트 처리
     private void ReceivePlayerMoveEvent(PlayerMoveMessage msg)
     {
         if (ServerManager.Instance().IsHost() == true)
             return;
-        Debug.LogFormat("[OnReceive] ReceivePlayerMoveEvent : {0}", msg.id);
         Vector3 moveVector = msg.direction;
         // moveVector가 같으면 방향 & 이동량 같으므로 적용 굳이 안함
         if (!moveVector.Equals(players[msg.id].moveVector))
@@ -217,7 +206,7 @@ public class WorldManager : MonoBehaviour
             players[msg.id].SetMoveVector(moveVector);
         }
     }
-    private void ReceivePlayerBreakEvent(PlayerBreakMessage msg)
+    private void ReceivePlayerBreakEvent(Message msg)
     {
         if (ServerManager.Instance().IsHost() == true)
             return;
@@ -269,7 +258,6 @@ public class WorldManager : MonoBehaviour
     // 게임 시작 이벤트 처리
     private void ReceiveGameStartEvent()
     {
-        Debug.LogFormat("[OnReceive] ReceiveGameStartEvent");
         GameManager.Instance().ChangeState(GameManager.GameState.InGame);
     }
     // 다른 플레이어 접속 끊김 이벤트 처리
@@ -324,21 +312,18 @@ public class WorldManager : MonoBehaviour
         if (isGameStart)
             return;
         isGameStart = true;
-        Debug.LogFormat("[OnSend] SendGameStartEvent");
         Message msg = new Message(Protocol.Type.GameStart, myPlayerId);
         ServerManager.Instance().SendDataToInGame(msg);
     }
     // 내 플레이어가 골인했음을 서버에 알림
     private void SendPlayerGoalEvent()
     {
-        Debug.LogFormat("[OnSend] SendPlayerGoalEvent");
         Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId);
         ServerManager.Instance().SendDataToInGame(msg);
     }
     // 임시 서버 리셋
     private void SendResetServerEvent()
     {
-        Debug.LogFormat("[OnSend] SendResetServerEvent");
         Message msg = new Message(Protocol.Type.ResetServer, myPlayerId);
         ServerManager.Instance().SendDataToInGame(msg);
     }
@@ -351,6 +336,7 @@ public class WorldManager : MonoBehaviour
     // 서버로 보내는 데이터 처리 핸들러
     public void OnSend(Protocol.Type _type)
     {
+        Debug.LogFormat("[OnSend] 보낸 메세지 타입 : {0}", _type);
         switch (_type)
         {
             case Protocol.Type.PlayerMove:

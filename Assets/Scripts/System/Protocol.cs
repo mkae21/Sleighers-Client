@@ -6,23 +6,23 @@ namespace Protocol
     // 이벤트 타입
     public enum Type : byte
     {
-        Key = 1,            // 키 입력
-        PlayerBreak = 28,    // 플레이어 브레이크
-        PlayerMove = 30,    // 플레이어 이동
-        PlayerReconnect,    // 플레이어 재접속
-        PlayerDisconnect,   // 플레이어 접속 끊김
+        Key = 1,                // 키 입력
+        PlayerMove = 30,        // 플레이어 이동
+        PlayerBreak,            // 플레이어 브레이크
+        PlayerReconnect,        // 플레이어 재접속
+        PlayerDisconnect,       // 플레이어 접속 끊김
 
-        OtherPlayerConnect, // 다른 플레이어 접속
-        OtherPlayerReconnect, // 다른 플레이어 재접속
-        GameSync, // 플레이어 재접속 시 게임 현재 상황 싱크
+        OtherPlayerConnect,     // 다른 플레이어 접속
+        OtherPlayerReconnect,   // 다른 플레이어 재접속
+        GameSync,               // 플레이어 재접속 시 게임 현재 상황 싱크
 
-        LoadGameScene = 50, // 인게임 씬 로드
-        GameStartCountDown, // 게임 시작 전 카운트 다운
-        GameStart, // 게임 시작
-        PlayerGoal, // 플레이어 골인
-        GameEndCountDown, // 1등 도착 후 카운트 다운 시작
-        GameEnd, // 게임 종료
-        ResetServer = 100, // 서버 리셋
+        LoadGameScene = 50,     // 인게임 씬 로드
+        GameStartCountDown,     // 게임 시작 전 카운트 다운
+        GameStart,              // 게임 시작
+        PlayerGoal,             // 플레이어 골인
+        GameEndCountDown,       // 1등 도착 후 카운트 다운 시작
+        GameEnd,                // 게임 종료
+        ResetServer = 100,      // 서버 리셋
     }
 
     // 키 이벤트 코드

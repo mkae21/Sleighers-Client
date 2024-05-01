@@ -32,14 +32,12 @@ public class InputManager : MonoBehaviour
             return;
         if (Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
-        if (Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.T))
             WorldManager.instance.OnSend(Protocol.Type.GameStart);
     }
 
     private void PlayerInput()
     {
-        if (Input.anyKey == false)
-            return;
         if (ServerManager.Instance().IsHost() && Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
         float h = Input.GetAxis(HORIZONTAL);
@@ -61,11 +59,9 @@ public class InputManager : MonoBehaviour
     }
     private void BreakInput()
     {
-        if (!Input.GetButton("Jump"))
-            return;
         int keyCode = 0;
         keyCode |= KeyEventCode.BREAK;
-        if (keyCode <= 0)
+        if (!Input.GetButton("Jump") || keyCode <= 0)
             return;
         
         KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, keyCode, Vector3.zero);
