@@ -11,8 +11,8 @@ public class Player : MonoBehaviour
 #region PrivateVariables
     private float currentSteerAngle;
     //private bool isDrifting;
-    private float motorForce = 1000f;
-    private float brakeForce = 3000f;
+    private float motorForce = 2000f;
+    private float brakeForce = 5000f;
     private float maxSteerAngle = 20f;
 
     public WheelCollider frontLeftWheelCollider;
@@ -22,6 +22,12 @@ public class Player : MonoBehaviour
 
     private int playerId = 0;
     private bool isMe = false;
+    [SerializeField] private bool isBraking = false;
+    public bool IsBraking
+    {
+        get { return isBraking; }
+        set { isBraking = value; }
+    }
     private string nickName = string.Empty;
     private GameObject playerModelObject;
 #endregion
@@ -30,7 +36,6 @@ public class Player : MonoBehaviour
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
-    public bool isBraking = false; 
 #endregion
 
 
@@ -63,31 +68,29 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        HandleMotor();
-        CheckRotate();
-        HandleSteering();
-    }
-
-
-    private void HandleMotor()//엔진 속도 조절
-    {
-        //추가 사항 : max 속도 제한, AddForce로 속도 조절
-        frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
-        frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
-
-        if (isBraking)//Space 누르고 있을 때
+        if (isMove)
+            HandleMotor();
+        
+        if (IsBraking) // Space 누르고 있을 때
             ApplyBraking();
         else
             ApplyRestart();
 
-
-        //if(isDrifting)
-        //    Drift();
-
+        CheckRotate();
+        HandleSteering();
     }
 
-    private void ApplyBraking()//브레이크
+    private void HandleMotor() // 엔진 속도 조절
     {
+        //추가 사항 : max 속도 제한, AddForce로 속도 조절
+        frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
+        frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
+        isMove = false;
+    }
+
+    private void ApplyBraking() // 브레이크
+    {
+        IsBraking = false;
         frontLeftWheelCollider.brakeTorque = brakeForce;
         frontRightWheelCollider.brakeTorque = brakeForce;
     }
@@ -96,8 +99,6 @@ public class Player : MonoBehaviour
     {
         frontLeftWheelCollider.brakeTorque = 0;
         frontRightWheelCollider.brakeTorque = 0;
-        frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
-        frontRightWheelCollider.motorTorque = moveVector.z * motorForce; 
     }
 
     private void CheckRotate()//차량이 절대값 19도 이상으로 기울지 않게
