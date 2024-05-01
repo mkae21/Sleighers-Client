@@ -9,16 +9,18 @@ using Cinemachine;
 public class Player : MonoBehaviour
 {
     #region PrivateVariables
-    private Rigidbody rb;
     private float currentSteerAngle;
     //private bool isDrifting;
+    private float maxSpeed = 20f;
+    private float currentSpeed;
     private float motorForce = 1000f;
     private float brakeForce = 3000f;
-    private float maxSteerAngle = 15f;
+    private float maxSteerAngle = 20f;
     private int playerId = 0;
     private bool isMe = false;
     private string nickName = string.Empty;
     private GameObject playerModelObject;
+    private Rigidbody rb;
     #endregion
 
     #region PublicVariables
@@ -27,8 +29,6 @@ public class Player : MonoBehaviour
     public WheelCollider backLeftWheelCollider;
     public WheelCollider backRightWheelCollider;
 
-    public GameObject poPoint;
-    public GameObject nePoint;
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
@@ -39,7 +39,7 @@ public class Player : MonoBehaviour
     #region PrivateMethod
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();//Player의 Rigidbody를 가져옴
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
     }
     private void Start()
@@ -67,14 +67,20 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         HandleMotor();
-        CheckRotate();
+        // CheckRotate();
         HandleSteering();
     }
 
 
     private void HandleMotor()//엔진 속도 조절
     {
-        //추가 사항 : max 속도 제한, AddForce로 속도 조절
+        currentSpeed = rb.velocity.magnitude;
+
+        if (currentSpeed > maxSpeed)
+        {
+            rb.velocity = rb.velocity.normalized * maxSpeed;
+        }
+
         frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
         frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
 
@@ -103,48 +109,19 @@ public class Player : MonoBehaviour
         frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
     }
 
-    // private void CheckRotate()//차량이 절대값 19도 이상으로 기울지 않게, nePoint와 poPoint를 이용하여 회전 각도 제한
+    // private void CheckRotate()
     // {
-
+    //     Debug.Log("회전 체크중");
     //     if (transform.rotation.z > 0.33f)
     //     {
     //         Debug.Log("힘주는 중");
-    //         Vector3 forceStabilization = -transform.up * 1000f;
-    //         rb.AddForceAtPosition(forceStabilization, poPoint.transform.position, ForceMode.Force);
     //     }
     //     if (transform.rotation.z < -0.33f)
     //     {
     //         Debug.Log("힘주는 중");
-    //         Vector3 forceStabilization = -transform.up * 1000f;
-    //         rb.AddForceAtPosition(forceStabilization, nePoint.transform.position, ForceMode.Force);
     //     }
     // }
 
-    private void CheckRotate()
-    {
-        float zRotation = transform.eulerAngles.z;
-
-        // 360도 체계에서 각도 조정
-        if (zRotation > 180)
-        {
-            zRotation -= 360;
-        }
-
-        // 차량이 너무 오른쪽으로 기울었을 때
-        if (zRotation > 8)
-        {
-            Debug.Log("힘주는 중 - 오른쪽 기울기");
-            Vector3 forceStabilization = -transform.up * 5000f;
-            rb.AddForceAtPosition(forceStabilization, poPoint.transform.position, ForceMode.Force);
-        }
-        // 차량이 너무 왼쪽으로 기울었을 때
-        else if (zRotation < -8)
-        {
-            Debug.Log("힘주는 중 - 왼쪽 기울기");
-            Vector3 forceStabilization = -transform.up * 5000f;
-            rb.AddForceAtPosition(forceStabilization, nePoint.transform.position, ForceMode.Force);
-        }
-    }
 
 
     private void HandleSteering()//방향 조정은 전륜만 조정
@@ -154,14 +131,15 @@ public class Player : MonoBehaviour
         frontRightWheelCollider.steerAngle = currentSteerAngle;
 
     }
-    private void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other)
+    {
         if (other.gameObject.tag == "Finish")
         {
             WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
             Debug.LogFormat("플레이어 {0} 도착", playerId);
         }
     }
-#endregion
+    #endregion
 
 
     #region PublicMethod

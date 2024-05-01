@@ -9,21 +9,21 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
 
-#region PrivateVariables
+    #region PrivateVariables
     private static bool isCreate = false;
     private static GameManager instance;
     private IEnumerator ReadyUpdateCoroutine;
     private IEnumerator InGameUpdateCoroutine;
     private GameState gameState;
-#endregion
+    #endregion
 
-#region PublicVariables
+    #region PublicVariables
     public static event Action Ready = delegate { }; // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { }; // InGame 상태에서 실행되는 함수들
     public enum GameState { Login, MatchLobby, Ready, Start, InGame, Over, Result, Reconnect };
-#endregion
+    #endregion
 
-#region PrivateMethod
+    #region PrivateMethod
     private void Awake()
     {
         if (!instance)
@@ -49,9 +49,10 @@ public class GameManager : MonoBehaviour
             DestroyImmediate(gameObject, true);
             return;
         }
-        ChangeState(GameState.Ready); // TODO: 일단 바로 시작. 나중에 바꿔야 함
+        // ChangeState(GameState.Ready); // TODO: 일단 바로 시작. 나중에 바꿔야 함
+        ChangeState(GameState.InGame);
         isCreate = true;
-    }  
+    }
     // Ready 상태에서 실행되는 코루틴
     private IEnumerator ReadyUpdate()
     {
@@ -81,9 +82,9 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(0.01f);
         }
     }
-#endregion
+    #endregion
 
-#region PublicMethod
+    #region PublicMethod
     public static GameManager Instance()
     {
         if (instance == null)
@@ -117,5 +118,5 @@ public class GameManager : MonoBehaviour
     {
         return gameState;
     }
-#endregion
+    #endregion
 }
