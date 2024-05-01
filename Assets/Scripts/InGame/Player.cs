@@ -14,12 +14,12 @@ public class Player : MonoBehaviour
 
     private float maxSpeed = 20f;
     private float currentSpeed;
-    private float motorForce = 1000f;
+    private float motorForce = 2000f;
     private float brakeForce = 3000f;
 
     private float maxSteerAngle = 20f;
     private int playerId = 0;
-    private bool isMe = false;
+    [SerializeField] private bool isMe = false;
     [SerializeField] private bool isBraking = false;
     public bool IsBraking
     {
