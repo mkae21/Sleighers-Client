@@ -212,11 +212,11 @@ public class WorldManager : MonoBehaviour
         Debug.LogFormat("[OnReceive] ReceivePlayerMoveEvent : {0}", msg.id);
         Vector3 moveVector = msg.direction;
         // moveVector가 같으면 방향 & 이동량 같으므로 적용 굳이 안함
-        // if (!moveVector.Equals(players[msg.id].moveVector))
-        // {
-            players[msg.id].SetPosition(msg.position);
+        if (!moveVector.Equals(players[msg.id].moveVector))
+        {
+            // players[msg.id].SetPosition(msg.position);
             players[msg.id].SetMoveVector(moveVector);
-        // }
+        }
     }
     private void ReceivePlayerBreakEvent(PlayerBreakMessage msg)
     {
@@ -231,6 +231,7 @@ public class WorldManager : MonoBehaviour
         int newId = msg.id;
         Transform sp = startingPoints[sessionInfo.totalPlayerCount];
         GameObject newInstance = Instantiate(playerPrefab, sp.position, sp.rotation, playerPool.transform);
+        newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId);
         players.Add(newId, newInstance.GetComponent<Player>());
         sessionInfo.totalPlayerCount++;
     }

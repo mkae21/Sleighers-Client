@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
             DestroyImmediate(gameObject, true);
             return;
         }
-        ChangeState(GameState.InGame); // TODO: 일단 바로 시작. 나중에 바꿔야 함
+        ChangeState(GameState.Ready); // TODO: 일단 바로 시작. 나중에 바꿔야 함
         isCreate = true;
     }  
     // Ready 상태에서 실행되는 코루틴
