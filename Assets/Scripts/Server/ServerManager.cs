@@ -79,10 +79,7 @@ public class ServerManager : MonoBehaviour
                 var msg = localQueue.Dequeue();
                 WorldManager.instance.OnRecieveForLocal(msg);
             }
-        
         }
-        // if (Stream.DataAvailable && IsConnect)
-        //     WorldManager.instance.OnReceive(Stream);
     }
     private void Init()
     {

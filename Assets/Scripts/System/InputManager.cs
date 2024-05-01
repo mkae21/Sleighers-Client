@@ -29,6 +29,8 @@ public class InputManager : MonoBehaviour
     }
     private void ReadyInput()
     {
+        if (ServerManager.Instance().IsHost() == false)
+            return;
         if (Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
         if (Input.GetKey(KeyCode.S))
@@ -39,7 +41,7 @@ public class InputManager : MonoBehaviour
     {
         if (Input.anyKey == false)
             return;
-        if (Input.GetKey(KeyCode.R))
+        if (ServerManager.Instance().IsHost() && Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
         float h = Input.GetAxis(HORIZONTAL);
         float v = Input.GetAxis(VERTICAL);
