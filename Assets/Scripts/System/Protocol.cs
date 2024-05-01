@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 namespace Protocol
@@ -8,6 +7,7 @@ namespace Protocol
     public enum Type : byte
     {
         Key = 1,            // 키 입력
+        PlayerBreak = 28,    // 플레이어 브레이크
         PlayerMove = 30,    // 플레이어 이동
         PlayerReconnect,    // 플레이어 재접속
         PlayerDisconnect,   // 플레이어 접속 끊김
@@ -66,6 +66,13 @@ namespace Protocol
             this.id = _id;
             this.position = _pos;
             this.direction = _dir;
+        }
+    }
+    public class PlayerBreakMessage : Message
+    {
+        public PlayerBreakMessage(int _id) : base(Type.PlayerBreak, _id)
+        {
+            this.id = _id;
         }
     }
     public class LoadGameSceneMessage : Message

@@ -14,7 +14,6 @@ public class InputManager : MonoBehaviour
 
 #region PublicVariables
     static public InputManager instance;
-    public int playerId;
 #endregion
 
 #region PrivateMethod
@@ -26,6 +25,7 @@ public class InputManager : MonoBehaviour
     {
         GameManager.Ready += ReadyInput;
         GameManager.InGame += PlayerInput;
+        GameManager.InGame += BreakInput;
     }
     private void ReadyInput()
     {
@@ -37,17 +37,12 @@ public class InputManager : MonoBehaviour
 
     private void PlayerInput()
     {
+        if (Input.anyKey == false)
+            return;
         if (Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
         float h = Input.GetAxis(HORIZONTAL);
         float v = Input.GetAxis(VERTICAL);
-        //isDrifting = Input.GetKey(KeyCode.LeftShift);
-
-        if (Input.GetButton("Jump"))
-            WorldManager.instance.GetMyPlayer().isBraking = true;
-
-        if (!Input.GetButton("Jump"))
-            WorldManager.instance.GetMyPlayer().isBraking = false;
 
         int keyCode = 0;
         keyCode |= KeyEventCode.MOVE;
@@ -57,16 +52,33 @@ public class InputManager : MonoBehaviour
         Vector3 moveVector = new Vector3(h, 0, v);
         moveVector = Vector3.Normalize(moveVector);
 
-        // Truncate playerPos components to 6 decimal places
-        moveVector.x = (float)Math.Truncate(moveVector.x * 1000000) / 1000000;
-        moveVector.y = (float)Math.Truncate(moveVector.y * 1000000) / 1000000;
-        moveVector.z = (float)Math.Truncate(moveVector.z * 1000000) / 1000000;
-
-        KeyMessage msg = new KeyMessage(playerId, keyCode, moveVector);
+        KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, keyCode, moveVector);
         if (ServerManager.Instance().IsHost())
             ServerManager.Instance().AddMsgToLocalQueue(msg);
         else
             ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
+    }
+    private void BreakInput()
+    {
+        Debug.Log("BreakInput");
+        if (!Input.GetButton("Jump"))
+            return;
+        int keyCode = 0;
+        keyCode |= KeyEventCode.BREAK;
+        if (keyCode <= 0)
+            return;
+        
+        KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, keyCode, Vector3.zero);
+        if (ServerManager.Instance().IsHost())
+        {
+            Debug.Log("AddMsgToLocalQueue");
+            ServerManager.Instance().AddMsgToLocalQueue(msg);
+        }
+        else
+        {
+            Debug.Log("SendDataToInGame");
+            ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
+        }
     }
 
 #endregion

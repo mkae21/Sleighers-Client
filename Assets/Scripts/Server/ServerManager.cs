@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Net.Sockets;
 using System.Collections.Generic;
 using Protocol;
+using System.Collections;
 
 /* ServeManager.cs
  * - 서버와의 통신을 관리
@@ -9,6 +10,7 @@ using Protocol;
 public class ServerManager : MonoBehaviour
 {
 #region PrivateVariables
+    private IEnumerator ServerPollCoroutine;
     private TcpClient client;
     public TcpClient Client
     {
@@ -46,7 +48,7 @@ public class ServerManager : MonoBehaviour
     private static ServerManager instance = null;
     private string serverIP = string.Empty;
     private int serverPort = 0;
-    private bool isHost = false;                // 호스트 여부 (서버에서 설정한 SuperGamer 정보를 가져옴)
+    [SerializeField] private bool isHost = false;                // 호스트 여부 (서버에서 설정한 SuperGamer 정보를 가져옴)
     private Queue<KeyMessage> localQueue = null;   // 호스트에서 로컬로 처리하는 패킷을 쌓아두는 큐 (로컬처리하는 데이터는 서버로 발송 안함)
 
 #endregion
@@ -57,6 +59,7 @@ public class ServerManager : MonoBehaviour
 #region PrivateMethod
     private void Awake()
     {
+        ServerPollCoroutine = Poll();
         if (instance != null)
             Destroy(instance);
         instance = this;
@@ -65,6 +68,7 @@ public class ServerManager : MonoBehaviour
     private void Start()
     {
         Init();
+        StartCoroutine(ServerPollCoroutine);
     }
     private void Update()
     {
@@ -77,8 +81,8 @@ public class ServerManager : MonoBehaviour
             }
         
         }
-        if (Stream.DataAvailable)
-            WorldManager.instance.OnReceive(Stream);
+        // if (Stream.DataAvailable && IsConnect)
+        //     WorldManager.instance.OnReceive(Stream);
     }
     private void Init()
     {
@@ -98,6 +102,16 @@ public class ServerManager : MonoBehaviour
             Debug.LogError("[ServerManager] 서버 접속 실패");
             IsConnect = false;
         }
+    }
+    private IEnumerator Poll()
+    {
+        while (true)
+        {
+            if (Stream.DataAvailable && IsConnect)
+                WorldManager.instance.OnReceive();
+            yield return new WaitForSeconds(0.1f);
+        }
+    
     }
 #endregion
 
@@ -183,11 +197,8 @@ public class ServerManager : MonoBehaviour
     // 서버로 데이터 전송
     public void SendDataToInGame<T>(T msg)
     {
-        if (IsConnect)
-        {
-            var byteArray = DataParser.DataToJsonData<T>(msg);
-            Stream.Write(byteArray, 0, byteArray.Length);
-        }
+        var byteArray = DataParser.DataToJsonData<T>(msg);
+        Stream.Write(byteArray, 0, byteArray.Length);
     }
     // 로컬 큐에 메시지 추가
     public void AddMsgToLocalQueue(KeyMessage _msg)
