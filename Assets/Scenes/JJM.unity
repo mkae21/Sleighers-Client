@@ -5224,7 +5224,7 @@ Camera:
     height: 1
   near clip plane: 0.1
   far clip plane: 5000
-  field of view: 60.000004
+  field of view: 60
   orthographic: 0
   orthographic size: 10
   m_Depth: -1
@@ -5251,7 +5251,7 @@ Transform:
   m_GameObject: {fileID: 1670872554}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 156.20999, y: 27.182, z: 73.28}
+  m_LocalPosition: {x: 161.31, y: 27.182, z: 73.28}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5729,8 +5729,8 @@ MonoBehaviour:
   - {fileID: 1834788174}
   - {fileID: 1646229393}
   m_Instructions:
-  - m_VirtualCamera: {fileID: 1834788174}
-    m_Hold: 1
+  - m_VirtualCamera: {fileID: 1646229393}
+    m_Hold: 0
     m_Blend:
       m_Style: 1
       m_Time: 2
@@ -5740,7 +5740,7 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - m_VirtualCamera: {fileID: 1646229393}
+  - m_VirtualCamera: {fileID: 1834788174}
     m_Hold: 3
     m_Blend:
       m_Style: 1

@@ -14,9 +14,8 @@ public class DataParser : MonoBehaviour
     public static byte[] DataToJsonData<T>(T obj)
     {
         var jsonData = JsonUtility.ToJson(obj);
-        // jsonData 맨 뒤에 개행문자 추가
+        // jsonData 맨 뒤에 패킷 간 구분자인 개행문자 추가
         jsonData += "\n";
-        Debug.Log("jsonData : " + jsonData);
         return Encoding.UTF8.GetBytes(jsonData);
     }
 }
