@@ -1,21 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class AntiRollBar : MonoBehaviour
 {
-    #region PrivateVariables
-        private Rigidbody Car;
+#region PrivateVariables
+    private Rigidbody Car;
 
-    #endregion
+#endregion
 
-    #region PublicVariables
-        public WheelCollider wheelL;
-        public WheelCollider wheelR;
-        public float antiRoll = 5000.0f;
+#region PublicVariables
+    public WheelCollider wheelL;
+    public WheelCollider wheelR;
+    public float antiRoll = 5000.0f;
 
-    #endregion
+#endregion
     void Start()
     {
         Car = GetComponent<Rigidbody>();
