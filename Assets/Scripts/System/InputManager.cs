@@ -62,7 +62,6 @@ public class InputManager : MonoBehaviour
     }
     private void BreakInput()
     {
-        Debug.Log("BreakInput");
         if (!Input.GetButton("Jump"))
             return;
         int keyCode = 0;
@@ -72,15 +71,9 @@ public class InputManager : MonoBehaviour
         
         KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, keyCode, Vector3.zero);
         if (ServerManager.Instance().IsHost())
-        {
-            Debug.Log("AddMsgToLocalQueue");
             ServerManager.Instance().AddMsgToLocalQueue(msg);
-        }
         else
-        {
-            Debug.Log("SendDataToInGame");
             ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
-        }
     }
 
 #endregion

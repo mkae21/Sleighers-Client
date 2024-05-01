@@ -198,7 +198,6 @@ public class WorldManager : MonoBehaviour
         }
         if (isBreak)
         {
-            Debug.Log("브레이크 이벤트 발생" + id);
             players[id].IsBraking = true;
             PlayerBreakMessage msg = new PlayerBreakMessage(id);
             ServerManager.Instance().SendDataToInGame<PlayerBreakMessage>(msg);
