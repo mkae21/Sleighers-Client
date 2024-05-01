@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 namespace Protocol
@@ -13,7 +14,7 @@ namespace Protocol
 
         OtherPlayerConnect, // 다른 플레이어 접속
         OtherPlayerReconnect, // 다른 플레이어 재접속
-        GameSync, // 위치 동기화
+        GameSync, // 플레이어 재접속 시 게임 현재 상황 싱크
 
         LoadGameScene = 50, // 인게임 씬 로드
         GameStartCountDown, // 게임 시작 전 카운트 다운
@@ -37,84 +38,101 @@ namespace Protocol
     public class Message
     {
         public Type type;
-        public int playerId;
-        public Message(Type _type)
+        public int id;
+        public Message(Type _type, int _id)
         {
             this.type = _type;
+            this.id = _id;
         }
     }
 
     public class KeyMessage : Message
     {
         public int keyData;
-        public float x;
-        public float y;
-        public float z;
-
-        public KeyMessage(int _id, int _data, Vector3 _pos) : base(Type.Key)
+        public Vector3 position;
+        public KeyMessage(int _id, int _data, Vector3 _pos) : base(Type.Key, _id)
         {
-            this.playerId = _id;
+            this.id = _id;
             this.keyData = _data;
-            this.x = _pos.x;
-            this.y = _pos.y;
-            this.z = _pos.z;
+            this.position = _pos;
         }
     }
     public class PlayerMoveMessage : Message
     {
-        public float xPos;
-        public float yPos;
-        public float zPos;
-        public float xDir;
-        public float yDir;
-        public float zDir;
-        public PlayerMoveMessage(int _id, Vector3 _pos, Vector3 _dir) : base(Type.PlayerMove)
+        public Vector3 position;
+        public Vector3 direction;
+        public PlayerMoveMessage(int _id, Vector3 _pos, Vector3 _dir) : base(Type.PlayerMove, _id)
         {
-            this.playerId = _id;
-            this.xPos = _pos.x;
-            this.yPos = _pos.y;
-            this.zPos = _pos.z;
-            this.xDir = _dir.x;
-            this.yDir = _dir.y;
-            this.zDir = _dir.z;
+            this.id = _id;
+            this.position = _pos;
+            this.direction = _dir;
+        }
+    }
+    public class LoadGameSceneMessage : Message
+    {
+        public int count;
+        public List<int> list;
+        public bool ishost;
+        public LoadGameSceneMessage(int _id, int _count, List<int> _userList, bool _host) : base(Type.LoadGameScene, _id)
+        {
+            this.id = _id;
+            this.count = _count;
+            this.list = new List<int>(_userList);
+            this.ishost = _host;
         }
     }
 
     public class GameSyncMessage : Message
     {
-        public int host;
         public int count = 0;
-        public float[] xPos = null;
-        public float[] zPos = null;
+        public Vector3[] positions = null;
         public bool[] onlineInfo = null;
 
-        public GameSyncMessage(int _id, int count, float[] x, float[] z, bool[] online) : base(Type.GameSync)
+        public GameSyncMessage(int _host, int _count, Vector3[] _positions, bool[] _online) : base(Type.GameSync, _host)
         {
-            this.host = _id;
-            this.count = count;
-            this.xPos = new float[count];
-            this.zPos = new float[count];
-            this.onlineInfo = new bool[count];
+            this.id = _host;
+            this.count = _count;
+            this.onlineInfo = new bool[_count];
 
-            for (int i = 0; i < count; ++i)
+            for (int i = 0; i < _count; ++i)
             {
-                xPos[i] = x[i];
-                zPos[i] = z[i];
-                onlineInfo[i] = online[i];
+                positions[i] = _positions[i];
+                onlineInfo[i] = _online[i];
             }
         }
     }
-    public class LoadGameSceneMessage : Message
+
+    public class GameStartCountDownMessage : Message
     {
-        public int userCount;
-        public List<int> userList;
-        public bool isHost;
-        public LoadGameSceneMessage(int _id, int _count, List<int> _userList, bool _host) : base(Type.LoadGameScene)
+        public int count;
+        public GameStartCountDownMessage(int _id, int _count) : base(Type.GameStartCountDown, _id)
         {
-            this.playerId = _id;
-            this.userCount = _count;
-            this.userList = new List<int>(_userList);
-            this.isHost = _host;
+            this.id = _id;
+            this.count = _count;
+        }
+    }
+
+    public class GameStartMessage : Message
+    {
+        public GameStartMessage(int _id) : base(Type.GameStart, _id) 
+        { 
+            this.id = _id;
+        }
+    }
+
+    public class GameEndMessage : Message
+    {
+        public int count;
+        public int[] sessionList;
+        public GameEndMessage(int _id, Stack<int> result) : base(Type.GameEnd, _id)
+        {
+            this.id = _id;
+            count = result.Count;
+            sessionList = new int[count];
+            for (int i = 0; i < count; ++i)
+            {
+                sessionList[i] = (int)result.Pop();
+            }
         }
     }
 

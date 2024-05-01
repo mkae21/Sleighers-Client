@@ -10,8 +10,39 @@ public class ServerManager : MonoBehaviour
 {
 #region PrivateVariables
     private TcpClient client;
+    public TcpClient Client
+    {
+        get 
+        { 
+            if (client == null)
+            {
+                Debug.LogWarningFormat("[ServerManager] Client가 null입니다.");
+                return null;
+            }
+            return client;
+        }
+        set { client = value; }
+    }
     private NetworkStream stream;
+    public NetworkStream Stream
+    {
+        get
+        {
+            if (stream == null)
+            {
+                Debug.LogWarningFormat("[ServerManager] Stream이 null입니다.");
+                return null;
+            }
+            return stream; 
+        }
+        set { stream = value; }
+    }
     private bool isConnect = false;
+    public bool IsConnect
+    {
+        get { return isConnect; }
+        set { isConnect = value; }
+    }
     private static ServerManager instance = null;
     private string serverIP = string.Empty;
     private int serverPort = 0;
@@ -37,7 +68,7 @@ public class ServerManager : MonoBehaviour
     }
     private void Update()
     {
-        if (isConnect && localQueue != null)
+        if (IsConnect && localQueue != null)
         {
             while (localQueue.Count > 0)
             {
@@ -46,24 +77,26 @@ public class ServerManager : MonoBehaviour
             }
         
         }
+        if (Stream.DataAvailable)
+            WorldManager.instance.OnReceive(Stream);
     }
     private void Init()
     {
-        // serverIP = SecretLoader.s_serverIp;
-        serverIP = "localhost";
+        // serverIP = "localhost"; // 로컬 테스트 용
+        serverIP = SecretLoader.s_serverIp;
         serverPort = SecretLoader.s_serverPort;
 
-        client = new TcpClient(serverIP, serverPort);
-        if (client.Connected)
+        Client = new TcpClient(serverIP, serverPort);
+        if (Client.Connected)
         {
             Debug.LogFormat("[ServerManager] 서버 접속 성공 {0}:{1}", serverIP, serverPort);
-            stream = client.GetStream();
-            isConnect = true;
+            Stream = Client.GetStream();
+            IsConnect = true;
         }
         else
         {
             Debug.LogError("[ServerManager] 서버 접속 실패");
-            isConnect = false;
+            IsConnect = false;
         }
     }
 #endregion
@@ -79,25 +112,69 @@ public class ServerManager : MonoBehaviour
 
         return instance;
     }
-    public NetworkStream GetStream()
+    public bool SetHostSession(int _id)
     {
-        return stream;
+        if (WorldManager.instance.MyPlayerId == _id)
+        {
+            isHost = true;
+            localQueue = new Queue<KeyMessage>();
+        }
+        else
+        {
+            isHost = false;
+            localQueue = null;
+        }
+        Debug.LogFormat("[ServerManager] 호스트 여부 : {0}", isHost);
+        return true;
     }
-    public TcpClient GetTcpClient()
+    public void SetSubHost(int hostSessionId)
     {
-        return client;
+        // Debug.Log("서브 호스트 세션 설정 진입");
+        // // 누가 서브 호스트 세션인지 서버에서 보낸 정보값 확인
+        // // 서버에서 보낸 SuperGamer 정보로 GameRecords의 SuperGamer 정보 갱신
+        // foreach (var record in gameRecords)
+        // {
+        //     if (record.Value.m_sessionId.Equals(hostSessionId))
+        //     {
+        //         record.Value.m_isSuperGamer = true;
+        //     }
+        //     else
+        //     {
+        //         record.Value.m_isSuperGamer = false;
+        //     }
+        // }
+        // // 내가 호스트 세션인지 확인
+        // if (hostSessionId.Equals(Backend.Match.GetMySessionId()))
+        // {
+        //     isHost = true;
+        // }
+        // else
+        // {
+        //     isHost = false;
+        // }
+
+        // hostSession = hostSessionId;
+
+        // Debug.Log("서브 호스트 여부 : " + isHost);
+        // // 호스트 세션이면 로컬에서 처리하는 패킷이 있으므로 로컬 큐를 생성해준다
+        // if (isHost)
+        // {
+        //     localQueue = new Queue<KeyMessage>();
+        // }
+        // else
+        // {
+        //     localQueue = null;
+        // }
+
+        // Debug.Log("서브 호스트 설정 완료");
+    }
+    public void CloseStream()
+    {
+        Stream.Close();
     }
     public void CloseTcpClient()
     {
-        client.Close();
-    }
-    public bool GetIsConnect()
-    {
-        return isConnect;
-    }
-    public void SetIsConnect(bool _isConnect)
-    {
-        isConnect = _isConnect;
+        Client.Close();
     }
     public bool IsHost()
     {
@@ -106,10 +183,10 @@ public class ServerManager : MonoBehaviour
     // 서버로 데이터 전송
     public void SendDataToInGame<T>(T msg)
     {
-        if (isConnect)
+        if (IsConnect)
         {
             var byteArray = DataParser.DataToJsonData<T>(msg);
-            stream.Write(byteArray, 0, byteArray.Length);
+            Stream.Write(byteArray, 0, byteArray.Length);
         }
     }
     // 로컬 큐에 메시지 추가
