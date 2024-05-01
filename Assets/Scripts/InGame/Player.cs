@@ -194,5 +194,6 @@ public class Player : MonoBehaviour
     {
         return gameObject.transform.rotation.eulerAngles;
     }
+
 #endregion
 }
