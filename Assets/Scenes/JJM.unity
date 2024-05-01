@@ -390,6 +390,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36e14157d69bf82479d5a8d309537a94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myPlayerId: 0
   playerPool: {fileID: 1545142623}
   startingPoints:
   - {fileID: 1284220573}
@@ -427,7 +428,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0422ecace75c84c4684efa8f8d46a065, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerId: 0
 --- !u!1 &80366637
 GameObject:
   m_ObjectHideFlags: 0
@@ -1699,6 +1699,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b168e963aabdebc4fb8d748f29d56f36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isHost: 0
 --- !u!4 &628001668
 Transform:
   m_ObjectHideFlags: 0

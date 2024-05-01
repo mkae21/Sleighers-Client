@@ -11,13 +11,21 @@ public class Player : MonoBehaviour
 #region PrivateVariables
     private float currentSteerAngle;
     //private bool isDrifting;
+
     private float maxSpeed = 20f;
     private float currentSpeed;
     private float motorForce = 1000f;
     private float brakeForce = 3000f;
+
     private float maxSteerAngle = 20f;
     private int playerId = 0;
     private bool isMe = false;
+    [SerializeField] private bool isBraking = false;
+    public bool IsBraking
+    {
+        get { return isBraking; }
+        set { isBraking = value; }
+    }
     private string nickName = string.Empty;
     private GameObject playerModelObject;
     private Rigidbody rb;
@@ -32,7 +40,6 @@ public class Player : MonoBehaviour
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
-    public bool isBraking = false;
 #endregion
 
 
@@ -66,13 +73,19 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        HandleMotor();
-        // CheckRotate();
+        if (isMove)
+            HandleMotor();
+        
+        if (IsBraking) // Space 누르고 있을 때
+            ApplyBraking();
+        else
+            ApplyRestart();
+
+        //CheckRotate();
         HandleSteering();
     }
 
-
-    private void HandleMotor()//엔진 속도 조절
+    private void HandleMotor() // 엔진 속도 조절
     {
         currentSpeed = rb.velocity.magnitude;
 
@@ -83,20 +96,12 @@ public class Player : MonoBehaviour
 
         frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
         frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
-
-        if (isBraking)//Space 누르고 있을 때
-            ApplyBraking();
-        else
-            ApplyRestart();
-
-
-        //if(isDrifting)
-        //    Drift();
-
+        isMove = false;
     }
 
-    private void ApplyBraking()//브레이크
+    private void ApplyBraking() // 브레이크
     {
+        IsBraking = false;
         frontLeftWheelCollider.brakeTorque = brakeForce;
         frontRightWheelCollider.brakeTorque = brakeForce;
     }
@@ -105,8 +110,6 @@ public class Player : MonoBehaviour
     {
         frontLeftWheelCollider.brakeTorque = 0;
         frontRightWheelCollider.brakeTorque = 0;
-        frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
-        frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
     }
 
     // private void CheckRotate()
@@ -204,19 +207,6 @@ public class Player : MonoBehaviour
     {
         return gameObject.transform.rotation.eulerAngles;
     }
+
 #endregion
-    /* 드리프트 하려면 후륜을 멈추게 한다.-> 관성 때문에 자동차가 미끄러진다.
-     * stiffness를 조절한다.
-     */
-
-    //private void Drift()
-    //{
-    //    Drifting();
-    //}
-
-
-    //private void Drifting()
-    //{
-
-    //}
 }
