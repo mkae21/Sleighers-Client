@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using UnityEngine;
 using Protocol;
 using Reader;
+using System;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
@@ -171,19 +172,23 @@ public class WorldManager : MonoBehaviour
         int keyData = keyMessage.keyData;
         int id = keyMessage.id;
 
-        Vector3 moveVector = Vector3.zero;
         Vector3 playerPos = players[id].GetPosition();
+        Vector3 playerDir = Vector3.zero;
         if ((keyData & KeyEventCode.MOVE) == KeyEventCode.MOVE)
         {
-            moveVector = keyMessage.position;
-            moveVector = Vector3.Normalize(moveVector);
+            playerDir = keyMessage.position;
+            playerDir = Vector3.Normalize(playerDir);
             isMove = true;
         }
 
         if (isMove)
         {
-            players[id].SetMoveVector(moveVector);
-            PlayerMoveMessage msg = new PlayerMoveMessage(id, playerPos, moveVector);
+            // Truncate playerPos components to 6 decimal places
+            playerPos.x = (float)Math.Round(playerPos.x, 6);
+            playerPos.y = (float)Math.Round(playerPos.x, 6);
+            playerPos.z = (float)Math.Round(playerPos.x, 6);
+            players[id].SetMoveVector(playerDir);
+            PlayerMoveMessage msg = new PlayerMoveMessage(id, playerPos, playerDir);
             ServerManager.Instance().SendDataToInGame<PlayerMoveMessage>(msg);
         }
     }

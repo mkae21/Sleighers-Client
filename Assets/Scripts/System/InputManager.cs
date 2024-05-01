@@ -1,6 +1,6 @@
 using UnityEngine;
-using Reader;
 using Protocol;
+using System;
 /* InputManager.cs
  * - 인게임에서 플레이어 입력 처리
  * - 플레이어 스크립트는 여러 개 생성되기에 여기서 플레이어의 입력을 받아서 서버로 전송 및 플레이어 이동 처리
@@ -57,6 +57,10 @@ public class InputManager : MonoBehaviour
         Vector3 moveVector = new Vector3(h, 0, v);
         moveVector = Vector3.Normalize(moveVector);
 
+        // Truncate playerPos components to 6 decimal places
+        moveVector.x = (float)Math.Truncate(moveVector.x * 1000000) / 1000000;
+        moveVector.y = (float)Math.Truncate(moveVector.y * 1000000) / 1000000;
+        moveVector.z = (float)Math.Truncate(moveVector.z * 1000000) / 1000000;
 
         KeyMessage msg = new KeyMessage(playerId, keyCode, moveVector);
         if (ServerManager.Instance().IsHost())
