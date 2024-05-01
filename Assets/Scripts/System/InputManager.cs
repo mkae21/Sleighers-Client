@@ -1,6 +1,5 @@
 using UnityEngine;
 using Protocol;
-using System;
 /* InputManager.cs
  * - 인게임에서 플레이어 입력 처리
  * - 플레이어 스크립트는 여러 개 생성되기에 여기서 플레이어의 입력을 받아서 서버로 전송 및 플레이어 이동 처리
