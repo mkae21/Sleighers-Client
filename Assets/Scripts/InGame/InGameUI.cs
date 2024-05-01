@@ -61,12 +61,5 @@ public class InGameUI : MonoBehaviour
 
 #region PublicMethod
 
-    // public void UpdateSpeedometer()
-    // {
-    //     vehicleSpeed = WorldManager.instance.GetMyPlayer().GetSpeed() * 3.6f;
-    //     desiredPosition = startPosition - endPosition;
-    //     float temp = vehicleSpeed / 240;
-    //     arrow.transform.eulerAngles = new Vector3(0, 0, (startPosition- temp * desiredPosition));
-    // }
 #endregion
 }

@@ -24,7 +24,6 @@ public class Player : MonoBehaviour
     private bool isMe = false;
     private string nickName = string.Empty;
     private GameObject playerModelObject;
-    private Rigidbody rb;
 #endregion
 
 #region PublicVariables
@@ -39,7 +38,6 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
-        rb = GetComponent<Rigidbody>();
     }
     private void Start()
     {
@@ -195,12 +193,6 @@ public class Player : MonoBehaviour
     {
         return gameObject.transform.rotation.eulerAngles;
     }
-
-    //속도계에서 사용할 Player rigidbody의 속력 반환 함수
-    // public float GetSpeed()
-    // {
-    //     return rb.velocity.magnitude;
-    // }
 
 #endregion
     /* 드리프트 하려면 후륜을 멈추게 한다.-> 관성 때문에 자동차가 미끄러진다.
