@@ -10,113 +10,113 @@ public class GameManager : MonoBehaviour
 {
 
     #region PrivateVariables
-    private static bool isCreate = false;
-    private static GameManager instance;
-    private IEnumerator ReadyUpdateCoroutine;
-    private IEnumerator InGameUpdateCoroutine;
-    private GameState gameState;
-    #endregion
+        private static bool isCreate = false;
+        private static GameManager instance;
+        private IEnumerator ReadyUpdateCoroutine;
+        private IEnumerator InGameUpdateCoroutine;
+        private GameState gameState;
+        #endregion
 
     #region PublicVariables
-    public static event Action Ready = delegate { }; // Ready 상태에서 실행되는 함수들
-    public static event Action InGame = delegate { }; // InGame 상태에서 실행되는 함수들
-    public enum GameState { Login, MatchLobby, Ready, Start, InGame, Over, Result, Reconnect };
+        public static event Action Ready = delegate { }; // Ready 상태에서 실행되는 함수들
+        public static event Action InGame = delegate { }; // InGame 상태에서 실행되는 함수들
+        public enum GameState { Login, MatchLobby, Ready, Start, InGame, Over, Result, Reconnect };
     #endregion
 
     #region PrivateMethod
-    private void Awake()
-    {
-        if (!instance)
+        private void Awake()
         {
-            instance = this;
-        }
-        // 60프레임 고정
-        Application.targetFrameRate = 60;
-        // 게임중 슬립모드 해제
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
-
-        ReadyUpdateCoroutine = ReadyUpdate();
-
-        InGameUpdateCoroutine = InGameUpdate();
-
-        DontDestroyOnLoad(this.gameObject);
-    }
-
-    private void Start()
-    {
-        if (isCreate)
-        {
-            DestroyImmediate(gameObject, true);
-            return;
-        }
-        // ChangeState(GameState.Ready); // TODO: 일단 바로 시작. 나중에 바꿔야 함
-        ChangeState(GameState.InGame);
-        isCreate = true;
-    }
-    // Ready 상태에서 실행되는 코루틴
-    private IEnumerator ReadyUpdate()
-    {
-        while (true)
-        {
-            if (gameState != GameState.Ready)
+            if (!instance)
             {
-                StopCoroutine(ReadyUpdateCoroutine);
-                yield return null;
+                instance = this;
             }
-            Ready();
-            yield return new WaitForSeconds(0.1f);
-        }
-    }
+            // 60프레임 고정
+            Application.targetFrameRate = 60;
+            // 게임중 슬립모드 해제
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-    // 인게임에서 실행되는 코루틴
-    private IEnumerator InGameUpdate()
-    {
-        while (true)
-        {
-            if (gameState != GameState.InGame)
-            {
-                StopCoroutine(InGameUpdateCoroutine);
-                yield return null;
-            }
-            InGame();
-            yield return new WaitForSeconds(0.01f);
+            ReadyUpdateCoroutine = ReadyUpdate();
+
+            InGameUpdateCoroutine = InGameUpdate();
+
+            DontDestroyOnLoad(this.gameObject);
         }
-    }
+
+        private void Start()
+        {
+            if (isCreate)
+            {
+                DestroyImmediate(gameObject, true);
+                return;
+            }
+            // ChangeState(GameState.Ready); // TODO: 일단 바로 시작. 나중에 바꿔야 함
+            ChangeState(GameState.InGame);
+            isCreate = true;
+        }
+        // Ready 상태에서 실행되는 코루틴
+        private IEnumerator ReadyUpdate()
+        {
+            while (true)
+            {
+                if (gameState != GameState.Ready)
+                {
+                    StopCoroutine(ReadyUpdateCoroutine);
+                    yield return null;
+                }
+                Ready();
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+
+        // 인게임에서 실행되는 코루틴
+        private IEnumerator InGameUpdate()
+        {
+            while (true)
+            {
+                if (gameState != GameState.InGame)
+                {
+                    StopCoroutine(InGameUpdateCoroutine);
+                    yield return null;
+                }
+                InGame();
+                yield return new WaitForSeconds(0.01f);
+            }
+        }
     #endregion
 
     #region PublicMethod
-    public static GameManager Instance()
-    {
-        if (instance == null)
+        public static GameManager Instance()
         {
-            Debug.LogError("GameManager 인스턴스가 존재하지 않습니다.");
-            return null;
+            if (instance == null)
+            {
+                Debug.LogError("GameManager 인스턴스가 존재하지 않습니다.");
+                return null;
+            }
+            return instance;
         }
-        return instance;
-    }
 
-    public void ChangeState(GameState state, Action<bool> func = null)
-    {
-        gameState = state;
-        switch (gameState)
+        public void ChangeState(GameState state, Action<bool> func = null)
         {
-            case GameState.Ready:
-                StartCoroutine(ReadyUpdateCoroutine);
-                break;
+            gameState = state;
+            switch (gameState)
+            {
+                case GameState.Ready:
+                    StartCoroutine(ReadyUpdateCoroutine);
+                    break;
 
-            case GameState.InGame:
-                StartCoroutine(InGameUpdateCoroutine);
-                break;
+                case GameState.InGame:
+                    StartCoroutine(InGameUpdateCoroutine);
+                    break;
 
-            default:
-                Debug.Log("[GameManager] 알 수 없는 상태입니다.");
-                break;
+                default:
+                    Debug.Log("[GameManager] 알 수 없는 상태입니다.");
+                    break;
+            }
         }
-    }
 
-    public GameState GetGameState()
-    {
-        return gameState;
-    }
+        public GameState GetGameState()
+        {
+            return gameState;
+        }
     #endregion
 }

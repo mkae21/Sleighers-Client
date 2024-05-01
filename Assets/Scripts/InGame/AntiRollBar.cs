@@ -6,14 +6,14 @@ using UnityEngine;
 public class AntiRollBar : MonoBehaviour
 {
     #region PrivateVariables
-    private Rigidbody Car;
+        private Rigidbody Car;
 
     #endregion
 
     #region PublicVariables
-    public WheelCollider wheelL;
-    public WheelCollider wheelR;
-    public float antiRoll = 5000.0f;
+        public WheelCollider wheelL;
+        public WheelCollider wheelR;
+        public float antiRoll = 5000.0f;
 
     #endregion
     void Start()
@@ -25,6 +25,7 @@ public class AntiRollBar : MonoBehaviour
     {
         //접촉 정보 저장
         WheelHit hit;
+
         float travelL = 1.0f;
 
         float travelR = 1.0f;

@@ -9,136 +9,136 @@ using Cinemachine;
 public class Player : MonoBehaviour
 {
     #region PrivateVariables
-    private float currentSteerAngle;
-    //private bool isDrifting;
-    private float maxSpeed = 20f;
-    private float currentSpeed;
-    private float motorForce = 1000f;
-    private float brakeForce = 3000f;
-    private float maxSteerAngle = 20f;
-    private int playerId = 0;
-    private bool isMe = false;
-    private string nickName = string.Empty;
-    private GameObject playerModelObject;
-    private Rigidbody rb;
+        private float currentSteerAngle;
+        //private bool isDrifting;
+        private float maxSpeed = 20f;
+        private float currentSpeed;
+        private float motorForce = 1000f;
+        private float brakeForce = 3000f;
+        private float maxSteerAngle = 20f;
+        private int playerId = 0;
+        private bool isMe = false;
+        private string nickName = string.Empty;
+        private GameObject playerModelObject;
+        private Rigidbody rb;
     #endregion
 
     #region PublicVariables
-    public WheelCollider frontLeftWheelCollider;
-    public WheelCollider frontRightWheelCollider;
-    public WheelCollider backLeftWheelCollider;
-    public WheelCollider backRightWheelCollider;
+        public WheelCollider frontLeftWheelCollider;
+        public WheelCollider frontRightWheelCollider;
+        public WheelCollider backLeftWheelCollider;
+        public WheelCollider backRightWheelCollider;
 
-    [field: SerializeField] public Vector3 moveVector { get; private set; }
-    [field: SerializeField] public bool isMove { get; private set; }
-    public GameObject nameObject;
-    public bool isBraking = false;
+        [field: SerializeField] public Vector3 moveVector { get; private set; }
+        [field: SerializeField] public bool isMove { get; private set; }
+        public GameObject nameObject;
+        public bool isBraking = false;
     #endregion
 
 
     #region PrivateMethod
-    private void Awake()
-    {
-        rb = GetComponent<Rigidbody>();//Player의 Rigidbody를 가져옴
-        nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
-    }
-    private void Start()
-    {
-        // 서버 인스턴스가 없으면 인게임 테스트용으로 초기화
-        if (ServerManager.Instance() == null)
-            Initialize(true, 0, "TestPlayer");
-    }
-    private void Update()
-    {
-        if (ServerManager.Instance() == null)
+        private void Awake()
         {
-            float h = Input.GetAxis("Horizontal");
-            float v = Input.GetAxis("Vertical");
-            Vector3 tmp = new Vector3(h, 0, v);
-            tmp = Vector3.Normalize(tmp);
-            SetMoveVector(tmp);
+            rb = GetComponent<Rigidbody>();//Player의 Rigidbody를 가져옴
+            nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
         }
-    }
-    private Vector3 GetNameUIPos()
-    {
-        return this.transform.position + (Vector3.up * 2.0f);
-    }
-
-    private void FixedUpdate()
-    {
-        HandleMotor();
-        // CheckRotate();
-        HandleSteering();
-    }
-
-
-    private void HandleMotor()//엔진 속도 조절
-    {
-        currentSpeed = rb.velocity.magnitude;
-
-        if (currentSpeed > maxSpeed)
+        private void Start()
         {
-            rb.velocity = rb.velocity.normalized * maxSpeed;
+            // 서버 인스턴스가 없으면 인게임 테스트용으로 초기화
+            if (ServerManager.Instance() == null)
+                Initialize(true, 0, "TestPlayer");
+        }
+        private void Update()
+        {
+            if (ServerManager.Instance() == null)
+            {
+                float h = Input.GetAxis("Horizontal");
+                float v = Input.GetAxis("Vertical");
+                Vector3 tmp = new Vector3(h, 0, v);
+                tmp = Vector3.Normalize(tmp);
+                SetMoveVector(tmp);
+            }
+        }
+        private Vector3 GetNameUIPos()
+        {
+            return this.transform.position + (Vector3.up * 2.0f);
         }
 
-        frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
-        frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
-
-        if (isBraking)//Space 누르고 있을 때
-            ApplyBraking();
-        else
-            ApplyRestart();
-
-
-        //if(isDrifting)
-        //    Drift();
-
-    }
-
-    private void ApplyBraking()//브레이크
-    {
-        frontLeftWheelCollider.brakeTorque = brakeForce;
-        frontRightWheelCollider.brakeTorque = brakeForce;
-    }
-
-    private void ApplyRestart()//브레이크가 풀렸을 때 엔진 다시 켜기
-    {
-        frontLeftWheelCollider.brakeTorque = 0;
-        frontRightWheelCollider.brakeTorque = 0;
-        frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
-        frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
-    }
-
-    // private void CheckRotate()
-    // {
-    //     Debug.Log("회전 체크중");
-    //     if (transform.rotation.z > 0.33f)
-    //     {
-    //         Debug.Log("힘주는 중");
-    //     }
-    //     if (transform.rotation.z < -0.33f)
-    //     {
-    //         Debug.Log("힘주는 중");
-    //     }
-    // }
-
-
-
-    private void HandleSteering()//방향 조정은 전륜만 조정
-    {
-        currentSteerAngle = maxSteerAngle * moveVector.x;
-        frontLeftWheelCollider.steerAngle = currentSteerAngle;
-        frontRightWheelCollider.steerAngle = currentSteerAngle;
-
-    }
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "Finish")
+        private void FixedUpdate()
         {
-            WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
-            Debug.LogFormat("플레이어 {0} 도착", playerId);
+            HandleMotor();
+            // CheckRotate();
+            HandleSteering();
         }
-    }
+
+
+        private void HandleMotor()//엔진 속도 조절
+        {
+            currentSpeed = rb.velocity.magnitude;
+
+            if (currentSpeed > maxSpeed)
+            {
+                rb.velocity = rb.velocity.normalized * maxSpeed;
+            }
+
+            frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
+            frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
+
+            if (isBraking)//Space 누르고 있을 때
+                ApplyBraking();
+            else
+                ApplyRestart();
+
+
+            //if(isDrifting)
+            //    Drift();
+
+        }
+
+        private void ApplyBraking()//브레이크
+        {
+            frontLeftWheelCollider.brakeTorque = brakeForce;
+            frontRightWheelCollider.brakeTorque = brakeForce;
+        }
+
+        private void ApplyRestart()//브레이크가 풀렸을 때 엔진 다시 켜기
+        {
+            frontLeftWheelCollider.brakeTorque = 0;
+            frontRightWheelCollider.brakeTorque = 0;
+            frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
+            frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
+        }
+
+        // private void CheckRotate()
+        // {
+        //     Debug.Log("회전 체크중");
+        //     if (transform.rotation.z > 0.33f)
+        //     {
+        //         Debug.Log("힘주는 중");
+        //     }
+        //     if (transform.rotation.z < -0.33f)
+        //     {
+        //         Debug.Log("힘주는 중");
+        //     }
+        // }
+
+
+
+        private void HandleSteering()//방향 조정은 전륜만 조정
+        {
+            currentSteerAngle = maxSteerAngle * moveVector.x;
+            frontLeftWheelCollider.steerAngle = currentSteerAngle;
+            frontRightWheelCollider.steerAngle = currentSteerAngle;
+
+        }
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.tag == "Finish")
+            {
+                WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
+                Debug.LogFormat("플레이어 {0} 도착", playerId);
+            }
+        }
     #endregion
 
 
