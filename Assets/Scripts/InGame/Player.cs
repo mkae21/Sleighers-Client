@@ -11,15 +11,13 @@ public class Player : MonoBehaviour
 #region PrivateVariables
     private float currentSteerAngle;
     //private bool isDrifting;
-    private float motorForce = 2000f;
-    private float brakeForce = 5000f;
+
+    private float maxSpeed = 20f;
+    private float currentSpeed;
+    private float motorForce = 1000f;
+    private float brakeForce = 3000f;
+
     private float maxSteerAngle = 20f;
-
-    public WheelCollider frontLeftWheelCollider;
-    public WheelCollider frontRightWheelCollider;
-    public WheelCollider backLeftWheelCollider;
-    public WheelCollider backRightWheelCollider;
-
     private int playerId = 0;
     private bool isMe = false;
     [SerializeField] private bool isBraking = false;
@@ -30,9 +28,15 @@ public class Player : MonoBehaviour
     }
     private string nickName = string.Empty;
     private GameObject playerModelObject;
+    private Rigidbody rb;
 #endregion
 
 #region PublicVariables
+    public WheelCollider frontLeftWheelCollider;
+    public WheelCollider frontRightWheelCollider;
+    public WheelCollider backLeftWheelCollider;
+    public WheelCollider backRightWheelCollider;
+
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
@@ -42,6 +46,7 @@ public class Player : MonoBehaviour
 #region PrivateMethod
     private void Awake()
     {
+        rb = GetComponent<Rigidbody>();//Player의 Rigidbody를 가져옴
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
     }
     private void Start()
@@ -76,13 +81,19 @@ public class Player : MonoBehaviour
         else
             ApplyRestart();
 
-        CheckRotate();
+        //CheckRotate();
         HandleSteering();
     }
 
     private void HandleMotor() // 엔진 속도 조절
     {
-        //추가 사항 : max 속도 제한, AddForce로 속도 조절
+        currentSpeed = rb.velocity.magnitude;
+
+        if (currentSpeed > maxSpeed)
+        {
+            rb.velocity = rb.velocity.normalized * maxSpeed;
+        }
+
         frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
         frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
         isMove = false;
@@ -94,26 +105,27 @@ public class Player : MonoBehaviour
         frontLeftWheelCollider.brakeTorque = brakeForce;
         frontRightWheelCollider.brakeTorque = brakeForce;
     }
-    
+
     private void ApplyRestart()//브레이크가 풀렸을 때 엔진 다시 켜기
     {
         frontLeftWheelCollider.brakeTorque = 0;
         frontRightWheelCollider.brakeTorque = 0;
     }
 
-    private void CheckRotate()//차량이 절대값 19도 이상으로 기울지 않게
-    {
-        if (transform.rotation.z > 0.33f)
-        {
-            transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, 0.33f);
+    // private void CheckRotate()
+    // {
+    //     Debug.Log("회전 체크중");
+    //     if (transform.rotation.z > 0.33f)
+    //     {
+    //         Debug.Log("힘주는 중");
+    //     }
+    //     if (transform.rotation.z < -0.33f)
+    //     {
+    //         Debug.Log("힘주는 중");
+    //     }
+    // }
 
-        }
-        if (transform.rotation.z < -0.33f)
-        {
-            transform.rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, -0.33f);
 
-        }
-    }
 
     private void HandleSteering()//방향 조정은 전륜만 조정
     {
@@ -122,7 +134,8 @@ public class Player : MonoBehaviour
         frontRightWheelCollider.steerAngle = currentSteerAngle;
 
     }
-    private void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other)
+    {
         if (other.gameObject.tag == "Finish")
         {
             WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);

@@ -8,14 +8,14 @@ using UnityEngine;
  */
 public class GameManager : MonoBehaviour
 {
-
+    
 #region PrivateVariables
     private static bool isCreate = false;
     private static GameManager instance;
     private IEnumerator ReadyUpdateCoroutine;
     private IEnumerator InGameUpdateCoroutine;
     private GameState gameState;
-#endregion
+    #endregion
 
 #region PublicVariables
     public static event Action Ready = delegate { }; // Ready 상태에서 실행되는 함수들
@@ -49,9 +49,10 @@ public class GameManager : MonoBehaviour
             DestroyImmediate(gameObject, true);
             return;
         }
-        ChangeState(GameState.Ready); // TODO: 일단 바로 시작. 나중에 바꿔야 함
+        // ChangeState(GameState.Ready); // TODO: 일단 바로 시작. 나중에 바꿔야 함
+        ChangeState(GameState.InGame);
         isCreate = true;
-    }  
+    }
     // Ready 상태에서 실행되는 코루틴
     private IEnumerator ReadyUpdate()
     {
