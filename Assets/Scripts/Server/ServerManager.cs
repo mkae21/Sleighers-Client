@@ -106,7 +106,7 @@ public class ServerManager : MonoBehaviour
         {
             if (Stream.DataAvailable && IsConnect)
                 WorldManager.instance.OnReceive();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.001f);
         }
     
     }

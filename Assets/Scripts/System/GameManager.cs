@@ -49,8 +49,7 @@ public class GameManager : MonoBehaviour
             DestroyImmediate(gameObject, true);
             return;
         }
-        // ChangeState(GameState.Ready); // TODO: 일단 바로 시작. 나중에 바꿔야 함
-        ChangeState(GameState.InGame);
+        ChangeState(GameState.Ready);
         isCreate = true;
     }
     // Ready 상태에서 실행되는 코루틴
@@ -64,7 +63,7 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
             Ready();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.001f);
         }
     }
 
@@ -79,7 +78,7 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
             InGame();
-            yield return new WaitForSeconds(0.01f);
+            yield return new WaitForSeconds(0.001f);
         }
     }
 #endregion
