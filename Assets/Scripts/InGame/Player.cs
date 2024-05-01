@@ -195,18 +195,4 @@ public class Player : MonoBehaviour
         return gameObject.transform.rotation.eulerAngles;
     }
 #endregion
-    /* 드리프트 하려면 후륜을 멈추게 한다.-> 관성 때문에 자동차가 미끄러진다.
-     * stiffness를 조절한다.
-     */
-
-    //private void Drift()
-    //{
-    //    Drifting();
-    //}
-
-
-    //private void Drifting()
-    //{
-
-    //}
 }
