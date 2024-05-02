@@ -29,6 +29,7 @@ public class InGameUI : MonoBehaviour
     }
     private void Start()
     {
+        GameManager.InGame += UpdateTimer;
         GameManager.InGame += UpdateSpeedometer;
     }
 
@@ -44,14 +45,6 @@ public class InGameUI : MonoBehaviour
         text_Timer.text = string.Format("Time: {0:D2} : {1:D2} : {2:D2}", hours, minutes, seconds);
     }
 
-    public void SetCountDown(int count)
-    {
-        countDownDuration = count;
-        countDownDuration -= Time.deltaTime;
-        text_CountDown.text = ((int)countDownDuration + 1).ToString();
-        if(countDownDuration <= 0.0f)
-            text_CountDown.gameObject.SetActive(false);
-    }
     public void UpdateSpeedometer()
     {
         speed = WorldManager.instance.GetMyPlayer().GetSpeed();
