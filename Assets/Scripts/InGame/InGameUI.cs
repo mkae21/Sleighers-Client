@@ -27,23 +27,15 @@ public class InGameUI : MonoBehaviour
     {
         instance = this;
     }
-
-    private void Update()
     private void Start()
     {
-        if(countDownDuration > 0.0f)
-            SetCountDown();
-        else
-            UpdateTimer();
         GameManager.InGame += UpdateSpeedometer;
     }
 
-    }
-
-    private void UpdateTimer()
 #endregion
 
 #region PublicMethod
+    public void UpdateTimer()
     {
         timer += Time.deltaTime;
         int hours = (int)(timer / 3600);
@@ -53,6 +45,7 @@ public class InGameUI : MonoBehaviour
     }
 
     private void SetCountDown()
+    public void SetCountDown(Message count)
     {
         countDownDuration -= Time.deltaTime;
         text_CountDown.text = ((int)countDownDuration + 1).ToString();
@@ -62,8 +55,6 @@ public class InGameUI : MonoBehaviour
             Destroy(text_CountDown.gameObject, 0.4f);          
         }
     }
-
-#endregion
     public void UpdateSpeedometer()
     {
         speed = WorldManager.instance.GetMyPlayer().GetSpeed();
@@ -73,8 +64,6 @@ public class InGameUI : MonoBehaviour
         if(arrow != null)
             arrow.localEulerAngles = new Vector3(0,0, Mathf.Lerp(minSpeedArrowAngle, maxSpeedArrowAngle, speed / maxSpeed));
     }
-
-#region PublicMethod
 
 #endregion
 }
