@@ -388,7 +388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36e14157d69bf82479d5a8d309537a94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myPlayerId: 0
+  myPlayerId: -1
   playerPool: {fileID: 1545142623}
   startingPoints:
   - {fileID: 1284220573}
@@ -1833,7 +1833,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b168e963aabdebc4fb8d748f29d56f36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isHost: 0
 --- !u!4 &628001668
 Transform:
   m_ObjectHideFlags: 0
@@ -5275,7 +5274,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 7e57d6bb6a6a1b74795062b56af48f40, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

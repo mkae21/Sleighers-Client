@@ -207,6 +207,10 @@ public class Player : MonoBehaviour
     {
         return gameObject.transform.rotation.eulerAngles;
     }
+    public Vector3 GetVelocity()
+    {
+        return rb.velocity;
+    }
 
 #endregion
 }

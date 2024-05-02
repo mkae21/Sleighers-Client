@@ -16,7 +16,7 @@ public class SecretLoader : MonoBehaviour
 
 #region PublicVariables
     public static string s_serverIp = "localhost";
-    public static int s_serverPort = 30303;
+    public static int s_serverPort = 5000;
 #endregion
 
 #region PrivateMethod
@@ -26,8 +26,6 @@ public class SecretLoader : MonoBehaviour
         Secret secret = JsonUtility.FromJson<Secret>(jsonString);
         s_serverIp = secret.m_serverIp;
         s_serverPort = int.Parse(secret.m_serverPort);
-
-        Debug.LogFormat("[SecretLoader] {0}:{1}", s_serverIp, s_serverPort);
     }
     #endregion
 }
