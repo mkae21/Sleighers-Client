@@ -216,5 +216,10 @@ public class Player : MonoBehaviour
         return rb.velocity;
     }
 
+    public float GetSpeed()
+    {   
+        // km/h로 변환
+        return rb.velocity.magnitude * 3.6f;
+    }
 #endregion
 }
