@@ -49,10 +49,6 @@ public class InGameUI : MonoBehaviour
         countDownDuration -= Time.deltaTime;
         text_CountDown.text = ((int)countDownDuration + 1).ToString();
         if(countDownDuration <= 0.0f)
-        {
-            text_CountDown.text = "GO!";
-            Destroy(text_CountDown.gameObject, 0.4f);          
-        }
             text_CountDown.gameObject.SetActive(false);
     }
     public void UpdateSpeedometer()
