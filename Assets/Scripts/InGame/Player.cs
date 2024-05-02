@@ -208,5 +208,10 @@ public class Player : MonoBehaviour
         return gameObject.transform.rotation.eulerAngles;
     }
 
+    public float GetSpeed()
+    {   
+        // km/h로 변환
+        return rb.velocity.magnitude * 3.6f;
+    }
 #endregion
 }

@@ -29,15 +29,21 @@ public class InGameUI : MonoBehaviour
     }
 
     private void Update()
+    private void Start()
     {
         if(countDownDuration > 0.0f)
             SetCountDown();
         else
             UpdateTimer();
+        GameManager.InGame += UpdateSpeedometer;
+    }
 
     }
 
     private void UpdateTimer()
+#endregion
+
+#region PublicMethod
     {
         timer += Time.deltaTime;
         int hours = (int)(timer / 3600);
@@ -58,6 +64,15 @@ public class InGameUI : MonoBehaviour
     }
 
 #endregion
+    public void UpdateSpeedometer()
+    {
+        speed = WorldManager.instance.GetMyPlayer().GetSpeed();
+        if(text_speedLabel != null)
+            text_speedLabel.text = string.Format("{0} km/h", (int)speed);
+        
+        if(arrow != null)
+            arrow.localEulerAngles = new Vector3(0,0, Mathf.Lerp(minSpeedArrowAngle, maxSpeedArrowAngle, speed / maxSpeed));
+    }
 
 #region PublicMethod
 
