@@ -36,6 +36,10 @@ public class InputManager : MonoBehaviour
 
     private void KeyInput()
     {
+        if (Input.GetKey(KeyCode.R))
+            WorldManager.instance.OnSend(Protocol.Type.ResetServer);
+        if (Input.GetKey(KeyCode.T))
+            WorldManager.instance.OnSend(Protocol.Type.GameStart);
         float h = Input.GetAxis(HORIZONTAL);
         float v = Input.GetAxis(VERTICAL);
 

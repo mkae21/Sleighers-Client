@@ -150,7 +150,6 @@ public class WorldManager : MonoBehaviour
         Vector3 position = keyMessage.position;
         Vector3 velocity = keyMessage.velocity;
         Vector3 acceleration = keyMessage.acceleration;
-        Debug.LogFormat("[OnReceive] ReceiveKeyEvent : {0} / {1} / {2}", position, velocity, acceleration);
 
         players[id].SetMoveVector(acceleration);
 
