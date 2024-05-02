@@ -20,6 +20,11 @@ public class Player : MonoBehaviour
     private float maxSteerAngle = 20f;
     private int playerId = 0;
     [SerializeField] private bool isMe = false;
+    public bool IsMe
+    {
+        get { return isMe; }
+        set { isMe = value; }
+    }
     [SerializeField] private bool isBraking = false;
     public bool IsBraking
     {
@@ -40,6 +45,7 @@ public class Player : MonoBehaviour
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
+    public MiniMapComponent miniMapComponent;
 #endregion
 
 
@@ -149,21 +155,19 @@ public class Player : MonoBehaviour
     // 내 플레이어와 다른 플레이어 객체 초기화
     public void Initialize(bool _isMe, int _playerId, string _nickName)
     {
-        this.isMe = _isMe;
+        IsMe = _isMe;
         this.playerId = _playerId;
         this.nickName = _nickName;
 
+        miniMapComponent.enabled = true;
         playerModelObject = this.gameObject;
-        playerModelObject.transform.rotation = Quaternion.Euler(0, 0, 0);
 
         nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, playerModelObject.transform);
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
         nameObject.transform.position = GetNameUIPos();
 
-        if (this.isMe)
-        {
+        if (IsMe)
             CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = this.transform;
-        }
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
@@ -206,6 +210,10 @@ public class Player : MonoBehaviour
     public Vector3 GetRotation()
     {
         return gameObject.transform.rotation.eulerAngles;
+    }
+    public Vector3 GetVelocity()
+    {
+        return rb.velocity;
     }
 
     public float GetSpeed()

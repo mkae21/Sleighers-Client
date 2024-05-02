@@ -19,7 +19,7 @@ public class WorldManager : MonoBehaviour
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
     private Dictionary<int, Player> players;
-    [SerializeField] private int myPlayerId;
+    [SerializeField] private int myPlayerId = -1;
     public int MyPlayerId
     {
         get { return myPlayerId; }
@@ -32,6 +32,7 @@ public class WorldManager : MonoBehaviour
     static public WorldManager instance;
     public GameObject playerPool;
     public Transform[] startingPoints;
+    public MiniMapController miniMapController;
 #endregion
 
 #region PrivateMethod
@@ -52,26 +53,22 @@ public class WorldManager : MonoBehaviour
     private void Start()
     {
         players = new Dictionary<int, Player>();
-        sessionInfo = new SessionInfo();
         InitializeGame();
     }
 
     // 인게임 초기화
-    private bool InitializeGame()
+    private void InitializeGame()
     {
 
         if (!playerPool)
         {
             Debug.Log("[World Manager] Player Pool이 존재하지 않습니다.");
-            return false;
+            return;
         }
         Debug.Log("[World Manager] 게임 초기화 진행");
-
+        sessionInfo = new SessionInfo();
         playerPrefab = Resources.Load("Prefabs/Player2") as GameObject;
-
-        return true;
     }
-
 
     // 서버로부터 받는 데이터 처리 핸들러
     public void OnReceive()
@@ -92,131 +89,79 @@ public class WorldManager : MonoBehaviour
             return;
         }
         Message msg = DataParser.ReadJsonData<Message>(data);
-        if (msg == null)
-            return;
-        if (ServerManager.Instance().IsHost() == true && msg.id == MyPlayerId)
-            return;
         if (players == null)
+        {
+            Debug.LogWarning("[OnReceive] 플레이어 리스트가 존재하지 않습니다.");
             return;
+        }
+
+        if (msg == null )
+        {
+            Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
+            return;
+        }
+        if (msg.from == MyPlayerId)
+        {
+            Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
+            LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
+            return;
+        }
         Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
+        LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
+
         switch(msg.type)
         {
-            case Protocol.Type.Key:
-                KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                ReceiveKeyEvent(keyMessage);
-                break;
-            case Protocol.Type.PlayerBreak:
-                ReceivePlayerBreakEvent(msg);
-                break;
-            case Protocol.Type.PlayerMove:
-                PlayerMoveMessage moveMessage = DataParser.ReadJsonData<PlayerMoveMessage>(data);
-                ReceivePlayerMoveEvent(moveMessage);
-                break;
-
-            // case Protocol.Type.PlayerReconnect:
-            //     break;
-
-            case Protocol.Type.PlayerDisconnect:
-                ReceivePlayerDisconnectEvent(msg);
-                break;
-
-            case Protocol.Type.OtherPlayerConnect:
-                ReceiveOtherPlayerConnectEvent(msg);
-                break;
-
-            // case Protocol.Type.OtherPlayerReconnect:
-            //     break;
-
-            case Protocol.Type.GameSync:
-                GameSyncMessage syncMessage = DataParser.ReadJsonData<GameSyncMessage>(data);
-                ReceiveGameSyncEvent(syncMessage);
-                break;
-
             case Protocol.Type.LoadGameScene:
                 LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
                 ReceiveLoadGameSceneEvent(loadMessage);
                 break;
 
-            case Protocol.Type.GameStartCountDown:
+            case Protocol.Type.SendCountDown:
                 GameStartCountDownMessage startCountMessage = DataParser.ReadJsonData<GameStartCountDownMessage>(data);
-                ReceiveGameStartCountDownEvent(startCountMessage);
+                ReceiveSendCountDownEvent(startCountMessage);
                 break;
 
             case Protocol.Type.GameStart:
                 ReceiveGameStartEvent();
                 break;
 
-            case Protocol.Type.PlayerGoal:
+            case Protocol.Type.Key:
+                KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                ReceiveKeyEvent(keyMessage);
                 break;
 
-            case Protocol.Type.GameEndCountDown:
+            case Protocol.Type.PlayerReconnect:
+                ReceivePlayerReconnectEvent(msg);
                 break;
 
-            // case Protocol.Type.GameEnd:
-            //     ReceiveGameEndEvent(br);
-            //     break;
+            case Protocol.Type.PlayerDisconnect:
+                ReceivePlayerDisconnectEvent(msg);
+                break;
 
             default:
                 Debug.LogWarning("[OnReceive] 알 수 없는 프로토콜");
                 break;
         }
     }
-    public void OnRecieveForLocal(KeyMessage keyMessage)
-    {
-        ReceiveKeyEvent(keyMessage);
-    }
+
 #region Receive 프로토콜 처리
     // 키 입력 이벤트 처리
     private void ReceiveKeyEvent(KeyMessage keyMessage)
     {
-        if (ServerManager.Instance().IsHost() == false)
-            return;
-        int keyData = keyMessage.keyData;
-        int id = keyMessage.id;
+        int id = keyMessage.from;
 
-        Vector3 playerPos = players[id].GetPosition();
-        Vector3 playerDir = Vector3.zero;
-        if ((keyData & KeyEventCode.MOVE) == KeyEventCode.MOVE)
-        {
-            playerDir = keyMessage.position;
-            playerDir = Vector3.Normalize(playerDir);
+        Vector3 position = keyMessage.position;
+        Vector3 velocity = keyMessage.velocity;
+        Vector3 acceleration = keyMessage.acceleration;
 
-            players[id].SetMoveVector(playerDir);
-            PlayerMoveMessage msg = new PlayerMoveMessage(id, playerPos, playerDir);
-            ServerManager.Instance().SendDataToInGame<PlayerMoveMessage>(msg);
-        }
-        else if ((keyData & KeyEventCode.BREAK) == KeyEventCode.BREAK)
-        {
-            players[id].IsBraking = true;
-            Message msg = new Message(Protocol.Type.PlayerBreak, id);
-            ServerManager.Instance().SendDataToInGame<Message>(msg);
-        }
-        Debug.LogFormat("[OnReceive] ReceiveKeyEvent : {0} / {1}", keyMessage.type, keyData);
-    }
-    // 플레이어 이동 이벤트 처리
-    private void ReceivePlayerMoveEvent(PlayerMoveMessage msg)
-    {
-        if (ServerManager.Instance().IsHost() == true)
-            return;
-        Vector3 moveVector = msg.direction;
-        // moveVector가 같으면 방향 & 이동량 같으므로 적용 굳이 안함
-        if (!moveVector.Equals(players[msg.id].moveVector))
-        {
-            // players[msg.id].SetPosition(msg.position);
-            players[msg.id].SetMoveVector(moveVector);
-        }
-    }
-    private void ReceivePlayerBreakEvent(Message msg)
-    {
-        if (ServerManager.Instance().IsHost() == true)
-            return;
-        Debug.LogFormat("[OnReceive] ReceivePlayerBreakEvent : {0}", msg.id);
-        players[msg.id].IsBraking = true;
+        players[id].SetMoveVector(acceleration);
+
+        // TODO: interpolation 적용
     }
     // 다른 플레이어 접속 이벤트 처리
-    private void ReceiveOtherPlayerConnectEvent(Message msg)
+    private void ReceivePlayerReconnectEvent(Message msg)
     {
-        int newId = msg.id;
+        int newId = msg.from;
         Transform sp = startingPoints[sessionInfo.totalPlayerCount];
         GameObject newInstance = Instantiate(playerPrefab, sp.position, sp.rotation, playerPool.transform);
         newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId);
@@ -226,20 +171,18 @@ public class WorldManager : MonoBehaviour
     // 게임 씬 로드 이벤트 처리
     private void ReceiveLoadGameSceneEvent(LoadGameSceneMessage msg)
     {
-        myPlayerId = msg.id;
+        myPlayerId = msg.from;
         int totalPlayerCount = msg.count;
         sessionInfo.totalPlayerCount = totalPlayerCount + 1;
         List<int> userList = msg.list;
-        if (msg.ishost)
-        {
-            ServerManager.Instance().SetHostSession(myPlayerId);
-        }
 
         Transform sp = startingPoints[totalPlayerCount].transform;
         GameObject myPlayer = Instantiate(playerPrefab, sp.position, sp.rotation, playerPool.transform);
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId);
+        miniMapController.SetTarget(myPlayer.transform);
         players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
+
         for (int i = 0; i < totalPlayerCount; i++)
         {
             int otherPlayerId = userList[i];
@@ -250,10 +193,10 @@ public class WorldManager : MonoBehaviour
         }
     }
     // 게임 시작 카운트 다운 이벤트 처리
-    private void ReceiveGameStartCountDownEvent(GameStartCountDownMessage msg)
+    private void ReceiveSendCountDownEvent(GameStartCountDownMessage msg)
     {
         int count = msg.count;
-        Debug.LogFormat("[OnReceive] GameStartCountDownEvent : {0}", count);
+        Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);
     }
     // 게임 시작 이벤트 처리
     private void ReceiveGameStartEvent()
@@ -263,24 +206,12 @@ public class WorldManager : MonoBehaviour
     // 다른 플레이어 접속 끊김 이벤트 처리
     private void ReceivePlayerDisconnectEvent(Message msg)
     {
-        int userId = msg.id;
+        int userId = msg.from;
         Destroy(players[userId].gameObject);
         players.Remove(userId);
+        sessionInfo.totalPlayerCount--;
     }
-    // 플레이어 위치 및 회전 동기화 이벤트 처리
-    private void ReceiveGameSyncEvent(GameSyncMessage msg)
-    {
-        int index = 0;
-        if (players == null)
-            return;
 
-        foreach (var player in players)
-        {
-            player.Value.SetPosition(msg.positions[index]);
-            index++;
-        }
-        // ServerManager.Instance().SetHostSession(syncMessage.host);
-    }
     // 게임 종료 이벤트 처리
     private void ReceiveGameEndEvent(ByteReader br)
     {
@@ -290,22 +221,6 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region Send 프로토콜 처리
-    // 호스트의 게임 정보를 서버에 보내서 모든 플레이어에게 동기화
-    private void SendGameSyncEvent()
-    {
-        int numOfClient = players.Count;
-
-        Vector3[] positions = new Vector3[numOfClient];
-        bool[] online = new bool[numOfClient];
-        int index = 0;
-        foreach (var player in players)
-        {
-            positions[index] = player.Value.GetPosition();
-            index++;
-        }
-        GameSyncMessage msg = new GameSyncMessage(myPlayerId, numOfClient, positions, online);
-        ServerManager.Instance().SendDataToInGame(msg);
-    }
     // 게임 시작 이벤트를 서버에 알림
     private void SendGameStartEvent()
     {
@@ -339,20 +254,10 @@ public class WorldManager : MonoBehaviour
         Debug.LogFormat("[OnSend] 보낸 메세지 타입 : {0}", _type);
         switch (_type)
         {
-            case Protocol.Type.PlayerMove:
-                break;
-
             case Protocol.Type.PlayerReconnect:
-                break;
-                
-            case Protocol.Type.GameSync:
-                SendGameSyncEvent();
                 break;
 
             case Protocol.Type.LoadGameScene:
-                break;
-
-            case Protocol.Type.GameStartCountDown:
                 break;
 
             case Protocol.Type.GameStart:
@@ -361,9 +266,6 @@ public class WorldManager : MonoBehaviour
 
             case Protocol.Type.PlayerGoal:
                 SendPlayerGoalEvent();
-                break;
-
-            case Protocol.Type.GameEndCountDown:
                 break;
 
             case Protocol.Type.GameEnd:
@@ -382,6 +284,14 @@ public class WorldManager : MonoBehaviour
     public Player GetMyPlayer()
     {
         return players[myPlayerId];
+    }
+    public Vector3 GetMyPlayerPosition()
+    {
+        return players[myPlayerId].GetPosition();
+    }
+    public Vector3 GetMyPlayerVelocity()
+    {
+        return players[myPlayerId].GetVelocity();
     }
     public Player GetPlayerFromId(int _id)
     {

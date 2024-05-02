@@ -1,5 +1,6 @@
 using UnityEngine;
 using Protocol;
+using System.Runtime.CompilerServices;
 /* InputManager.cs
  * - 인게임에서 플레이어 입력 처리
  * - 플레이어 스크립트는 여러 개 생성되기에 여기서 플레이어의 입력을 받아서 서버로 전송 및 플레이어 이동 처리
@@ -23,54 +24,36 @@ public class InputManager : MonoBehaviour
     private void Start()
     {
         GameManager.Ready += ReadyInput;
-        GameManager.InGame += PlayerInput;
-        GameManager.InGame += BreakInput;
+        GameManager.InGame += KeyInput;
     }
     private void ReadyInput()
     {
-        if (ServerManager.Instance().IsHost() == false)
-            return;
         if (Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
         if (Input.GetKey(KeyCode.T))
             WorldManager.instance.OnSend(Protocol.Type.GameStart);
     }
 
-    private void PlayerInput()
+    private void KeyInput()
     {
-        if (ServerManager.Instance().IsHost() && Input.GetKey(KeyCode.R))
+        if (Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
+        if (Input.GetKey(KeyCode.T))
+            WorldManager.instance.OnSend(Protocol.Type.GameStart);
         float h = Input.GetAxis(HORIZONTAL);
         float v = Input.GetAxis(VERTICAL);
 
-        int keyCode = 0;
-        keyCode |= KeyEventCode.MOVE;
-        if (keyCode <= 0)
+        if (h == 0 && v == 0)
             return;
 
-        Vector3 moveVector = new Vector3(h, 0, v);
-        moveVector = Vector3.Normalize(moveVector);
-
-        KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, keyCode, moveVector);
-        if (ServerManager.Instance().IsHost())
-            ServerManager.Instance().AddMsgToLocalQueue(msg);
-        else
-            ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
+        Vector3 position = WorldManager.instance.GetMyPlayerPosition();
+        Vector3 velocity = WorldManager.instance.GetMyPlayerVelocity();
+        Vector3 acceleration = new Vector3(h, 0, v);
+        acceleration = Vector3.Normalize(acceleration);
+        WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
+        KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, position, velocity, acceleration);
+        ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
     }
-    private void BreakInput()
-    {
-        int keyCode = 0;
-        keyCode |= KeyEventCode.BREAK;
-        if (!Input.GetButton("Jump") || keyCode <= 0)
-            return;
-        
-        KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, keyCode, Vector3.zero);
-        if (ServerManager.Instance().IsHost())
-            ServerManager.Instance().AddMsgToLocalQueue(msg);
-        else
-            ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
-    }
-
 #endregion
 
 #region PublicMethod
