@@ -32,6 +32,7 @@ public class WorldManager : MonoBehaviour
     static public WorldManager instance;
     public GameObject playerPool;
     public Transform[] startingPoints;
+    public MiniMapController miniMapController;
 #endregion
 
 #region PrivateMethod
@@ -150,7 +151,6 @@ public class WorldManager : MonoBehaviour
         Vector3 position = keyMessage.position;
         Vector3 velocity = keyMessage.velocity;
         Vector3 acceleration = keyMessage.acceleration;
-        Debug.LogFormat("[OnReceive] ReceiveKeyEvent : {0} / {1} / {2}", position, velocity, acceleration);
 
         players[id].SetMoveVector(acceleration);
 
@@ -177,8 +177,10 @@ public class WorldManager : MonoBehaviour
         Transform sp = startingPoints[totalPlayerCount].transform;
         GameObject myPlayer = Instantiate(playerPrefab, sp.position, sp.rotation, playerPool.transform);
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId);
+        miniMapController.SetTarget(myPlayer.transform);
         players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
+
         for (int i = 0; i < totalPlayerCount; i++)
         {
             int otherPlayerId = userList[i];
@@ -205,6 +207,7 @@ public class WorldManager : MonoBehaviour
         int userId = msg.from;
         Destroy(players[userId].gameObject);
         players.Remove(userId);
+        sessionInfo.totalPlayerCount--;
     }
 
     // 게임 종료 이벤트 처리
