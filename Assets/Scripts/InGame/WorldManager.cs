@@ -103,9 +103,11 @@ public class WorldManager : MonoBehaviour
         if (msg.from == MyPlayerId)
         {
             Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
+            LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
             return;
         }
         Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
+        LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
 
         switch(msg.type)
         {
