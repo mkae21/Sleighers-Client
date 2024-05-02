@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
             Ready();
-            yield return new WaitForSeconds(0.001f);
+            yield return new WaitForSeconds(0.0333f);
         }
     }
 
@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }
             InGame();
-            yield return new WaitForSeconds(0.001f);
+            yield return new WaitForSeconds(0.0333f);
         }
     }
 #endregion
