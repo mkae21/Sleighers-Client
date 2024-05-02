@@ -37,7 +37,6 @@ public class MiniMapComponent : MonoBehaviour {
 	void OnEnable(){
 		miniMapController = GameObject.Find ("CanvasMiniMap").GetComponent<MiniMapController> ();
 		mme = new MiniMapEntity ();
-		Debug.LogFormat(" {0} 아이콘 초기화", gameObject.GetComponent<Player>().IsMe ? "내" : "다른");
 		if (gameObject.GetComponent<Player>().IsMe)
 			mme.icon = Resources.Load<Sprite>("Sprites/MyIndicator");
 		else
