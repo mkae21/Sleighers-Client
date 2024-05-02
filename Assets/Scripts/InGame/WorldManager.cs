@@ -32,6 +32,7 @@ public class WorldManager : MonoBehaviour
     static public WorldManager instance;
     public GameObject playerPool;
     public Transform[] startingPoints;
+    public MiniMapController miniMapController;
 #endregion
 
 #region PrivateMethod
@@ -176,6 +177,7 @@ public class WorldManager : MonoBehaviour
         Transform sp = startingPoints[totalPlayerCount].transform;
         GameObject myPlayer = Instantiate(playerPrefab, sp.position, sp.rotation, playerPool.transform);
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId);
+        miniMapController.SetTarget(myPlayer.transform);
         players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
 
