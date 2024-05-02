@@ -178,6 +178,7 @@ public class WorldManager : MonoBehaviour
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId);
         players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
+
         for (int i = 0; i < totalPlayerCount; i++)
         {
             int otherPlayerId = userList[i];
@@ -204,6 +205,7 @@ public class WorldManager : MonoBehaviour
         int userId = msg.from;
         Destroy(players[userId].gameObject);
         players.Remove(userId);
+        sessionInfo.totalPlayerCount--;
     }
 
     // 게임 종료 이벤트 처리
