@@ -181,7 +181,7 @@ public class Player : MonoBehaviour
     #endregion
 
 
-    #region PublicMethod
+#region PublicMethod
     // 내 플레이어와 다른 플레이어 객체 초기화
     public void Initialize(bool _isMe, int _playerId, string _nickName)
     {
@@ -220,18 +220,12 @@ public class Player : MonoBehaviour
         moveVector = vector;
 
         if (vector == Vector3.zero)
-        {
             isMove = false;
-        }
         else
-        {
             isMove = true;
-        }
         if(!IsMe)
-        {
             ExtrapolatePosition();
-            
-        }
+
     }
 
     public void SetPosition(Vector3 pos)
