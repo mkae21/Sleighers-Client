@@ -6,23 +6,23 @@ namespace Ilumisoft.ArcardeRacingKit
 {
     [DefaultExecutionOrder(-1)]
     [HelpURL("https://ilumisoft.gitbook.io/arcade-racing-kit/managers/lap-manager")]
-    public class LapManager : MonoBehaviour
+    public class _LapManager : MonoBehaviour
     {
         [SerializeField]
         [Tooltip("Number of laps required to pass in order to finish the race.")]
         int laps;
 
-        Finish finish;
+        _Finish finish;
 
         /// <summary>
         /// Dictionary containing the lap info of all vehicles
         /// </summary>
-        Dictionary<Vehicle, LapInfo> LapInfoDictionary = new Dictionary<Vehicle, LapInfo>();
+        Dictionary<Vehicle, _LapInfo> LapInfoDictionary = new Dictionary<Vehicle, _LapInfo>();
 
         /// <summary>
         /// Action invoked, when a vehicle completes a lap
         /// </summary>
-        public UnityAction<Vehicle, LapInfo> OnLapComplete { get; set; }
+        public UnityAction<Vehicle, _LapInfo> OnLapComplete { get; set; }
 
         /// <summary>
         /// Gets the number of laps requried to finish the race
@@ -31,7 +31,7 @@ namespace Ilumisoft.ArcardeRacingKit
 
         private void Awake()
         {
-            finish = FindObjectOfType<Finish>();
+            finish = FindObjectOfType<_Finish>();
 
             if (finish != null)
             {
@@ -58,7 +58,7 @@ namespace Ilumisoft.ArcardeRacingKit
             // Create new dictionary entry if none exists
             if (!LapInfoDictionary.ContainsKey(vehicle))
             {
-                LapInfoDictionary.Add(vehicle, new LapInfo());
+                LapInfoDictionary.Add(vehicle, new _LapInfo());
             }
 
             // Increase and update the number of completed laps
@@ -76,9 +76,9 @@ namespace Ilumisoft.ArcardeRacingKit
         /// </summary>
         /// <param name="vehicle"></param>
         /// <returns></returns>
-        public LapInfo GetLapInfo(Vehicle vehicle)
+        public _LapInfo GetLapInfo(Vehicle vehicle)
         {
-            var lapInfo = new LapInfo()
+            var lapInfo = new _LapInfo()
             {
                 Completed = 0
             };

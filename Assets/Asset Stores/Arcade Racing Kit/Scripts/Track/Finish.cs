@@ -5,10 +5,10 @@ using UnityEngine.Events;
 
 namespace Ilumisoft.ArcardeRacingKit
 {
-    public class Finish : MonoBehaviour
+    public class _Finish : MonoBehaviour
     {
         [SerializeField]
-        List<Checkpoint> checkpoints = new List<Checkpoint>();
+        List<_Checkpoint> checkpoints = new List<_Checkpoint>();
 
         public UnityAction<Vehicle> OnVehicleEnter;
 
@@ -25,7 +25,7 @@ namespace Ilumisoft.ArcardeRacingKit
         /// </summary>
         /// <param name="vehicle"></param>
         /// <param name="checkpoint"></param>
-        private void OnVehicleEnterCheckpoint(Vehicle vehicle, Checkpoint checkpoint)
+        private void OnVehicleEnterCheckpoint(Vehicle vehicle, _Checkpoint checkpoint)
         {
             var checkpointInfo = GetOrAddCheckpointInfo(vehicle);
 
@@ -59,7 +59,7 @@ namespace Ilumisoft.ArcardeRacingKit
         /// </summary>
         /// <param name="checkpoint"></param>
         /// <returns></returns>
-        Checkpoint GetNextCheckpoint(Checkpoint checkpoint)
+        _Checkpoint GetNextCheckpoint(_Checkpoint checkpoint)
         {
             int index = checkpoints.IndexOf(checkpoint);
 
@@ -71,13 +71,13 @@ namespace Ilumisoft.ArcardeRacingKit
         /// </summary>
         /// <param name="vehicle"></param>
         /// <returns></returns>
-        CheckpointInfo GetOrAddCheckpointInfo(Vehicle vehicle)
+        _CheckpointInfo GetOrAddCheckpointInfo(Vehicle vehicle)
         {
-            var result = vehicle.GetComponent<CheckpointInfo>();
+            var result = vehicle.GetComponent<_CheckpointInfo>();
 
             if(result == null)
             {
-                result = vehicle.gameObject.AddComponent<CheckpointInfo>();
+                result = vehicle.gameObject.AddComponent<_CheckpointInfo>();
             }
 
             return result;
