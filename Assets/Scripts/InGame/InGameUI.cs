@@ -5,9 +5,11 @@ public class InGameUI : MonoBehaviour
 {
 #region PublicVariables
     public static InGameUI instance;
-    public TextMeshProUGUI text_Lab;
-    public TextMeshProUGUI text_Timer;
-    public TextMeshProUGUI text_CountDown;
+
+    public TextMeshProUGUI text_timer;
+    public TextMeshProUGUI text_countDown;
+    public TextMeshProUGUI text_lab;
+
     public TextMeshProUGUI text_speedLabel;
     public RectTransform arrow;
     public LapManager lapManager;
@@ -42,8 +44,8 @@ public class InGameUI : MonoBehaviour
     // Go! 텍스트 숨기기
     private void HideCountDown()
     {
-        if(text_CountDown != null)
-            text_CountDown.gameObject.SetActive(false);
+        if(text_countDown != null)
+            text_countDown.gameObject.SetActive(false);
     }
     private void OnLapComplete(Player _player, LapInfo _lapInfo)
     {
@@ -74,10 +76,10 @@ public class InGameUI : MonoBehaviour
     public void UpdateTimer()
     {
         timer += Time.deltaTime;
-        int hours = (int)(timer / 3600);
         int minutes = (int)(timer / 60 % 60);
         int seconds = (int)(timer % 60);
-        text_Timer.text = string.Format("Time: {0:D2} : {1:D2} : {2:D2}", hours, minutes, seconds);
+        int miliseconds = (int)(timer * 1000 % 1000);
+        text_timer.text = string.Format("Time : {0:D2} : {1:D2} : {2:D3}", minutes, seconds, miliseconds);
     }
 
     // 카운트 다운 설정
@@ -85,22 +87,22 @@ public class InGameUI : MonoBehaviour
     {
         countDownDuration = count;
 
-        if(text_CountDown != null)
+        if(text_countDown != null)
         {
             if(countDownDuration > 0)
             {
-                text_CountDown.text = countDownDuration.ToString();
-                text_CountDown.gameObject.SetActive(true);
+                text_countDown.text = countDownDuration.ToString();
+                text_countDown.gameObject.SetActive(true);
             }
             else
             {
-                text_CountDown.text = "GO!";
+                text_countDown.text = "GO!";
                 Invoke("HideCountDown", 0.4f);
             }
         }
         else
         {
-            text_CountDown.gameObject.SetActive(false);         
+            text_countDown.gameObject.SetActive(false);         
         }
     }
 
@@ -108,10 +110,7 @@ public class InGameUI : MonoBehaviour
     {
         speed = WorldManager.instance.GetMyPlayer().GetSpeed();
         if(text_speedLabel != null)
-            text_speedLabel.text = string.Format("{0} km/h", (int)speed);
-        
-        if(arrow != null)
-            arrow.localEulerAngles = new Vector3(0,0, Mathf.Lerp(minSpeedArrowAngle, maxSpeedArrowAngle, speed / maxSpeed));
+            text_speedLabel.text = string.Format("{0}", (int)speed);
     }
 
 #endregion
