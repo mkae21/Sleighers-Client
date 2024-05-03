@@ -8,8 +8,7 @@ public class InGameUI : MonoBehaviour
 
     public TextMeshProUGUI text_timer;
     public TextMeshProUGUI text_countDown;
-
-    public TextMeshProUGUI text_Lab;
+    public TextMeshProUGUI text_lab;
 
     public TextMeshProUGUI text_speedLabel;
     public RectTransform arrow;
