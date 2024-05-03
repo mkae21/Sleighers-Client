@@ -31,10 +31,10 @@ public class MiniMapController : MonoBehaviour {
 	[Tooltip("The mask to change the shape of minimap")]
 	public Sprite miniMapMask;
 	[Tooltip("border graphics of the minimap")]
-	public Sprite miniMapBorder;
-	[Tooltip("Set opacity of minimap")]
-	[Range(0,1)]
-	public float miniMapOpacity=1;
+	// public Sprite miniMapBorder;
+	// [Tooltip("Set opacity of minimap")]
+	// [Range(0,1)]
+	public float miniMapOpacity= 1f;
 	[Tooltip("border graphics of the minimap")]
 	public Vector3 miniMapScale = new Vector3(1,1,1);
 
@@ -71,11 +71,11 @@ public class MiniMapController : MonoBehaviour {
 		ownerIconMap.Clear ();
 		GameObject maskPanelGO = transform.GetComponentInChildren<Mask> ().gameObject;
 		mapPanelMask = maskPanelGO.GetComponent<Image> ();
-		mapPanelBorder = maskPanelGO.transform.parent.GetComponent<Image> ();
+		// mapPanelBorder = maskPanelGO.transform.parent.GetComponent<Image> ();
 		miniMapPanel = maskPanelGO.transform.GetChild (0).gameObject;
 		mapPanel = miniMapPanel.GetComponent<Image> ();
 		mapColor = mapPanel.color;
-		mapBorderColor = mapPanelBorder.color;
+		// mapBorderColor = mapPanelBorder.color;
 		//mapPanelImage = transform.GetComponent<Image> ();
 		if(mapCamera==null) mapCamera = transform.GetComponentInChildren<Camera>();
 		mapCamera.cullingMask = minimapLayers;
@@ -112,11 +112,11 @@ public class MiniMapController : MonoBehaviour {
 	public void LateUpdate(){
 		//Set minimap images and colors
 		mapPanelMask.sprite = miniMapMask;
-		mapPanelBorder.sprite = miniMapBorder;
-		mapPanelBorder.rectTransform.localScale = miniMapScale;
-		mapBorderColor.a = miniMapOpacity;
+		// mapPanelBorder.sprite = miniMapBorder;
+		// mapPanelBorder.rectTransform.localScale = miniMapScale;
+		// mapBorderColor.a = miniMapOpacity;
 		mapColor.a = miniMapOpacity;
-		mapPanelBorder.color = mapBorderColor;
+		// mapPanelBorder.color = mapBorderColor;
 		mapPanel.color = mapColor;
 
 		//Set minimappanel size and position, so it updates with size and resolution changes

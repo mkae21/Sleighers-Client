@@ -11,6 +11,7 @@ public class InGameUI : MonoBehaviour
     public TextMeshProUGUI text_countDown;
     public TextMeshProUGUI text_lab;
     public TextMeshProUGUI text_speedLabel;
+
     public Transform rankHolder; // 랭킹 프리팹을 가지고 있는 부모
     public RankManager lapManager;
 
@@ -80,8 +81,9 @@ public class InGameUI : MonoBehaviour
 
     private void UpdateLapText(int _currentLap)
     {
+
         if (lapManager != null)
-            text_lab.text = $"LAP {_currentLap} / {lapManager.Laps}";
+            text_lab.text = $"<b><size=120>{currentLap}</size=120></b> / {lapManager.Laps} LAP";
     }
 
 #endregion
