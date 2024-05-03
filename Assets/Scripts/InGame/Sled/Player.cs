@@ -168,14 +168,11 @@ public class Player : MonoBehaviour
         {
             Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate) + (0.5f * lastServerAcceleration * timeSinceLastUpdate);
             transform.position = Vector3.Lerp(transform.position, extrapolatedPosition, interpolationRatio);
-
         }
         else
         {
             transform.position = Vector3.Lerp(transform.position, lastServerPosition, interpolationRatio);
         }
-        //Quaternion extrapolatedRotation = Quaternion.Slerp(transform.rotation, lastServerRotation, interpolationRatio);
-        //transform.rotation = extrapolatedRotation;
     }
     #endregion
 
