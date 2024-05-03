@@ -192,6 +192,9 @@ public class Player : MonoBehaviour
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
         nameObject.transform.position = GetNameUIPos();
 
+        RankManager.instance.InitPlayerLapInfo(GetComponent<Player>());
+        InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
+
         if (IsMe)
             CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = this.transform;
 
