@@ -33,6 +33,13 @@ public class InGameUI : MonoBehaviour
         GameManager.InGame += UpdateSpeedometer;
     }
 
+    // Go! 텍스트 숨기기
+    private void HideCountDown()
+    {
+        if(text_CountDown != null)
+            text_CountDown.gameObject.SetActive(false);
+    }
+
 #endregion
 
 #region PublicMethod
@@ -43,6 +50,30 @@ public class InGameUI : MonoBehaviour
         int minutes = (int)(timer / 60 % 60);
         int seconds = (int)(timer % 60);
         text_Timer.text = string.Format("Time: {0:D2} : {1:D2} : {2:D2}", hours, minutes, seconds);
+    }
+
+    // 카운트 다운 설정
+    public void SetCountDown(int count)
+    {
+        countDownDuration = count;
+
+        if(text_CountDown != null)
+        {
+            if(countDownDuration > 0)
+            {
+                text_CountDown.text = countDownDuration.ToString();
+                text_CountDown.gameObject.SetActive(true);
+            }
+            else
+            {
+                text_CountDown.text = "GO!";
+                Invoke("HideCountDown", 0.4f);
+            }
+        }
+        else
+        {
+            text_CountDown.gameObject.SetActive(false);         
+        }
     }
 
     public void UpdateSpeedometer()

@@ -196,7 +196,8 @@ public class WorldManager : MonoBehaviour
     private void ReceiveSendCountDownEvent(GameStartCountDownMessage msg)
     {
         int count = msg.count;
-        Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);
+        Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);  
+        InGameUI.instance.SetCountDown(count);      
     }
     // 게임 시작 이벤트 처리
     private void ReceiveGameStartEvent()
