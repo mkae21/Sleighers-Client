@@ -11,7 +11,6 @@ public class InGameUI : MonoBehaviour
     public TextMeshProUGUI text_lab;
 
     public TextMeshProUGUI text_speedLabel;
-    public RectTransform arrow;
     public LapManager lapManager;
 
     public float countDownDuration = 3.0f;
@@ -64,10 +63,10 @@ public class InGameUI : MonoBehaviour
         }
     }
 
-    private void UpdateLapText(int currentLap)
+    private void UpdateLapText(int _currentLap)
     {
         if (lapManager != null)
-            text_Lab.text = $"LAP {currentLap} / {lapManager.Laps}";
+            text_lab.text = $"LAP {_currentLap} / {lapManager.Laps}";
     }
 
 #endregion
@@ -83,9 +82,9 @@ public class InGameUI : MonoBehaviour
     }
 
     // 카운트 다운 설정
-    public void SetCountDown(int count)
+    public void SetCountDown(int _count)
     {
-        countDownDuration = count;
+        countDownDuration = _count;
 
         if(text_countDown != null)
         {

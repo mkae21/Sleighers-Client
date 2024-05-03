@@ -28,9 +28,7 @@ public class Checkpoint : MonoBehaviour
         Player player = _other.GetComponentInParent<Player>();
 
         if (player != null)
-        {
             OnPlayerEnterCheckpoint?.Invoke(player, this);
-        }
     }
 #endregion
 }

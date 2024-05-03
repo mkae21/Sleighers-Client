@@ -18,7 +18,7 @@ public class LapManager : MonoBehaviour
     private Finish finish;
 
     // 모든 차량의 랩 정보를 포함하는 딕셔너리
-    Dictionary<Player, LapInfo> lapInfoDictionary = new Dictionary<Player, LapInfo>();
+    private Dictionary<Player, LapInfo> lapInfoDictionary = new Dictionary<Player, LapInfo>();
 #endregion
 
 #region PublicVariables
@@ -33,13 +33,9 @@ public class LapManager : MonoBehaviour
         finish = FindObjectOfType<Finish>();
 
         if (finish != null)
-        {
             finish.OnPlayerEnter += OnPlayerEnter;
-        }
         else
-        {
             Debug.Log("[Lab Manager] 씬에 결승선이 없습니다.");
-        }
     }
     // 차량이 피니시 라인에 진입할 때(한 바퀴 완료 후) 호출되는 콜백
     private void OnPlayerEnter(Player _player)
