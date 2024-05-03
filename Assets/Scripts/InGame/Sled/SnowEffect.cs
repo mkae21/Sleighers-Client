@@ -1,20 +1,19 @@
 ﻿using UnityEngine;
-/* CameraSpeedLinesEffect.cs
- * 차량이 특정 속도에 도달하면 스피드 라인 효과를 만들 수 있습니다.
- * 1인칭 또는 탑뷰를 사용하는 경우 이펙트가 잘 보이지 않는다는 점에 유의하세요.
+/* SnowEffect.cs
+ * 플레이어가 특정 속도에 도달하면 눈 효과를 생성하는 스크립트
  */
-public class CameraSpeedLinesEffect : MonoBehaviour
+public class SnowEffect : MonoBehaviour
 {
 #region PrivateVariables
-    [Tooltip("The min rate of it's max velociyt the vehicle needs to reach, in order to produce speed lines")]
-    [SerializeField, Range(0, 1)] private float startVelocity = 0.5f;
+    [Tooltip("눈 효과를 생성하기 위해 플레이어가 도달해야 하는 최대 속도의 최소 속도")]
+    [SerializeField, Range(0, 1)] private float startVelocity = 0.2f;
 
     
-    [Tooltip("The max emission rate of the particle system")]
-    [SerializeField] private float maxEmissionRate = 50;
+    [Tooltip("파티클 시스템의 최대 방출 속도")]
+    [SerializeField] private float maxEmissionRate = 100;
 
     
-    [Tooltip("The particle system creating the speed lines")]
+    [Tooltip("눈 효과를 만드는 파티클 시스템")]
     [SerializeField] private new ParticleSystem particleSystem = null;
 
     private Camera mainCamera;
@@ -31,7 +30,7 @@ public class CameraSpeedLinesEffect : MonoBehaviour
     private void Update()
     {
         UpdateEmission();
-        UpdateRotation();
+        // UpdateRotation();
     }
 
     // 차량의 속도에 따라 파티클 시스템의 방출 속도를 조정합니다.
