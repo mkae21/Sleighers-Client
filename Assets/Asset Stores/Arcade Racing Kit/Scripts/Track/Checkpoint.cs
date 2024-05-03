@@ -4,9 +4,9 @@ using UnityEngine.Events;
 namespace Ilumisoft.ArcardeRacingKit
 {
     [RequireComponent(typeof(Collider))]
-    public class Checkpoint : MonoBehaviour
+    public class _Checkpoint : MonoBehaviour
     {
-        public UnityAction<Vehicle, Checkpoint> OnVehicleEnterCheckpoint;
+        public UnityAction<Vehicle, _Checkpoint> OnVehicleEnterCheckpoint;
 
         new Collider collider;
 

@@ -1,6 +1,6 @@
 ﻿namespace Ilumisoft.ArcardeRacingKit
 {
-    public struct LapInfo
+    public struct _LapInfo
     {
         /// <summary>
         /// Number of completed laps
