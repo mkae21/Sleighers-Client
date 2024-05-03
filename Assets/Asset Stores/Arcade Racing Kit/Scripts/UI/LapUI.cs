@@ -8,11 +8,11 @@ namespace Ilumisoft.ArcardeRacingKit.UI
         [SerializeField]
         protected TextMeshProUGUI text = null;
 
-        LapManager lapManager;
+        _LapManager lapManager;
 
         private void Start()
         {
-            lapManager = FindObjectOfType<LapManager>();
+            lapManager = FindObjectOfType<_LapManager>();
 
             if (lapManager != null)
             {
@@ -31,7 +31,7 @@ namespace Ilumisoft.ArcardeRacingKit.UI
         /// </summary>
         /// <param name="vehicle"></param>
         /// <param name="lapInfo"></param>
-        private void OnLapComplete(Vehicle vehicle, LapInfo lapInfo)
+        private void OnLapComplete(Vehicle vehicle, _LapInfo lapInfo)
         {
             // Return if another vehicle completed the lap
             if (this.Vehicle != vehicle)
