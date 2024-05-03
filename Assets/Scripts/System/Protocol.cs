@@ -41,12 +41,14 @@ namespace Protocol
         public Vector3 position;        // 위치
         public Vector3 velocity;        // 속도
         public Vector3 acceleration;    // 가속도
-        public KeyMessage(int _id, Vector3 _p, Vector3 _v, Vector3 _a) : base(Type.Key, _id)
+        public long timeStamp;
+        public KeyMessage(int _id, Vector3 _p, Vector3 _v, Vector3 _a, long timestamp) : base(Type.Key, _id)
         {
             this.from = _id;
             this.position = _p;
             this.velocity = _v;
             this.acceleration = _a;
+            this.timeStamp = timestamp;
         }
     }
 
