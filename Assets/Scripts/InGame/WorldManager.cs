@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
+using UnityEngine.Events;
 using Protocol;
 using Reader;
 /* WorldManager.cs
@@ -15,6 +16,7 @@ public class WorldManager : MonoBehaviour
         public int totalPlayerCount;
     }
 #region PrivateVariables
+    private LapManager lapManager;
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
     private Dictionary<int, Player> players;
@@ -25,6 +27,7 @@ public class WorldManager : MonoBehaviour
         set { myPlayerId = value; }
     }
     private bool isGameStart = false;
+    private bool isRaceFinish = false;
 #endregion
 
 #region PublicVariables
@@ -32,6 +35,9 @@ public class WorldManager : MonoBehaviour
     public GameObject playerPool;
     public Transform[] startingPoints;
     public MiniMapController miniMapController;
+    // 레이스가 종료되면 호출되는 액션
+    public UnityAction OnRaceFinished { get; set; }
+
 #endregion
 
 #region PrivateMethod
@@ -48,10 +54,13 @@ public class WorldManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
+        lapManager = GetComponent<LapManager>();
+        players = new Dictionary<int, Player>();
+        lapManager.OnLapComplete += OnLapComplete;
+        OnRaceFinished += FinishRace;
     }
     private void Start()
     {
-        players = new Dictionary<int, Player>();
         InitializeGame();
     }
 
@@ -65,84 +74,31 @@ public class WorldManager : MonoBehaviour
             return;
         }
         Debug.Log("[World Manager] 게임 초기화 진행");
+        isRaceFinish = false;
         sessionInfo = new SessionInfo();
         playerPrefab = Resources.Load("Prefabs/Player2") as GameObject;
     }
-
-    // 서버로부터 받는 데이터 처리 핸들러
-    public void OnReceive()
+    // 플레이어가 한 바퀴를 완주했을 때 호출되는 콜백
+    private void OnLapComplete(Player _player, LapInfo _lapInfo)
     {
-        NetworkStream stream = ServerManager.Instance().Stream;
-        byte[] size = new byte[4];
-        stream.Read(size, 0, size.Length);
-
-        ByteReader br = new ByteReader(size);
-        int jsonSize = br.ReadInt();
-
-        byte[] data = new byte[jsonSize];
-        int receiveSize = stream.Read(data, 0, data.Length);
-        
-        if (receiveSize == 0)
+        // 플레이어가 레이스를 완료했나 확인
+        if (_player.IsMe && _lapInfo.completed == lapManager.Laps)
         {
-            Debug.Log("[OnReceive] 빈 데이터가 브로드캐스킹 되었습니다.");
-            return;
-        }
-        Message msg = DataParser.ReadJsonData<Message>(data);
-        if (players == null)
-        {
-            Debug.LogWarning("[OnReceive] 플레이어 리스트가 존재하지 않습니다.");
-            return;
-        }
-
-        if (msg == null )
-        {
-            Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
-            return;
-        }
-        if (msg.from == MyPlayerId)
-        {
-            Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
-            LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
-            return;
-        }
-        Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
-        LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
-
-        switch(msg.type)
-        {
-            case Protocol.Type.LoadGameScene:
-                LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
-                ReceiveLoadGameSceneEvent(loadMessage);
-                break;
-
-            case Protocol.Type.SendCountDown:
-                GameStartCountDownMessage startCountMessage = DataParser.ReadJsonData<GameStartCountDownMessage>(data);
-                ReceiveSendCountDownEvent(startCountMessage);
-                break;
-
-            case Protocol.Type.GameStart:
-                ReceiveGameStartEvent();
-                break;
-
-            case Protocol.Type.Key:
-                KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                ReceiveKeyEvent(keyMessage);
-                break;
-
-            case Protocol.Type.PlayerReconnect:
-                ReceivePlayerReconnectEvent(msg);
-                break;
-
-            case Protocol.Type.PlayerDisconnect:
-                ReceivePlayerDisconnectEvent(msg);
-                break;
-
-            default:
-                Debug.LogWarning("[OnReceive] 알 수 없는 프로토콜");
-                break;
+            // 아직 완료하지 못했다면 레이스를 완료
+            if (!isRaceFinish)
+            {
+                OnRaceFinished?.Invoke();
+            }
         }
     }
 
+    // 레이스를 완료하고 아웃트로 타임라인을 재생
+    private void FinishRace()
+    {
+        Debug.LogFormat("[WorldManager] 레이스 종료");
+        isRaceFinish = true;
+        OnSend(Protocol.Type.PlayerGoal);
+    }
 #region Receive 프로토콜 처리
     // 키 입력 이벤트 처리
     private void ReceiveKeyEvent(KeyMessage keyMessage)
@@ -248,6 +204,79 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region PublicMethod
+    // 서버로부터 받는 데이터 처리 핸들러
+    public void OnReceive()
+    {
+        NetworkStream stream = ServerManager.Instance().Stream;
+        byte[] size = new byte[4];
+        stream.Read(size, 0, size.Length);
+
+        ByteReader br = new ByteReader(size);
+        int jsonSize = br.ReadInt();
+
+        byte[] data = new byte[jsonSize];
+        int receiveSize = stream.Read(data, 0, data.Length);
+        
+        if (receiveSize == 0)
+        {
+            Debug.Log("[OnReceive] 빈 데이터가 브로드캐스킹 되었습니다.");
+            return;
+        }
+        Message msg = DataParser.ReadJsonData<Message>(data);
+        if (players == null)
+        {
+            Debug.LogWarning("[OnReceive] 플레이어 리스트가 존재하지 않습니다.");
+            return;
+        }
+
+        if (msg == null )
+        {
+            Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
+            return;
+        }
+        if (msg.from == MyPlayerId)
+        {
+            Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
+            LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
+            return;
+        }
+        Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
+        LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
+
+        switch(msg.type)
+        {
+            case Protocol.Type.LoadGameScene:
+                LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
+                ReceiveLoadGameSceneEvent(loadMessage);
+                break;
+
+            case Protocol.Type.SendCountDown:
+                GameStartCountDownMessage startCountMessage = DataParser.ReadJsonData<GameStartCountDownMessage>(data);
+                ReceiveSendCountDownEvent(startCountMessage);
+                break;
+
+            case Protocol.Type.GameStart:
+                ReceiveGameStartEvent();
+                break;
+
+            case Protocol.Type.Key:
+                KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                ReceiveKeyEvent(keyMessage);
+                break;
+
+            case Protocol.Type.PlayerReconnect:
+                ReceivePlayerReconnectEvent(msg);
+                break;
+
+            case Protocol.Type.PlayerDisconnect:
+                ReceivePlayerDisconnectEvent(msg);
+                break;
+
+            default:
+                Debug.LogWarning("[OnReceive] 알 수 없는 프로토콜");
+                break;
+        }
+    }
     // 서버로 보내는 데이터 처리 핸들러
     public void OnSend(Protocol.Type _type)
     {
@@ -266,9 +295,6 @@ public class WorldManager : MonoBehaviour
 
             case Protocol.Type.PlayerGoal:
                 SendPlayerGoalEvent();
-                break;
-
-            case Protocol.Type.GameEnd:
                 break;
 
             case Protocol.Type.ResetServer:
