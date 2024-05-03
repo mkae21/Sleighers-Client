@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using Cinemachine;
+using UnityEngine.Rendering;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
@@ -9,15 +10,14 @@ using Cinemachine;
 public class Player : MonoBehaviour
 {
 #region PrivateVariables
-    private float currentSteerAngle;
-    //private bool isDrifting;
 
-    private float maxSpeed = 20f;
+    //최대속도 제한, 드리프트
+    private float maxSpeed = 1000f;
+    private float speed = 100f;
     private float currentSpeed;
-    private float motorForce = 2000f;
-    private float brakeForce = 3000f;
+    private float rotate;
 
-    private float maxSteerAngle = 20f;
+    private float currentRotate;
     private int playerId = 0;
     [SerializeField] private bool isMe = false;
     public bool IsMe
@@ -33,14 +33,21 @@ public class Player : MonoBehaviour
     }
     private string nickName = string.Empty;
     private GameObject playerModelObject;
-    private Rigidbody rb;
+
+    
 #endregion
 
 #region PublicVariables
-    public WheelCollider frontLeftWheelCollider;
-    public WheelCollider frontRightWheelCollider;
-    public WheelCollider backLeftWheelCollider;
-    public WheelCollider backRightWheelCollider;
+
+    public Rigidbody rb;
+    public Transform sledModel;
+    public Transform sledNormal;
+    
+    [Header("Parameters")]
+    public float acceleration = 40f;
+    public float steering = 40f;
+    public float gravity = 10f;
+    public float amount;
 
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
@@ -52,7 +59,6 @@ public class Player : MonoBehaviour
 #region PrivateMethod
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();//Player의 Rigidbody를 가져옴
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
     }
     private void Start()
@@ -71,81 +77,95 @@ public class Player : MonoBehaviour
             tmp = Vector3.Normalize(tmp);
             SetMoveVector(tmp);
         }
+        
+        SledPosition();
+        SteerHandle();
+        GetVerticalSpeed();
+        CuerrentValue();
+        CheckVelocity();
     }
+
+    private void FixedUpdate()
+    {
+        if(isMove)
+            ApplyPhysics();
+    }
+
+    private void GetVerticalSpeed()
+    {
+        if (moveVector.z > 0)
+            speed = acceleration;
+        else if (moveVector.z < 0)
+            speed = -acceleration;
+        else
+            speed = 0;
+    }
+
+    private void SteerHandle()
+    {
+        if (moveVector.x != 0)
+        {
+            int dir = moveVector.x > 0 ? 1 : -1;
+            amount = Mathf.Abs(moveVector.x);
+            Steer(dir, amount);
+        }
+    }
+    private void CuerrentValue()
+    {
+        currentSpeed = Mathf.SmoothStep(currentSpeed, speed , Time.deltaTime * 10f);
+        speed = 0f; // Reset for next frame
+        currentRotate = Mathf.Lerp(currentRotate, rotate, Time.deltaTime * 4f);
+        rotate = 0f; // Reset for next frame
+    }
+
     private Vector3 GetNameUIPos()
     {
         return this.transform.position + (Vector3.up * 2.0f);
     }
 
-    private void FixedUpdate()
+    private void ApplyPhysics()
     {
-        if (isMove)
-            HandleMotor();
-        
-        if (IsBraking) // Space 누르고 있을 때
-            ApplyBraking();
-        else
-            ApplyRestart();
+        rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
 
-        //CheckRotate();
-        HandleSteering();
-    }
+        rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration); // Apply gravity
 
-    private void HandleMotor() // 엔진 속도 조절
-    {
-        currentSpeed = rb.velocity.magnitude;
+        //steering, 썰매를 모델링한 오브젝트를 회전시키기 위해 사용
+        sledModel.eulerAngles = Vector3.Lerp(sledModel.eulerAngles, new Vector3(0, sledModel.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
 
-        if (currentSpeed > maxSpeed)
-        {
-            rb.velocity = rb.velocity.normalized * maxSpeed;
-        }
+        RaycastHit hitOn, hitNear;
 
-        frontLeftWheelCollider.motorTorque = moveVector.z * motorForce;
-        frontRightWheelCollider.motorTorque = moveVector.z * motorForce;
+        Physics.Raycast(transform.position, Vector3.down, out hitOn, 1.1f);
+        Physics.Raycast(transform.position, Vector3.down, out hitNear, 2.0f);
+
+        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
+        sledNormal.Rotate(0, transform.eulerAngles.y, 0);
         isMove = false;
     }
 
-    private void ApplyBraking() // 브레이크
+    public void Steer(int direction, float amount)
     {
-        IsBraking = false;
-        frontLeftWheelCollider.brakeTorque = brakeForce;
-        frontRightWheelCollider.brakeTorque = brakeForce;
+        rotate = (steering * direction) * amount;
     }
 
-    private void ApplyRestart()//브레이크가 풀렸을 때 엔진 다시 켜기
+    private void SledPosition()
     {
-        frontLeftWheelCollider.brakeTorque = 0;
-        frontRightWheelCollider.brakeTorque = 0;
+        sledModel.transform.position = rb.transform.position - new Vector3(0, 1f, 0);
     }
 
-    // private void CheckRotate()
-    // {
-    //     Debug.Log("회전 체크중");
-    //     if (transform.rotation.z > 0.33f)
-    //     {
-    //         Debug.Log("힘주는 중");
-    //     }
-    //     if (transform.rotation.z < -0.33f)
-    //     {
-    //         Debug.Log("힘주는 중");
-    //     }
-    // }
-
-
-
-    private void HandleSteering()//방향 조정은 전륜만 조정
-    {
-        currentSteerAngle = maxSteerAngle * moveVector.x;
-        frontLeftWheelCollider.steerAngle = currentSteerAngle;
-        frontRightWheelCollider.steerAngle = currentSteerAngle;
-
-    }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Finish")
         {
             WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
             Debug.LogFormat("플레이어 {0} 도착", playerId);
+        }
+    }
+
+    private void CheckVelocity()
+    {
+        if (rb.velocity.magnitude > maxSpeed)
+        {
+            rb.velocity = rb.velocity.normalized * maxSpeed;
         }
     }
 #endregion
@@ -160,14 +180,14 @@ public class Player : MonoBehaviour
         this.nickName = _nickName;
 
         miniMapComponent.enabled = true;
-        playerModelObject = this.gameObject;
+        playerModelObject = sledModel.gameObject;
 
         nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, playerModelObject.transform);
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
         nameObject.transform.position = GetNameUIPos();
 
         if (IsMe)
-            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = this.transform;
+            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sledModel.transform;
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
@@ -176,6 +196,7 @@ public class Player : MonoBehaviour
     {
         SetMoveVector(this.transform.forward * move);
     }
+
     public void SetMoveVector(Vector3 vector)
     {
         moveVector = vector;
@@ -221,11 +242,13 @@ public class Player : MonoBehaviour
         // km/h로 변환
         return rb.velocity.magnitude * 3.6f;
     }
+
     // 앞으로 나아가는 차량 속도의 양
     public float ForwardSpeed => Vector3.Dot(rb.velocity, transform.forward);
 
     // 차량의 최대 속도에 상대적인 전진 속도를 반환 
     // 반환되는 값은 [-1, 1] 범위
+    
     public float NormalizedForwardSpeed
     {
         get => (Mathf.Abs(ForwardSpeed) > 0.1f) ? ForwardSpeed / maxSpeed : 0.0f;

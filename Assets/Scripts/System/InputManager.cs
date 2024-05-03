@@ -10,6 +10,7 @@ public class InputManager : MonoBehaviour
 #region PrivateVariables
     private const string HORIZONTAL = "Horizontal";
     private const string VERTICAL = "Vertical";
+    private const string BRAKE = "Jump";
 #endregion
 
 #region PublicVariables
@@ -40,12 +41,13 @@ public class InputManager : MonoBehaviour
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
         if (Input.GetKey(KeyCode.T))
             WorldManager.instance.OnSend(Protocol.Type.GameStart);
+        
         float h = Input.GetAxis(HORIZONTAL);
         float v = Input.GetAxis(VERTICAL);
 
         if (h == 0 && v == 0)
             return;
-
+            
         Vector3 position = WorldManager.instance.GetMyPlayerPosition();
         Vector3 velocity = WorldManager.instance.GetMyPlayerVelocity();
         Vector3 acceleration = new Vector3(h, 0, v);

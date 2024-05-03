@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using UnityEngine;
 using Protocol;
 using Reader;
+using System;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
@@ -31,7 +32,6 @@ public class WorldManager : MonoBehaviour
     static public WorldManager instance;
     public GameObject playerPool;
     public Transform[] startingPoints;
-    public MiniMapController miniMapController;
 #endregion
 
 #region PrivateMethod
@@ -66,7 +66,7 @@ public class WorldManager : MonoBehaviour
         }
         Debug.Log("[World Manager] 게임 초기화 진행");
         sessionInfo = new SessionInfo();
-        playerPrefab = Resources.Load("Prefabs/Player2") as GameObject;
+        playerPrefab = Resources.Load("Prefabs/SledPlayer") as GameObject;
     }
 
     // 서버로부터 받는 데이터 처리 핸들러
@@ -77,7 +77,7 @@ public class WorldManager : MonoBehaviour
         stream.Read(size, 0, size.Length);
 
         ByteReader br = new ByteReader(size);
-        int jsonSize = br.ReadInt();
+        int jsonSize = br.ReadInt(); 
 
         byte[] data = new byte[jsonSize];
         int receiveSize = stream.Read(data, 0, data.Length);
@@ -102,11 +102,9 @@ public class WorldManager : MonoBehaviour
         if (msg.from == MyPlayerId)
         {
             Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
-            LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
             return;
         }
         Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
-        LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
 
         switch(msg.type)
         {
@@ -152,6 +150,7 @@ public class WorldManager : MonoBehaviour
         Vector3 position = keyMessage.position;
         Vector3 velocity = keyMessage.velocity;
         Vector3 acceleration = keyMessage.acceleration;
+        Debug.LogFormat("[OnReceive] ReceiveKeyEvent : {0} / {1} / {2}", position, velocity, acceleration);
 
         players[id].SetMoveVector(acceleration);
 
@@ -178,10 +177,8 @@ public class WorldManager : MonoBehaviour
         Transform sp = startingPoints[totalPlayerCount].transform;
         GameObject myPlayer = Instantiate(playerPrefab, sp.position, sp.rotation, playerPool.transform);
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId);
-        miniMapController.SetTarget(myPlayer.transform);
         players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
-
         for (int i = 0; i < totalPlayerCount; i++)
         {
             int otherPlayerId = userList[i];
@@ -195,8 +192,7 @@ public class WorldManager : MonoBehaviour
     private void ReceiveSendCountDownEvent(GameStartCountDownMessage msg)
     {
         int count = msg.count;
-        Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);  
-        InGameUI.instance.SetCountDown(count);      
+        Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);
     }
     // 게임 시작 이벤트 처리
     private void ReceiveGameStartEvent()
@@ -209,7 +205,6 @@ public class WorldManager : MonoBehaviour
         int userId = msg.from;
         Destroy(players[userId].gameObject);
         players.Remove(userId);
-        sessionInfo.totalPlayerCount--;
     }
 
     // 게임 종료 이벤트 처리
