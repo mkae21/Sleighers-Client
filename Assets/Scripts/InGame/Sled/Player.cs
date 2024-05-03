@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using Cinemachine;
+using System;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
@@ -11,6 +12,13 @@ public class Player : MonoBehaviour
 #region PrivateVariables
     private float currentSteerAngle;
     //private bool isDrifting;
+
+    // expolation, slerp
+    private Vector3 lastServerPosition;
+    private Vector3 lastServerVelocity;
+    private Vector3 lastServerAcceleration;
+    private long lastServerTimeStamp;
+    private float extrapolationLimit = 0.5f;
 
     private float maxSpeed = 20f;
     private float currentSpeed;
@@ -148,7 +156,25 @@ public class Player : MonoBehaviour
             Debug.LogFormat("플레이어 {0} 도착", playerId);
         }
     }
-#endregion
+
+    private void ExtrapolatePosition()
+    {
+        Quaternion lastServerRotation = Quaternion.LookRotation(lastServerAcceleration);
+        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
+        float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
+
+        if (timeSinceLastUpdate < extrapolationLimit)
+        {
+            Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate) + (0.5f * lastServerAcceleration * timeSinceLastUpdate);
+            transform.position = Vector3.Lerp(transform.position, extrapolatedPosition, interpolationRatio);
+        }
+        else
+        {
+            transform.position = Vector3.Lerp(transform.position, lastServerPosition, interpolationRatio);
+        }
+    }
+    #endregion
 
 
 #region PublicMethod
@@ -172,6 +198,15 @@ public class Player : MonoBehaviour
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
     }
+
+    public void SetServerData(Vector3 _position, Vector3 _velocity, Vector3 _acceleration, long _timeStamp)
+    {
+        lastServerPosition = _position;
+        lastServerVelocity = _velocity;
+        lastServerAcceleration = _acceleration;
+        lastServerTimeStamp = _timeStamp;
+    }
+
     public void SetMoveVector(float move)
     {
         SetMoveVector(this.transform.forward * move);
@@ -181,13 +216,12 @@ public class Player : MonoBehaviour
         moveVector = vector;
 
         if (vector == Vector3.zero)
-        {
             isMove = false;
-        }
         else
-        {
             isMove = true;
-        }
+        if(!IsMe)
+            ExtrapolatePosition();
+
     }
 
     public void SetPosition(Vector3 pos)

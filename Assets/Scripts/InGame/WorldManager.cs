@@ -108,7 +108,9 @@ public class WorldManager : MonoBehaviour
         Vector3 position = keyMessage.position;
         Vector3 velocity = keyMessage.velocity;
         Vector3 acceleration = keyMessage.acceleration;
+        long timeStamp = keyMessage.timeStamp;
 
+        players[id].SetServerData(position, velocity, acceleration, timeStamp);
         players[id].SetMoveVector(acceleration);
 
         // TODO: interpolation 적용

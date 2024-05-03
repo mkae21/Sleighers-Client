@@ -51,7 +51,7 @@ public class InputManager : MonoBehaviour
         Vector3 acceleration = new Vector3(h, 0, v);
         acceleration = Vector3.Normalize(acceleration);
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
-        KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, position, velocity, acceleration);
+        KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, position, velocity, acceleration, 0);
         ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
     }
 #endregion
