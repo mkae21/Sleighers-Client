@@ -5,7 +5,7 @@ using UnityEngine.Events;
 public class Finish : MonoBehaviour
 {
 #region PrivateVariables
-    [SerializeField] private List<Checkpoint> checkpoints;
+    private List<Checkpoint> checkpoints;
     private int totalCheckpoints;
 #endregion
 
@@ -40,6 +40,8 @@ public class Finish : MonoBehaviour
             {
                 checkpointInfo.SetLastCheckpoint(_checkpoint);
                 checkpointInfo.SetNextCheckpoint(GetNextCheckpoint(_checkpoint));
+                RankManager.instance.SetPlayerCheckpointCount(_player);
+                InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
             }
         }
         // 그렇지 않으면 통과한 체크포인트가 통과해야 하는 다음 체크포인트인 경우, 그 다음 체크포인트를 잠금 해제합니다.
@@ -51,7 +53,9 @@ public class Finish : MonoBehaviour
 
             checkpointInfo.SetLastCheckpoint(_checkpoint);
             checkpointInfo.SetNextCheckpoint(GetNextCheckpoint(_checkpoint));
-        }
+            RankManager.instance.SetPlayerCheckpointCount(_player);
+            InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
+        } 
     }
     // 주어진 체크포인트의 다음 체크포인트를 반환
     private Checkpoint GetNextCheckpoint(Checkpoint _checkpoint)
@@ -72,16 +76,16 @@ public class Finish : MonoBehaviour
         return result;
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider _other)
     {
-        if(other.attachedRigidbody != null && other.attachedRigidbody.TryGetComponent<Player>(out var vehicle))
-            OnVehicleEnterFinish(vehicle);
+        if(_other.attachedRigidbody != null && _other.attachedRigidbody.TryGetComponent<Player>(out var player))
+            OnPlayerEnterFinish(player);
     }
 
-    // 차량이 결승선에 진입할 때 호출되는 콜백
-    private void OnVehicleEnterFinish(Player _player)
+    // 플레이어가 결승선에 진입할 때 호출되는 콜백
+    private void OnPlayerEnterFinish(Player _player)
     {
-        var checkpointInfo = GetOrAddCheckpointInfo(_player);
+        CheckpointInfo checkpointInfo = GetOrAddCheckpointInfo(_player);
 
         // 결승선을 통과하면 마지막으로 통과한 체크포인트를 초기화
         // 이렇게 하면 플레이어가 뒤로 운전하여 마지막 체크포인트를 통과한 후 다시 결승선을 통과하는 등의 부정행위를 방지할 수 있다
