@@ -8,6 +8,7 @@ public class Checkpoint : MonoBehaviour
 #endregion
 
 #region PublicVariables
+    // 플레이어가 체크포인트에 진입할 때 호출되는 콜백
     public UnityAction<Player, Checkpoint> OnPlayerEnterCheckpoint;
 #endregion
 
@@ -28,9 +29,7 @@ public class Checkpoint : MonoBehaviour
         Player player = _other.GetComponentInParent<Player>();
 
         if (player != null)
-        {
             OnPlayerEnterCheckpoint?.Invoke(player, this);
-        }
     }
 #endregion
 }

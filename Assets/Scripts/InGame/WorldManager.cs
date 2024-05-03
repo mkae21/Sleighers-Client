@@ -16,7 +16,7 @@ public class WorldManager : MonoBehaviour
         public int totalPlayerCount;
     }
 #region PrivateVariables
-    private LapManager lapManager;
+    private RankManager lapManager;
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
     private Dictionary<int, Player> players;
@@ -28,12 +28,13 @@ public class WorldManager : MonoBehaviour
     }
     private bool isGameStart = false;
     private bool isRaceFinish = false;
+    private Transform[] startingPoints;
 #endregion
 
 #region PublicVariables
     static public WorldManager instance;
     public GameObject playerPool;
-    public Transform[] startingPoints;
+    public Transform startingPointHolder;
     public MiniMapController miniMapController;
     // 레이스가 종료되면 호출되는 액션
     public UnityAction OnRaceFinished { get; set; }
@@ -54,7 +55,7 @@ public class WorldManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        lapManager = GetComponent<LapManager>();
+        lapManager = GetComponent<RankManager>();
         players = new Dictionary<int, Player>();
         lapManager.OnLapComplete += OnLapComplete;
         OnRaceFinished += FinishRace;
@@ -77,12 +78,15 @@ public class WorldManager : MonoBehaviour
         isRaceFinish = false;
         sessionInfo = new SessionInfo();
         playerPrefab = Resources.Load("Prefabs/Player2") as GameObject;
+        startingPoints = new Transform[startingPointHolder.childCount];
+        for (int i = 0; i < startingPointHolder.childCount; i++)
+            startingPoints[i] = startingPointHolder.GetChild(i);
     }
     // 플레이어가 한 바퀴를 완주했을 때 호출되는 콜백
-    private void OnLapComplete(Player _player, LapInfo _lapInfo)
+    private void OnLapComplete(Player _player, RankInfo _lapInfo)
     {
         // 플레이어가 레이스를 완료했나 확인
-        if (_player.IsMe && _lapInfo.completed == lapManager.Laps)
+        if (_player.IsMe && _lapInfo.lap == lapManager.Laps)
         {
             // 아직 완료하지 못했다면 레이스를 완료
             if (!isRaceFinish)
