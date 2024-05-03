@@ -46,10 +46,10 @@ public class InGameUI : MonoBehaviour
     public void UpdateTimer()
     {
         timer += Time.deltaTime;
-        int hours = (int)(timer / 3600);
         int minutes = (int)(timer / 60 % 60);
         int seconds = (int)(timer % 60);
-        text_Timer.text = string.Format("Time: {0:D2} : {1:D2} : {2:D2}", hours, minutes, seconds);
+        int miliseconds = (int)(timer * 1000 % 1000);
+        text_Timer.text = string.Format("Time : {0:D2} : {1:D2} : {2:D3}", minutes, seconds, miliseconds);
     }
 
     // 카운트 다운 설정
