@@ -163,7 +163,6 @@ public class Player : MonoBehaviour
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
         float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
-        //long timeSinceLastUpdate = (currentTime - lastServerTimeStamp);
 
         if (timeSinceLastUpdate < extrapolationLimit)
         {
@@ -203,12 +202,12 @@ public class Player : MonoBehaviour
         this.moveVector = new Vector3(0, 0, 0);
     }
 
-    public void SetServerData(Vector3 position, Vector3 velocity, Vector3 acceleration, long timeStamp)
+    public void SetServerData(Vector3 _position, Vector3 _velocity, Vector3 _acceleration, long _timeStamp)
     {
-        lastServerPosition = position;
-        lastServerVelocity = velocity;
-        lastServerAcceleration = acceleration;
-        lastServerTimeStamp = timeStamp;
+        lastServerPosition = _position;
+        lastServerVelocity = _velocity;
+        lastServerAcceleration = _acceleration;
+        lastServerTimeStamp = _timeStamp;
     }
 
     public void SetMoveVector(float move)
