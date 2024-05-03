@@ -6,7 +6,7 @@ using UnityEngine.Playables;
 namespace Ilumisoft.ArcardeRacingKit
 {
     [DefaultExecutionOrder(-2)]
-    [RequireComponent(typeof(LapManager), typeof(VehicleManager))]
+    [RequireComponent(typeof(_LapManager), typeof(VehicleManager))]
     [HelpURL("https://ilumisoft.gitbook.io/arcade-racing-kit/managers/race-manager")]
     public class RaceManager : MonoBehaviour
     {
@@ -23,7 +23,7 @@ namespace Ilumisoft.ArcardeRacingKit
         PlayableDirector outroTimeline = null;
 
         VehicleManager vehicleManager;
-        LapManager lapManager;
+        _LapManager lapManager;
 
         /// <summary>
         /// Action invoked when the race has started (after the intro timeline has been played)
@@ -43,7 +43,7 @@ namespace Ilumisoft.ArcardeRacingKit
         private void Awake()
         {
             vehicleManager = GetComponent<VehicleManager>();
-            lapManager = GetComponent<LapManager>();
+            lapManager = GetComponent<_LapManager>();
 
             lapManager.OnLapComplete += OnLapComplete;
         }
@@ -109,7 +109,7 @@ namespace Ilumisoft.ArcardeRacingKit
         /// </summary>
         /// <param name="vehicle"></param>
         /// <param name="lapInfo"></param>
-        private void OnLapComplete(Vehicle vehicle, LapInfo lapInfo)
+        private void OnLapComplete(Vehicle vehicle, _LapInfo lapInfo)
         {
             // Has the player finished the race?
             if (vehicle.CompareTag("Player") && lapInfo.Completed == lapManager.Laps)
