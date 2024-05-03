@@ -99,7 +99,6 @@ public class WorldManager : MonoBehaviour
     // 레이스를 완료하고 아웃트로 타임라인을 재생
     private void FinishRace()
     {
-        Debug.LogFormat("[WorldManager] 레이스 종료");
         isRaceFinish = true;
         OnSend(Protocol.Type.PlayerGoal);
     }
