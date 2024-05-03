@@ -11,7 +11,8 @@ public class InGameUI : MonoBehaviour
     public TextMeshProUGUI text_lab;
 
     public TextMeshProUGUI text_speedLabel;
-    public RectTransform arrow;
+    public TextMeshProUGUI text_totalLaps;
+
     public LapManager lapManager;
 
     public float countDownDuration = 3.0f;
@@ -66,8 +67,9 @@ public class InGameUI : MonoBehaviour
 
     private void UpdateLapText(int currentLap)
     {
+
         if (lapManager != null)
-            text_Lab.text = $"LAP {currentLap} / {lapManager.Laps}";
+            text_lab.text = $"<b><size=120>{currentLap}</size=120></b> / {lapManager.Laps} LAP";
     }
 
 #endregion
