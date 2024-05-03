@@ -80,10 +80,7 @@ public class InGameUI : MonoBehaviour
     {
         speed = WorldManager.instance.GetMyPlayer().GetSpeed();
         if(text_speedLabel != null)
-            text_speedLabel.text = string.Format("{0} km/h", (int)speed);
-        
-        if(arrow != null)
-            arrow.localEulerAngles = new Vector3(0,0, Mathf.Lerp(minSpeedArrowAngle, maxSpeedArrowAngle, speed / maxSpeed));
+            text_speedLabel.text = string.Format("{0}", (int)speed);
     }
 
 #endregion
