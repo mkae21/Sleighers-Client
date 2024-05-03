@@ -73,7 +73,6 @@ public class InGameUI : MonoBehaviour
             int lapsCompleted = lapManager.GetLapInfo(_player).lap;
 
             int currentLap = Mathf.Min(lapsCompleted + 1, lapManager.Laps);
-            Debug.LogFormat("Player {0}가 {1}번째 랩 완주", _player.playerId, currentLap);
 
             UpdateLapText(currentLap);
         }
@@ -83,7 +82,7 @@ public class InGameUI : MonoBehaviour
     {
 
         if (lapManager != null)
-            text_lab.text = $"<b><size=120>{currentLap}</size=120></b> / {lapManager.Laps} LAP";
+            text_lab.text = $"<b><size=120>{_currentLap}</size=120></b> / {lapManager.Laps} LAP";
     }
 
 #endregion
