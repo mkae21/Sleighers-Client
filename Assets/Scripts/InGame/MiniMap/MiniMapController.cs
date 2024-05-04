@@ -167,7 +167,6 @@ public class MiniMapController : MonoBehaviour {
 				mapCamera.transform.eulerAngles = target.eulerAngles + rotationOfCam;
 			}
 			mapCamera.transform.position = target.position + cameraOffset;
-			Debug.LogFormat("Target Position: {0}, Camera Position: {1}", target.position, mapCamera.transform.position);
 		}
 	}
 
