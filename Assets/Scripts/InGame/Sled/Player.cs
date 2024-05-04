@@ -185,8 +185,8 @@ public class Player : MonoBehaviour
         float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
 
         float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate/extrapolationLimit);
-        //Debug.Log("현재 레이턴시 :" + timeSinceLastUpdate);
-        //Debug.Log("인터폴레이션 비율 :" + interpolationRatio);
+        Debug.Log("현재 레이턴시 :" + timeSinceLastUpdate);
+        Debug.Log("인터폴레이션 비율 :" + interpolationRatio);
         if (timeSinceLastUpdate < extrapolationLimit)
         {
             Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate) + (0.5f * lastServerAcceleration * timeSinceLastUpdate);
