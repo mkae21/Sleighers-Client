@@ -468,6 +468,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf119559e933854dbc4256168dde221, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMe: 0
+  isBraking: 0
   frontLeftWheelCollider: {fileID: 560117563941063565}
   frontRightWheelCollider: {fileID: 7385474265868569234}
   backLeftWheelCollider: {fileID: 2542384390064026226}
@@ -475,7 +477,6 @@ MonoBehaviour:
   <moveVector>k__BackingField: {x: 0, y: 0, z: 0}
   <isMove>k__BackingField: 0
   nameObject: {fileID: 6711063065380186699, guid: 288abb305934d2b4cba29bea79a9c247, type: 3}
-  isBraking: 0
 --- !u!114 &6273742109643340255
 MonoBehaviour:
   m_ObjectHideFlags: 0
