@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using Cinemachine;
 using UnityEngine.Rendering;
+using System;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
@@ -10,6 +11,15 @@ using UnityEngine.Rendering;
 public class Player : MonoBehaviour
 {
 #region PrivateVariables
+    private float currentSteerAngle;
+    //private bool isDrifting;
+
+    // expolation, slerp
+    private Vector3 lastServerPosition;
+    private Vector3 lastServerVelocity;
+    private Vector3 lastServerAcceleration;
+    private long lastServerTimeStamp;
+    private float extrapolationLimit = 0.5f;
 
     //최대속도 제한, 드리프트
     private float maxSpeed = 1000f;
@@ -18,7 +28,7 @@ public class Player : MonoBehaviour
     private float rotate;
 
     private float currentRotate;
-    private int playerId = 0;
+    public int playerId { get; private set;} = -1;
     [SerializeField] private bool isMe = false;
     public bool IsMe
     {
@@ -168,7 +178,25 @@ public class Player : MonoBehaviour
             rb.velocity = rb.velocity.normalized * maxSpeed;
         }
     }
-#endregion
+
+    private void ExtrapolatePosition()
+    {
+        Quaternion lastServerRotation = Quaternion.LookRotation(lastServerAcceleration);
+        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
+        float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
+
+        if (timeSinceLastUpdate < extrapolationLimit)
+        {
+            Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate) + (0.5f * lastServerAcceleration * timeSinceLastUpdate);
+            transform.position = Vector3.Lerp(transform.position, extrapolatedPosition, interpolationRatio);
+        }
+        else
+        {
+            transform.position = Vector3.Lerp(transform.position, lastServerPosition, interpolationRatio);
+        }
+    }
+    #endregion
 
 
 #region PublicMethod
@@ -186,12 +214,24 @@ public class Player : MonoBehaviour
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
         nameObject.transform.position = GetNameUIPos();
 
+        RankManager.instance.InitPlayerLapInfo(GetComponent<Player>());
+        InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
+
         if (IsMe)
             CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sledModel.transform;
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
     }
+
+    public void SetServerData(Vector3 _position, Vector3 _velocity, Vector3 _acceleration, long _timeStamp)
+    {
+        lastServerPosition = _position;
+        lastServerVelocity = _velocity;
+        lastServerAcceleration = _acceleration;
+        lastServerTimeStamp = _timeStamp;
+    }
+
     public void SetMoveVector(float move)
     {
         SetMoveVector(this.transform.forward * move);
@@ -202,13 +242,12 @@ public class Player : MonoBehaviour
         moveVector = vector;
 
         if (vector == Vector3.zero)
-        {
             isMove = false;
-        }
         else
-        {
             isMove = true;
-        }
+        if(!IsMe)
+            ExtrapolatePosition();
+
     }
 
     public void SetPosition(Vector3 pos)
