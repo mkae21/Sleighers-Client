@@ -1,7 +1,6 @@
 using UnityEngine;
 using TMPro;
 using Cinemachine;
-using UnityEngine.Rendering;
 using System;
 
 /* Player.cs
@@ -22,7 +21,7 @@ public class Player : MonoBehaviour
     private float extrapolationLimit = 0.5f;
 
     //최대속도 제한, 드리프트
-    private float maxSpeed = 1000f;
+    private float maxSpeed = 100f;
     private float speed = 100f;
     private float currentSpeed;
     private float rotate;
@@ -290,7 +289,7 @@ public class Player : MonoBehaviour
     
     public float NormalizedForwardSpeed
     {
-        get => (Mathf.Abs(ForwardSpeed) > 0.1f) ? ForwardSpeed / maxSpeed : 0.0f;
+        get => (Mathf.Abs(ForwardSpeed) > 0.1f) ? Mathf.Abs(ForwardSpeed) * 5 / maxSpeed : 0.0f;
     }
 #endregion
 }
