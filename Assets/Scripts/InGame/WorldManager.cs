@@ -15,7 +15,7 @@ public class WorldManager : MonoBehaviour
     {
         public int totalPlayerCount;
     }
-#region PrivateVariables
+    #region PrivateVariables
     private RankManager lapManager;
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
@@ -29,9 +29,9 @@ public class WorldManager : MonoBehaviour
     private bool isGameStart = false;
     private bool isRaceFinish = false;
     private Transform[] startingPoints;
-#endregion
+    #endregion
 
-#region PublicVariables
+    #region PublicVariables
     static public WorldManager instance;
     public GameObject playerPool;
     public Transform startingPointHolder;
@@ -39,9 +39,9 @@ public class WorldManager : MonoBehaviour
     // 레이스가 종료되면 호출되는 액션
     public UnityAction OnRaceFinished { get; set; }
 
-#endregion
+    #endregion
 
-#region PrivateMethod
+    #region PrivateMethod
     // 애플리케이션 종료 시
     private void OnApplicationQuit()
     {
@@ -103,7 +103,7 @@ public class WorldManager : MonoBehaviour
         OnSend(Protocol.Type.PlayerGoal);
     }
 
-#region Receive 프로토콜 처리
+    #region Receive 프로토콜 처리
     // 키 입력 이벤트 처리
     private void ReceiveKeyEvent(KeyMessage keyMessage)
     {
@@ -113,6 +113,7 @@ public class WorldManager : MonoBehaviour
         Vector3 velocity = keyMessage.velocity;
         Vector3 acceleration = keyMessage.acceleration;
         long timeStamp = keyMessage.timeStamp;
+
         players[id].SetServerData(position, velocity, acceleration, timeStamp);
         players[id].SetMoveVector(acceleration);
 
@@ -156,8 +157,8 @@ public class WorldManager : MonoBehaviour
     private void ReceiveSendCountDownEvent(GameStartCountDownMessage msg)
     {
         int count = msg.count;
-        Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);  
-        InGameUI.instance.SetCountDown(count);      
+        //Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);
+        InGameUI.instance.SetCountDown(count);
     }
     // 게임 시작 이벤트 처리
     private void ReceiveGameStartEvent()
@@ -179,9 +180,9 @@ public class WorldManager : MonoBehaviour
         int userId = br.ReadInt();
         Debug.LogFormat("플레이어 {0}가 승리했습니다.", userId);
     }
-#endregion
+    #endregion
 
-#region Send 프로토콜 처리
+    #region Send 프로토콜 처리
     // 게임 시작 이벤트를 서버에 알림
     private void SendGameStartEvent()
     {
@@ -203,12 +204,12 @@ public class WorldManager : MonoBehaviour
         Message msg = new Message(Protocol.Type.ResetServer, myPlayerId);
         ServerManager.Instance().SendDataToInGame(msg);
     }
-#endregion
+    #endregion
 
 
-#endregion
+    #endregion
 
-#region PublicMethod
+    #region PublicMethod
     // 서버로부터 받는 데이터 처리 핸들러
     public void OnReceive()
     {
@@ -221,7 +222,7 @@ public class WorldManager : MonoBehaviour
 
         byte[] data = new byte[jsonSize];
         int receiveSize = stream.Read(data, 0, data.Length);
-        
+
         if (receiveSize == 0)
         {
             Debug.Log("[OnReceive] 빈 데이터가 브로드캐스킹 되었습니다.");
@@ -234,21 +235,21 @@ public class WorldManager : MonoBehaviour
             return;
         }
 
-        if (msg == null )
+        if (msg == null)
         {
             Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
             return;
         }
         if (msg.from == MyPlayerId)
         {
-            Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
-            LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
+            //Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
+            //LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
             return;
         }
-        Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
-        LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
+        //Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
+        //LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
 
-        switch(msg.type)
+        switch (msg.type)
         {
             case Protocol.Type.LoadGameScene:
                 LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
@@ -285,7 +286,7 @@ public class WorldManager : MonoBehaviour
     // 서버로 보내는 데이터 처리 핸들러
     public void OnSend(Protocol.Type _type)
     {
-        Debug.LogFormat("[OnSend] 보낸 메세지 타입 : {0}", _type);
+        //Debug.LogFormat("[OnSend] 보낸 메세지 타입 : {0}", _type);
         switch (_type)
         {
             case Protocol.Type.PlayerReconnect:
@@ -328,5 +329,5 @@ public class WorldManager : MonoBehaviour
     {
         return players[_id];
     }
-#endregion
+    #endregion
 }

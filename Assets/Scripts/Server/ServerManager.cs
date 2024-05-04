@@ -68,7 +68,7 @@ public class ServerManager : MonoBehaviour
     }
     private void Init()
     {
-        // serverIP = "localhost"; // 로컬 테스트 용
+        //serverIP = "localhost"; // 로컬 테스트 용
         serverIP = SecretLoader.s_serverIp;
         serverPort = SecretLoader.s_serverPort;
 
@@ -91,7 +91,7 @@ public class ServerManager : MonoBehaviour
         {
             if (Stream.DataAvailable && IsConnect)
                 WorldManager.instance.OnReceive();
-            yield return new WaitForSeconds(0.0333f);
+            yield return null;
         }
     
     }

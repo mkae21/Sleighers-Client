@@ -8,8 +8,8 @@ using UnityEngine;
  */
 public class GameManager : MonoBehaviour
 {
-    
-#region PrivateVariables
+
+    #region PrivateVariables
     private static bool isCreate = false;
     private static GameManager instance;
     private IEnumerator ReadyUpdateCoroutine;
@@ -17,14 +17,14 @@ public class GameManager : MonoBehaviour
     private GameState gameState;
     #endregion
 
-#region PublicVariables
+    #region PublicVariables
     public static event Action Ready = delegate { }; // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { }; // InGame 상태에서 실행되는 함수들
     public enum GameState { Login, MatchLobby, Ready, Start, InGame, Over, Result, Reconnect };
     public SoundManager soundManager = new SoundManager();
 #endregion
 
-#region PrivateMethod
+    #region PrivateMethod
     private void Awake()
     {
         if (!instance)
@@ -83,9 +83,9 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(0.0333f);
         }
     }
-#endregion
+    #endregion
 
-#region PublicMethod
+    #region PublicMethod
     public static GameManager Instance()
     {
         if (instance == null)
@@ -120,5 +120,5 @@ public class GameManager : MonoBehaviour
     {
         return gameState;
     }
-#endregion
+    #endregion
 }

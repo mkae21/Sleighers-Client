@@ -13,7 +13,7 @@ public class Player : MonoBehaviour
     private float currentSteerAngle;
     //private bool isDrifting;
 
-    // expolation, slerp
+    // extrapolation, slerp
     private Vector3 lastServerPosition;
     private Vector3 lastServerVelocity;
     private Vector3 lastServerAcceleration;
@@ -183,22 +183,26 @@ public class Player : MonoBehaviour
         Quaternion lastServerRotation = Quaternion.LookRotation(lastServerAcceleration);
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
-        float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
 
+        float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate/extrapolationLimit);
+        //Debug.Log("현재 레이턴시 :" + timeSinceLastUpdate);
+        //Debug.Log("인터폴레이션 비율 :" + interpolationRatio);
         if (timeSinceLastUpdate < extrapolationLimit)
         {
             Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate) + (0.5f * lastServerAcceleration * timeSinceLastUpdate);
-            transform.position = Vector3.Lerp(transform.position, extrapolatedPosition, interpolationRatio);
+            transform.position = Vector3.Slerp(transform.position, extrapolatedPosition, interpolationRatio);
         }
         else
         {
-            transform.position = Vector3.Lerp(transform.position, lastServerPosition, interpolationRatio);
+            transform.position = Vector3.Slerp(transform.position, lastServerPosition, interpolationRatio);
         }
+        //Quaternion extrapolatedRotation = Quaternion.Slerp(transform.rotation, lastServerRotation, interpolationRatio);
+        //transform.rotation = extrapolatedRotation;
     }
     #endregion
 
 
-#region PublicMethod
+    #region PublicMethod
     // 내 플레이어와 다른 플레이어 객체 초기화
     public void Initialize(bool _isMe, int _playerId, string _nickName)
     {
@@ -244,8 +248,10 @@ public class Player : MonoBehaviour
             isMove = false;
         else
             isMove = true;
-        if(!IsMe)
+        if (!IsMe)
+        {
             ExtrapolatePosition();
+        }
 
     }
 
