@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Xml.Linq;
 using UnityEngine;
 
 /* GameManager.cs
@@ -36,9 +37,9 @@ public class GameManager : MonoBehaviour
         // 게임중 슬립모드 해제
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        ReadyUpdateCoroutine = ReadyUpdate();
+        //ReadyUpdateCoroutine = ReadyUpdate();
 
-        InGameUpdateCoroutine = InGameUpdate();
+        //InGameUpdateCoroutine = InGameUpdate();
 
         DontDestroyOnLoad(this.gameObject);
     }
@@ -55,33 +56,41 @@ public class GameManager : MonoBehaviour
         isCreate = true;
     }
     // Ready 상태에서 실행되는 코루틴
-    private IEnumerator ReadyUpdate()
-    {
-        while (true)
-        {
-            if (gameState != GameState.Ready)
-            {
-                StopCoroutine(ReadyUpdateCoroutine);
-                yield return null;
-            }
-            Ready();
-            yield return new WaitForSeconds(0.0333f);
-        }
-    }
+    //private IEnumerator ReadyUpdate()
+    //{
+    //    while (true)
+    //    {
+    //        if (gameState != GameState.Ready)
+    //        {
+    //            StopCoroutine(ReadyUpdateCoroutine);
+    //            yield return null;
+    //        }
+    //        Ready();
+    //        yield return new WaitForSeconds(0.0333f);
+    //    }
+    //}
 
-    // 인게임에서 실행되는 코루틴
-    private IEnumerator InGameUpdate()
+    //// 인게임에서 실행되는 코루틴
+    //private IEnumerator InGameUpdate()
+    //{
+    //    while (true)
+    //    {
+    //        if (gameState != GameState.InGame)
+    //        {
+    //            StopCoroutine(InGameUpdateCoroutine);
+    //            yield return null;
+    //        }
+    //        InGame();
+    //        yield return new WaitForSeconds(0.0333f);
+    //    }
+    //}
+
+    private void FixedUpdate()
     {
-        while (true)
-        {
-            if (gameState != GameState.InGame)
-            {
-                StopCoroutine(InGameUpdateCoroutine);
-                yield return null;
-            }
+        if(gameState == GameState.Ready)
+            Ready();
+        else if(gameState == GameState.InGame)
             InGame();
-            yield return new WaitForSeconds(0.0333f);
-        }
     }
     #endregion
 
@@ -98,18 +107,29 @@ public class GameManager : MonoBehaviour
 
     public void ChangeState(GameState state, Action<bool> func = null)
     {
-        gameState = state;
         switch (gameState)
         {
             case GameState.Ready:
-                StartCoroutine(ReadyUpdateCoroutine);
+                // ready 상태 정리
                 break;
+            case GameState.InGame:
+                // InGame 상태정리
+                break;
+            default:
+                Debug.Log("[GameManager] 알 수 없는 상태입니다.");
+                break;
+        }
 
+        gameState = state;
+
+        switch (gameState)
+        {
+            case GameState.Ready:
+                break;
             case GameState.InGame:
                 soundManager.Play("BGM/InGame", SoundType.BGM);
-                StartCoroutine(InGameUpdateCoroutine);
+                //StartCoroutine(InGameUpdateCoroutine);
                 break;
-
             default:
                 Debug.Log("[GameManager] 알 수 없는 상태입니다.");
                 break;
