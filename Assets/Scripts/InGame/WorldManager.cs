@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using Protocol;
 using Reader;
-using System;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
@@ -102,83 +101,6 @@ public class WorldManager : MonoBehaviour
     {
         isRaceFinish = true;
         OnSend(Protocol.Type.PlayerGoal);
-    }
-
-#endregion
-
-#region PublicMethod
-    // 서버로부터 받는 데이터 처리 핸들러
-    public void OnReceive()
-    {
-        NetworkStream stream = ServerManager.Instance().Stream;
-        byte[] size = new byte[4];
-        stream.Read(size, 0, size.Length);
-
-        ByteReader br = new ByteReader(size);
-        int jsonSize = br.ReadInt();
-
-        byte[] data = new byte[jsonSize];
-        int receiveSize = stream.Read(data, 0, data.Length);
-        
-        if (receiveSize == 0)
-        {
-            Debug.Log("[OnReceive] 빈 데이터가 브로드캐스킹 되었습니다.");
-            return;
-        }
-        Message msg = DataParser.ReadJsonData<Message>(data);
-        if (players == null)
-        {
-            Debug.LogWarning("[OnReceive] 플레이어 리스트가 존재하지 않습니다.");
-            return;
-        }
-
-        if (msg == null )
-        {
-            Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
-            return;
-        }
-        if (msg.from == MyPlayerId)
-        {
-            Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
-            LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
-            return;
-        }
-        Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
-        LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
-
-        switch(msg.type)
-        {
-            case Protocol.Type.LoadGameScene:
-                LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
-                ReceiveLoadGameSceneEvent(loadMessage);
-                break;
-
-            case Protocol.Type.SendCountDown:
-                GameStartCountDownMessage startCountMessage = DataParser.ReadJsonData<GameStartCountDownMessage>(data);
-                ReceiveSendCountDownEvent(startCountMessage);
-                break;
-
-            case Protocol.Type.GameStart:
-                ReceiveGameStartEvent();
-                break;
-
-            case Protocol.Type.Key:
-                KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                ReceiveKeyEvent(keyMessage);
-                break;
-
-            case Protocol.Type.PlayerReconnect:
-                ReceivePlayerReconnectEvent(msg);
-                break;
-
-            case Protocol.Type.PlayerDisconnect:
-                ReceivePlayerDisconnectEvent(msg);
-                break;
-
-            default:
-                Debug.LogWarning("[OnReceive] 알 수 없는 프로토콜");
-                break;
-        }
     }
 
 #region Receive 프로토콜 처리
@@ -287,6 +209,79 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region PublicMethod
+    // 서버로부터 받는 데이터 처리 핸들러
+    public void OnReceive()
+    {
+        NetworkStream stream = ServerManager.Instance().Stream;
+        byte[] size = new byte[4];
+        stream.Read(size, 0, size.Length);
+
+        ByteReader br = new ByteReader(size);
+        int jsonSize = br.ReadInt();
+
+        byte[] data = new byte[jsonSize];
+        int receiveSize = stream.Read(data, 0, data.Length);
+        
+        if (receiveSize == 0)
+        {
+            Debug.Log("[OnReceive] 빈 데이터가 브로드캐스킹 되었습니다.");
+            return;
+        }
+        Message msg = DataParser.ReadJsonData<Message>(data);
+        if (players == null)
+        {
+            Debug.LogWarning("[OnReceive] 플레이어 리스트가 존재하지 않습니다.");
+            return;
+        }
+
+        if (msg == null )
+        {
+            Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
+            return;
+        }
+        if (msg.from == MyPlayerId)
+        {
+            Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
+            LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
+            return;
+        }
+        Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
+        LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
+
+        switch(msg.type)
+        {
+            case Protocol.Type.LoadGameScene:
+                LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
+                ReceiveLoadGameSceneEvent(loadMessage);
+                break;
+
+            case Protocol.Type.SendCountDown:
+                GameStartCountDownMessage startCountMessage = DataParser.ReadJsonData<GameStartCountDownMessage>(data);
+                ReceiveSendCountDownEvent(startCountMessage);
+                break;
+
+            case Protocol.Type.GameStart:
+                ReceiveGameStartEvent();
+                break;
+
+            case Protocol.Type.Key:
+                KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                ReceiveKeyEvent(keyMessage);
+                break;
+
+            case Protocol.Type.PlayerReconnect:
+                ReceivePlayerReconnectEvent(msg);
+                break;
+
+            case Protocol.Type.PlayerDisconnect:
+                ReceivePlayerDisconnectEvent(msg);
+                break;
+
+            default:
+                Debug.LogWarning("[OnReceive] 알 수 없는 프로토콜");
+                break;
+        }
+    }
     // 서버로 보내는 데이터 처리 핸들러
     public void OnSend(Protocol.Type _type)
     {
