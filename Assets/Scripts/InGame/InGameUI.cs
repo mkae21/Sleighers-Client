@@ -105,6 +105,7 @@ public class InGameUI : MonoBehaviour
     // 카운트 다운 설정
     public void SetCountDown(int _count)
     {
+        GameManager.Instance().soundManager.Play("Effect/StartCount", SoundType.EFFECT);
         countDownDuration = _count;
 
         if(text_countDown != null)

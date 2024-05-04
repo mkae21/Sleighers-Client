@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     public static event Action Ready = delegate { }; // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { }; // InGame 상태에서 실행되는 함수들
     public enum GameState { Login, MatchLobby, Ready, Start, InGame, Over, Result, Reconnect };
+    public SoundManager soundManager = new SoundManager();
 #endregion
 
 #region PrivateMethod
@@ -49,6 +50,7 @@ public class GameManager : MonoBehaviour
             DestroyImmediate(gameObject, true);
             return;
         }
+        soundManager.Init();
         ChangeState(GameState.Ready);
         isCreate = true;
     }
@@ -104,6 +106,7 @@ public class GameManager : MonoBehaviour
                 break;
 
             case GameState.InGame:
+                soundManager.Play("BGM/InGame", SoundType.BGM);
                 StartCoroutine(InGameUpdateCoroutine);
                 break;
 
