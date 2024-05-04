@@ -13,15 +13,15 @@ namespace Protocol
         EnterWaitingRoom,       // 대기실 입장
         LoadGameScene,          // 인게임 접속
         PlayerReady,            // 로딩 완료
-        SendCountDown,          // 게임 시작/끝 카운트 다운
+        GameStartCountDown,     // 게임 시작 카운트 다운
         GameStart,              // 게임 시작
         Key = 20,               // 키 입력
         Item,                   // 아이템 사용
         PlayerReconnect,        // 플레이어 재접속
         PlayerDisconnect,       // 플레이어 접속 끊김
         PlayerGoal,             // 플레이어 골인
-        GameEnd,                // 게임 종료
         GameEndCountDown,       // 1등 도착 후 카운트 다운 시작
+        GameEnd,                // 게임 종료
         GameSync,               // 게임 싱크
         ResetServer = 100,      // 서버 리셋
     }
@@ -65,31 +65,13 @@ namespace Protocol
         }
     }
 
-    public class GameStartCountDownMessage : Message
+    public class GameCountDownMessage : Message
     {
         public int count;
-        public GameStartCountDownMessage(int _id, int _count) : base(Type.SendCountDown, _id)
+        public GameCountDownMessage(int _id, int _count) : base(Type.GameStartCountDown, _id)
         {
             this.from = _id;
             this.count = _count;
-        }
-    }
-
-    public class GameEndCountDownMessage : Message
-    {
-        public int count;
-        public GameEndCountDownMessage(int _id, int _count) : base(Type.GameEndCountDown, _id)
-        {
-            this.from = _id;
-            this.count = _count;
-        }
-    }
-
-    public class GameStartMessage : Message
-    {
-        public GameStartMessage(int _id) : base(Type.GameStart, _id) 
-        { 
-            this.from = _id;
         }
     }
 

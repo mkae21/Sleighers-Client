@@ -154,7 +154,7 @@ public class WorldManager : MonoBehaviour
         }
     }
     // 게임 시작 카운트 다운 이벤트 처리
-    private void ReceiveSendCountDownEvent(GameStartCountDownMessage msg)
+    private void ReceiveGameStartCountDownEvent(GameCountDownMessage msg)
     {
         int count = msg.count;
         Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);  
@@ -166,7 +166,7 @@ public class WorldManager : MonoBehaviour
         GameManager.Instance().ChangeState(GameManager.GameState.InGame);
     }
     // 게임 종료 카운트 다운 이벤트 처리
-    private void ReceiveSendGameEndCountDownEvent(GameEndCountDownMessage msg)
+    private void ReceiveGameEndCountDownEvent(GameCountDownMessage msg)
     {
         int count = msg.count;
         Debug.LogFormat("[OnReceive] SendGameEndCountDownEvent : {0}", count);
@@ -266,14 +266,14 @@ public class WorldManager : MonoBehaviour
                 ReceiveLoadGameSceneEvent(loadMessage);
                 break;
 
-            case Protocol.Type.SendCountDown:
-                GameStartCountDownMessage startCountMessage = DataParser.ReadJsonData<GameStartCountDownMessage>(data);
-                ReceiveSendCountDownEvent(startCountMessage);
+            case Protocol.Type.GameStartCountDown:
+                GameCountDownMessage startCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
+                ReceiveGameStartCountDownEvent(startCountMessage);
                 break;
 
             case Protocol.Type.GameEndCountDown:
-                GameEndCountDownMessage endCountMessage = DataParser.ReadJsonData<GameEndCountDownMessage>(data);
-                ReceiveSendGameEndCountDownEvent(endCountMessage);
+                GameCountDownMessage endCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
+                ReceiveGameEndCountDownEvent(endCountMessage);
                 break;
 
             case Protocol.Type.GameStart:
