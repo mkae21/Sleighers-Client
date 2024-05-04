@@ -110,6 +110,9 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(InGameUpdateCoroutine);
                 break;
 
+            case GameState.End:
+                soundManager.StopAll();
+                break;
             default:
                 Debug.Log("[GameManager] 알 수 없는 상태입니다.");
                 break;
