@@ -28,6 +28,7 @@ public class WorldManager : MonoBehaviour
     }
     private bool isGameStart = false;
     private bool isRaceFinish = false;
+    public bool IsRaceFinish { get { return isRaceFinish; } }
     private Transform[] startingPoints;
 #endregion
 
@@ -164,6 +165,20 @@ public class WorldManager : MonoBehaviour
     {
         GameManager.Instance().ChangeState(GameManager.GameState.InGame);
     }
+    // 게임 종료 카운트 다운 이벤트 처리
+    private void ReceiveSendGameEndCountDownEvent(GameEndCountDownMessage msg)
+    {
+        int count = msg.count;
+        Debug.LogFormat("[OnReceive] SendGameEndCountDownEvent : {0}", count);
+        InGameUI.instance.SetGameEndCountDown(count);        
+    }
+    // 게임 종료 이벤트 처리
+    private void ReceiveGameEndEvent(KeyMessage msg)
+    {
+        int userId = msg.from;
+        Debug.LogFormat("플레이어 {0}가 승리했습니다.", userId);  
+        GameManager.Instance().ChangeState(GameManager.GameState.End);
+    }
     // 다른 플레이어 접속 끊김 이벤트 처리
     private void ReceivePlayerDisconnectEvent(Message msg)
     {
@@ -171,13 +186,6 @@ public class WorldManager : MonoBehaviour
         Destroy(players[userId].gameObject);
         players.Remove(userId);
         sessionInfo.totalPlayerCount--;
-    }
-
-    // 게임 종료 이벤트 처리
-    private void ReceiveGameEndEvent(ByteReader br)
-    {
-        int userId = br.ReadInt();
-        Debug.LogFormat("플레이어 {0}가 승리했습니다.", userId);
     }
 #endregion
 
@@ -194,6 +202,9 @@ public class WorldManager : MonoBehaviour
     // 내 플레이어가 골인했음을 서버에 알림
     private void SendPlayerGoalEvent()
     {
+        if(isRaceFinish)
+            return;
+        isRaceFinish = true;
         Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId);
         ServerManager.Instance().SendDataToInGame(msg);
     }
@@ -239,7 +250,7 @@ public class WorldManager : MonoBehaviour
             Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
             return;
         }
-        if (msg.from == MyPlayerId)
+        if (msg.from == MyPlayerId && msg.type == Protocol.Type.Key)
         {
             Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
             LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
@@ -260,8 +271,18 @@ public class WorldManager : MonoBehaviour
                 ReceiveSendCountDownEvent(startCountMessage);
                 break;
 
+            case Protocol.Type.GameEndCountDown:
+                GameEndCountDownMessage endCountMessage = DataParser.ReadJsonData<GameEndCountDownMessage>(data);
+                ReceiveSendGameEndCountDownEvent(endCountMessage);
+                break;
+
             case Protocol.Type.GameStart:
                 ReceiveGameStartEvent();
+                break;
+
+            case Protocol.Type.GameEnd:
+                KeyMessage endMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                ReceiveGameEndEvent(endMessage);
                 break;
 
             case Protocol.Type.Key:

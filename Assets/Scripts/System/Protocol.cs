@@ -21,6 +21,7 @@ namespace Protocol
         PlayerDisconnect,       // 플레이어 접속 끊김
         PlayerGoal,             // 플레이어 골인
         GameEnd,                // 게임 종료
+        GameEndCountDown,       // 1등 도착 후 카운트 다운 시작
         GameSync,               // 게임 싱크
         ResetServer = 100,      // 서버 리셋
     }
@@ -68,6 +69,16 @@ namespace Protocol
     {
         public int count;
         public GameStartCountDownMessage(int _id, int _count) : base(Type.SendCountDown, _id)
+        {
+            this.from = _id;
+            this.count = _count;
+        }
+    }
+
+    public class GameEndCountDownMessage : Message
+    {
+        public int count;
+        public GameEndCountDownMessage(int _id, int _count) : base(Type.GameEndCountDown, _id)
         {
             this.from = _id;
             this.count = _count;
