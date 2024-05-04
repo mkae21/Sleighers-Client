@@ -38,6 +38,7 @@ public class SnowEffect : MonoBehaviour
     {
         // 차량이 이동 중이고 필요한 속도보다 빠른 경우에만 속도선 파티클을 표시
         // if (player.NormalizedForwardSpeed >= startVelocity && player.isMove)
+        Debug.LogFormat("{0}, {1}, {2}", player.ForwardSpeed, player.NormalizedForwardSpeed, startVelocity);
         if (player.NormalizedForwardSpeed >= startVelocity)
         {
             var emission = particleSystem.emission;

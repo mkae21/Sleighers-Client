@@ -78,7 +78,7 @@ public class WorldManager : MonoBehaviour
         Debug.Log("[World Manager] 게임 초기화 진행");
         isRaceFinish = false;
         sessionInfo = new SessionInfo();
-        playerPrefab = Resources.Load("Prefabs/SledPlayer") as GameObject;
+        playerPrefab = Resources.Load("Prefabs/Player") as GameObject;
         startingPoints = new Transform[startingPointHolder.childCount];
         for (int i = 0; i < startingPointHolder.childCount; i++)
             startingPoints[i] = startingPointHolder.GetChild(i);
@@ -191,7 +191,7 @@ public class WorldManager : MonoBehaviour
         Vector3 velocity = keyMessage.velocity;
         Vector3 acceleration = keyMessage.acceleration;
         long timeStamp = keyMessage.timeStamp;
-
+        players[id].SetServerData(position, velocity, acceleration, timeStamp);
         players[id].SetMoveVector(acceleration);
 
         // TODO: interpolation 적용
