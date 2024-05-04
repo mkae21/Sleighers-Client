@@ -15,30 +15,24 @@ public class SnowEffect : MonoBehaviour
     
     [Tooltip("눈 효과를 만드는 파티클 시스템")]
     [SerializeField] private new ParticleSystem particleSystem = null;
-
-    private Camera mainCamera;
     private Player player;
 #endregion
 
 #region PrivateMethod
     private void Awake()
     {
-        mainCamera = Camera.main;
         player = GetComponentInParent<Player>();
     }
 
     private void Update()
     {
         UpdateEmission();
-        // UpdateRotation();
     }
 
     // 차량의 속도에 따라 파티클 시스템의 방출 속도를 조정합니다.
     private void UpdateEmission()
     {
         // 차량이 이동 중이고 필요한 속도보다 빠른 경우에만 속도선 파티클을 표시
-        // if (player.NormalizedForwardSpeed >= startVelocity && player.isMove)
-        Debug.LogFormat("{0}, {1}, {2}", player.ForwardSpeed, player.NormalizedForwardSpeed, startVelocity);
         if (player.NormalizedForwardSpeed >= startVelocity)
         {
             var emission = particleSystem.emission;
@@ -54,16 +48,6 @@ public class SnowEffect : MonoBehaviour
             var emission = particleSystem.emission;
             emission.rateOverTime = 0;
         }
-    }
-
-    // 속도선이 카메라의 시야를 가리키도록 회전을 조정
-    private void UpdateRotation()
-    {
-        var targetPos = mainCamera.transform.position;
-        targetPos.y = transform.position.y;
-
-        transform.LookAt(targetPos);
-        transform.forward = -transform.forward;
     }
 #endregion
 }

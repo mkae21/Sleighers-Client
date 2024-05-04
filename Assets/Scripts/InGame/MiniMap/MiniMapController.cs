@@ -158,7 +158,7 @@ public class MiniMapController : MonoBehaviour {
 		mapCamera.farClipPlane = camFarClip;
 		if (target == null) {
 			#if UNITY_EDITOR
-			// Debug.Log ("Please assign the target");
+			Debug.Log ("Please assign the target");
 			#endif
 		} else {
 			mapCamera.transform.eulerAngles = rotationOfCam;
@@ -167,6 +167,7 @@ public class MiniMapController : MonoBehaviour {
 				mapCamera.transform.eulerAngles = target.eulerAngles + rotationOfCam;
 			}
 			mapCamera.transform.position = target.position + cameraOffset;
+			Debug.LogFormat("Target Position: {0}, Camera Position: {1}", target.position, mapCamera.transform.position);
 		}
 	}
 
