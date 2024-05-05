@@ -130,13 +130,18 @@ public class WorldManager : MonoBehaviour
                         ReceiveLoadGameSceneEvent(loadMessage);
                         break;
 
-                    case Protocol.Type.SendCountDown:
-                        GameStartCountDownMessage startCountMessage = DataParser.ReadJsonData<GameStartCountDownMessage>(data);
-                        ReceiveSendCountDownEvent(startCountMessage);
+                    case Protocol.Type.GameStartCountDown:
+                        GameCountDownMessage startCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
+                        ReceiveGameStartCountDownEvent(startCountMessage);
                         break;
 
                     case Protocol.Type.GameStart:
                         ReceiveGameStartEvent();
+                        break;
+
+                    case Protocol.Type.GameEnd:
+                        KeyMessage endMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                        ReceiveGameEndEvent(endMessage);
                         break;
 
                     case Protocol.Type.Key:
