@@ -30,6 +30,7 @@ public class WorldManager : MonoBehaviour
     }
     private bool isGameStart = false;
     private bool isRaceFinish = false;
+    public bool IsRaceFinish { get { return isRaceFinish; } }
     private Transform[] startingPoints;
 
     private Queue<byte[]> messageQueue = new Queue<byte[]>();
@@ -210,7 +211,7 @@ public class WorldManager : MonoBehaviour
         }
     }
     // 게임 시작 카운트 다운 이벤트 처리
-    private void ReceiveSendCountDownEvent(GameStartCountDownMessage msg)
+    private void ReceiveGameStartCountDownEvent(GameCountDownMessage msg)
     {
         int count = msg.count;
         //Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);
@@ -220,6 +221,20 @@ public class WorldManager : MonoBehaviour
     private void ReceiveGameStartEvent()
     {
         GameManager.Instance().ChangeState(GameManager.GameState.InGame);
+    }
+    // 게임 종료 카운트 다운 이벤트 처리
+    private void ReceiveGameEndCountDownEvent(GameCountDownMessage msg)
+    {
+        int count = msg.count;
+        Debug.LogFormat("[OnReceive] SendGameEndCountDownEvent : {0}", count);
+        InGameUI.instance.SetGameEndCountDown(count);        
+    }
+    // 게임 종료 이벤트 처리
+    private void ReceiveGameEndEvent(KeyMessage msg)
+    {
+        int userId = msg.from;
+        Debug.LogFormat("플레이어 {0}가 승리했습니다.", userId);  
+        GameManager.Instance().ChangeState(GameManager.GameState.End);
     }
     // 다른 플레이어 접속 끊김 이벤트 처리
     private void ReceivePlayerDisconnectEvent(Message msg)
@@ -251,6 +266,9 @@ public class WorldManager : MonoBehaviour
     // 내 플레이어가 골인했음을 서버에 알림
     private async Task SendPlayerGoalEvent()
     {
+        if(isRaceFinish)
+            return;
+        isRaceFinish = true;
         Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId);
         await ServerManager.Instance().SendDataToInGame(msg);
     }

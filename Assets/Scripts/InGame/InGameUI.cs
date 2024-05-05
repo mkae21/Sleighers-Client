@@ -9,6 +9,7 @@ public class InGameUI : MonoBehaviour
 
     public TextMeshProUGUI text_timer;
     public TextMeshProUGUI text_countDown;
+    public TextMeshProUGUI text_gameEndCountDown;
     public TextMeshProUGUI text_lab;
     public TextMeshProUGUI text_speedLabel;
 
@@ -58,8 +59,10 @@ public class InGameUI : MonoBehaviour
     // Go! 텍스트 숨기기
     private void HideCountDown()
     {
-        if(text_countDown != null)
+        if(text_countDown.text == "GO!")
             text_countDown.gameObject.SetActive(false);
+        if(text_gameEndCountDown.text == "Game End")
+            text_gameEndCountDown.gameObject.SetActive(false);
     }
     // 플레이어가 랩을 통과하면 호출
     private void OnLapComplete(Player _player, RankInfo _lapInfo)
@@ -95,6 +98,9 @@ public class InGameUI : MonoBehaviour
     }
     public void UpdateTimer()
     {
+        if (WorldManager.instance.IsRaceFinish)
+            return;
+
         timer += Time.deltaTime;
         int minutes = (int)(timer / 60 % 60);
         int seconds = (int)(timer % 60);
@@ -127,6 +133,24 @@ public class InGameUI : MonoBehaviour
         }
     }
 
+    public void SetGameEndCountDown(int _count)
+    {
+        GameManager.Instance().soundManager.Play("Effect/EndCount", SoundType.EFFECT);
+
+        if(text_gameEndCountDown != null)
+        {
+            if(_count > 0)
+            {
+                text_gameEndCountDown.text = _count.ToString();
+                text_gameEndCountDown.gameObject.SetActive(true);
+            }
+            else
+            {
+                text_gameEndCountDown.text = "Game End";
+                Invoke("HideCountDown", 1f);
+            }
+        }
+    }
     public void UpdateSpeedometer()
     {
         speed = WorldManager.instance.GetMyPlayer().GetSpeed();

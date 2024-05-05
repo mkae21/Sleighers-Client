@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     #region PublicVariables
     public static event Action Ready = delegate { }; // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { }; // InGame 상태에서 실행되는 함수들
-    public enum GameState { Login, MatchLobby, Ready, Start, InGame, Over, Result, Reconnect };
+    public enum GameState { Login, MatchLobby, Ready, Start, InGame, End, Result, Reconnect };
     public SoundManager soundManager = new SoundManager();
 #endregion
 
@@ -129,6 +129,10 @@ public class GameManager : MonoBehaviour
             case GameState.InGame:
                 soundManager.Play("BGM/InGame", SoundType.BGM);
                 //StartCoroutine(InGameUpdateCoroutine);
+                break;
+
+            case GameState.End:
+                soundManager.StopAll();
                 break;
             default:
                 Debug.Log("[GameManager] 알 수 없는 상태입니다.");
