@@ -88,7 +88,7 @@ public class Player : MonoBehaviour
             tmp = Vector3.Normalize(tmp);
             SetMoveVector(tmp);
         }
-        
+
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -98,8 +98,9 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        RaycastHit hitData = AdJustBottom();
         if(isMove)
-            ApplyPhysics();
+            ApplyPhysics(hitData);
     }
 
     private void GetVerticalSpeed()
@@ -134,26 +135,14 @@ public class Player : MonoBehaviour
         return this.transform.position + (Vector3.up * 2.0f);
     }
 
-    private void ApplyPhysics()
+    private void ApplyPhysics(RaycastHit hitNear)
     {
-        RaycastHit hitOn;
-        RaycastHit hitNear;
-
-        Physics.Raycast(Sled.position + (Sled.up * .1f),Vector3.down ,out hitOn, 1.1f);
-        Physics.Raycast(Sled.position + (Sled.up * .1f),Vector3.down ,out hitNear, 7.0f);
-        
         if(hitNear.collider != null){//공중에 떠있을때
             rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
+            Sled.eulerAngles = Vector3.Lerp(Sled.eulerAngles, new Vector3(0, Sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
         }
 
         rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration); // Apply gravity
-
-        //steering, 썰매를 모델링한 오브젝트를 회전시키기 위해 사용
-        Sled.eulerAngles = Vector3.Lerp(Sled.eulerAngles, new Vector3(0, Sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
-        
-
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, Sled.eulerAngles.y, 0);
         isMove = false;
     }
 
@@ -166,7 +155,17 @@ public class Player : MonoBehaviour
     {
         Sled.transform.position = rb.transform.position - new Vector3(0, 1.2f, 0);
     }
+    private RaycastHit AdJustBottom()
+    {
+        RaycastHit hitNear;
 
+        Physics.Raycast(Sled.position + (Sled.up * .1f),Vector3.down ,out hitNear, 7.0f);
+
+        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
+        sledNormal.Rotate(0, Sled.eulerAngles.y, 0);
+
+        return hitNear;
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Finish")

@@ -199,8 +199,8 @@ MonoBehaviour:
   sledNormal: {fileID: 3752226300241623078}
   Sled: {fileID: 2172718939356495318}
   acceleration: 100
-  steering: 15
-  gravity: 25
+  steering: 20
+  gravity: 10
   amount: 0
   <moveVector>k__BackingField: {x: 0, y: 0, z: 0}
   <isMove>k__BackingField: 0
