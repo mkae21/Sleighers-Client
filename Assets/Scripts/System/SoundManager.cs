@@ -110,5 +110,46 @@ public class SoundManager
         AudioClip audioClip = GetOrAddAudioClip(path, type);
         Play(audioClip, type, pitch);
     }
+
+    public void Stop(AudioClip audioClip, SoundType type = SoundType.EFFECT)
+    {
+        if (audioClip == null)
+            return;
+
+        if (type == SoundType.BGM) // BGM 배경음악 정지
+        {
+            AudioSource audioSource = audioSources[(int)SoundType.BGM];
+            if (audioSource.clip == audioClip)
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
+            }
+        }
+        else // Effect 효과음 정지
+        {
+            AudioSource audioSource = audioSources[(int)SoundType.EFFECT];
+            if (audioSource.clip == audioClip)
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
+            }
+        }
+    }
+
+    public void Stop(string path, SoundType type = SoundType.EFFECT)
+    {
+        AudioClip audioClip = GetOrAddAudioClip(path, type);
+        Stop(audioClip, type);
+    }
+
+    public void StopAll()
+    {
+        foreach (AudioSource audioSource in audioSources)
+        {
+            audioSource.Stop();
+            audioSource.clip = null;
+        }
+    }
+
 #endregion
 }
