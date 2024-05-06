@@ -30,6 +30,9 @@ public class LobbyUI : MonoBehaviour
     public Toggle soundToggle;
     public Slider volumeSlider;
 
+    [Header("Store")]
+    public GameObject storePanel;
+
     [Space(10), Header("===== WaitingRoomUI =====")]
     public GameObject waitingRoomPanel;
     public Button waitingRoomBackBtn;
@@ -43,6 +46,7 @@ public class LobbyUI : MonoBehaviour
         settingPanel.SetActive(false);   
         checkExitPanel.SetActive(false); 
         waitingRoomPanel.SetActive(false);
+        storePanel.SetActive(false);
     }
 
     private void Update()
@@ -52,17 +56,33 @@ public class LobbyUI : MonoBehaviour
 #endregion
 
 #region PublicMethod
+    
+    public void TogglePanel(GameObject panel)
+    {
+        panel.SetActive(!panel.activeSelf);
+    }
 
     // 설정 패널 On/Off
     public void ToggleSettingPanel()
     {
-        settingPanel.SetActive(!settingPanel.activeSelf);
+        TogglePanel(settingPanel);
     }
 
     // 게임 종료 체크 패널 On/Off
     public void ToggleCheckExitPanel()
     {
-        checkExitPanel.SetActive(!checkExitPanel.activeSelf);
+        TogglePanel(checkExitPanel);
+    }
+    // 상점 패널 On/Off
+    public void ToggleStorePanel()
+    {
+        TogglePanel(storePanel);
+    }
+
+    // 대기실 패널 On/Off
+    public void ToggleWaitingRoom()
+    {
+        TogglePanel(waitingRoomPanel);
     }
 
     // 사운드 On/Off 함수
@@ -86,12 +106,6 @@ public class LobbyUI : MonoBehaviour
         AudioListener.volume = volumeSlider.value;  //TODO: 아직 노래를 안 넣어서 추후에 수정해야 함
     }
 
-    // 대기실로 이동/대기실에서 나가기
-    public void ToggleWaitingRoom()
-    {
-        waitingRoomPanel.SetActive(!waitingRoomPanel.activeSelf);
-    }
-
     // 게임 종료
     public void RealExitGame()
     {
@@ -100,4 +114,5 @@ public class LobbyUI : MonoBehaviour
     }
 
 #endregion
+
 }
