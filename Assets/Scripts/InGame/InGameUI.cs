@@ -23,6 +23,7 @@ public class InGameUI : MonoBehaviour
     private float speed = 0.0f;
     private float timer = 0.0f;
     private TextMeshProUGUI[] text_ranks;
+    private bool lastLapAonnouncd = false;
 #endregion
 
 #region PrivateMethod
@@ -60,6 +61,8 @@ public class InGameUI : MonoBehaviour
             text_countDown.gameObject.SetActive(false);
         if(text_gameEndCountDown.text == "Game End")
             text_gameEndCountDown.gameObject.SetActive(false);
+        if(text_countDown.text == "<color=#D18B0D>마지막 바퀴!</color>")
+            text_countDown.gameObject.SetActive(false);
     }
     // 플레이어가 랩을 통과하면 호출
     private void OnLapComplete(Player _player, RankInfo _lapInfo)
@@ -68,13 +71,16 @@ public class InGameUI : MonoBehaviour
         if (WorldManager.instance.GetMyPlayer() != _player)
             return;      
         // Lap 텍스트 업데이트
-        else
-        { 
-            int lapsCompleted = lapManager.GetLapInfo(_player).lap;
+        int lapsCompleted = lapManager.GetLapInfo(_player).lap;
+        int currentLap = Mathf.Min(lapsCompleted + 1, lapManager.Laps);
+        UpdateLapText(currentLap);
 
-            int currentLap = Mathf.Min(lapsCompleted + 1, lapManager.Laps);
-
-            UpdateLapText(currentLap);
+        if(currentLap == lapManager.Laps && !lastLapAonnouncd)
+        {
+            text_countDown.gameObject.SetActive(true);
+            text_countDown.text = "<color=#D18B0D>마지막 바퀴!</color>";
+            Invoke("HideCountDown", 1f);
+            lastLapAonnouncd = true;
         }
     }
 
@@ -82,7 +88,7 @@ public class InGameUI : MonoBehaviour
     {
 
         if (lapManager != null)
-            text_lab.text = $"<size=180>{_currentLap}</size=180>/{lapManager.Laps} LAP";
+            text_lab.text = $"<size=160>{_currentLap}</size=160>/{lapManager.Laps} LAP";
     }
 
 #endregion
@@ -102,7 +108,7 @@ public class InGameUI : MonoBehaviour
         int minutes = (int)(timer / 60 % 60);
         int seconds = (int)(timer % 60);
         int miliseconds = (int)(timer * 1000 % 1000);
-        text_timer.text = string.Format("{0:D2} : {1:D2} : {2:D3}", minutes, seconds, miliseconds);
+        text_timer.text = string.Format("TIME  {0:D2} : {1:D2} : {2:D3}", minutes, seconds, miliseconds);
     }
 
     // 카운트 다운 설정
