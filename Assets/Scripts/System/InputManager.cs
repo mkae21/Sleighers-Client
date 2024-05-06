@@ -35,7 +35,7 @@ public class InputManager : MonoBehaviour
             WorldManager.instance.OnSend(Protocol.Type.GameStart);
     }
 
-    private void KeyInput()
+    private async void KeyInput()
     {
         if (Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
@@ -59,7 +59,7 @@ public class InputManager : MonoBehaviour
         acceleration = Vector3.Normalize(acceleration);
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
         KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, position, velocity, acceleration, 0);
-        ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
+        await ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
     }
 #endregion
 

@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Net.Sockets;
 using System.Collections;
+using System.Threading.Tasks;
 
 /* ServeManager.cs
  * - 서버와의 통신을 관리
@@ -68,9 +69,8 @@ public class ServerManager : MonoBehaviour
     }
     private void Init()
     {
-        // serverIP = "localhost"; // 로컬 테스트 용
+        //serverIP = "localhost"; // 로컬 테스트 용
         serverIP = SecretLoader.s_serverIp;
-        // serverIP = "192.168.0.161";
         serverPort = SecretLoader.s_serverPort;
 
         Client = new TcpClient(serverIP, serverPort);
@@ -92,7 +92,7 @@ public class ServerManager : MonoBehaviour
         {
             if (Stream.DataAvailable && IsConnect)
                 WorldManager.instance.OnReceive();
-            yield return new WaitForSeconds(0.0333f);
+            yield return null;
         }
     
     }
@@ -119,10 +119,10 @@ public class ServerManager : MonoBehaviour
         Client.Close();
     }
     // 서버로 데이터 전송
-    public void SendDataToInGame<T>(T msg)
+    public async Task SendDataToInGame<T>(T msg)
     {
         var byteArray = DataParser.DataToJsonData<T>(msg);
-        Stream.Write(byteArray, 0, byteArray.Length);
+        await Stream.WriteAsync(byteArray, 0, byteArray.Length);
     }
 #endregion
 }
