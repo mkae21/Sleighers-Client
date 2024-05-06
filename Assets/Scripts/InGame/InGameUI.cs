@@ -12,18 +12,14 @@ public class InGameUI : MonoBehaviour
     public TextMeshProUGUI text_gameEndCountDown;
     public TextMeshProUGUI text_lab;
     public TextMeshProUGUI text_speedLabel;
-
     public Transform rankHolder; // 랭킹 프리팹을 가지고 있는 부모
     public RankManager lapManager;
 
-    public float countDownDuration = 3.0f;
-    public float maxSpeed = 0.0f;
-    public float speed = 0.0f;
-    public float minSpeedArrowAngle;
-    public float maxSpeedArrowAngle;
 #endregion
 
 #region PrivateVariables
+    private float countDownDuration = 3.0f;
+    private float speed = 0.0f;
     private float timer = 0.0f;
     private TextMeshProUGUI[] text_ranks;
 #endregion
