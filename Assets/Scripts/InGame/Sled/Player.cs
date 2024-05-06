@@ -199,8 +199,8 @@ public class Player : MonoBehaviour
             sphere.transform.position = Vector3.Lerp(sphere.transform.position, lastServerPosition, interpolationRatio);
         }
 
-        Quaternion extrapolatedRotation = Quaternion.Slerp(sledModel.rotation, lastServerRotation, interpolationRatio);
-        sledModel.rotation = extrapolatedRotation;
+        // Quaternion extrapolatedRotation = Quaternion.Slerp(sled.rotation, lastServerRotation, interpolationRatio);
+        // sled.rotation = extrapolatedRotation;
     }
 #endregion
 
