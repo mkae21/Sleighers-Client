@@ -41,16 +41,13 @@ public class Player : MonoBehaviour
         set { isBraking = value; }
     }
     private string nickName = string.Empty;
-    private GameObject playerModelObject;
 #endregion
 
 #region PublicVariables
 
-    public Rigidbody rb;
+    public Rigidbody sphere;
     public Transform sledModel;
-    public Transform sledNormal;
-
-    public Transform Sled;
+    public Transform sled;
 
     [Header("Parameters")]
     public float acceleration = 40f;
@@ -138,16 +135,17 @@ public class Player : MonoBehaviour
 
         if (hitNear.collider != null)// If the sled is on the ground
         {
-            rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
-            Sled.eulerAngles = Vector3.Lerp(Sled.eulerAngles, new Vector3(0, Sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
+            sphere.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
+            sled.eulerAngles = Vector3.Lerp(sled.eulerAngles, new Vector3(0, sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
         }
         else
-            rb.AddForce(sledModel.forward * rb.velocity.magnitude, ForceMode.Acceleration);
+            sphere.AddForce(sledModel.forward * sphere.velocity.magnitude, ForceMode.Acceleration);
 
-        rb.AddForce(sledModel.forward * rb.velocity.magnitude, ForceMode.Acceleration);
 
-        rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
+        sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
         isMove = false;
+        if (!IsMe)
+            ExtrapolatePosition();
     }
     public void Steer(int direction, float amount)
     {
@@ -155,16 +153,16 @@ public class Player : MonoBehaviour
     }
     private void SledPosition()
     {
-        Sled.transform.position = rb.transform.position - new Vector3(0, 1.2f, 0);
+        sled.transform.position = sphere.transform.position - new Vector3(0, 1.2f, 0);
     }
     private RaycastHit AdJustBottom()
     {
         RaycastHit hitNear;
 
-        Physics.Raycast(Sled.position + (Sled.up * .1f), Vector3.down, out hitNear, 2.0f);
+        Physics.Raycast(sled.position + (sled.up * .1f), Vector3.down, out hitNear, 2.0f);
 
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, Sled.eulerAngles.y, 0);
+        sledModel.up = Vector3.Lerp(sledModel.up, hitNear.normal, Time.deltaTime * 8.0f);
+        sledModel.Rotate(0, sled.eulerAngles.y, 0);
 
         return hitNear;
     }
@@ -179,9 +177,9 @@ public class Player : MonoBehaviour
 
     private void CheckVelocity()
     {
-        if (rb.velocity.magnitude > maxSpeed)
+        if (sphere.velocity.magnitude > maxSpeed)
         {
-            rb.velocity = rb.velocity.normalized * maxSpeed;
+            sphere.velocity = sphere.velocity.normalized * maxSpeed;
         }
     }
     private void ExtrapolatePosition()
@@ -194,15 +192,15 @@ public class Player : MonoBehaviour
         if (timeSinceLastUpdate < extrapolationLimit)
         {
             Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate);
-            rb.transform.position = Vector3.Lerp(rb.transform.position, extrapolatedPosition, interpolationRatio);
+            sphere.transform.position = Vector3.Lerp(sphere.transform.position, extrapolatedPosition, interpolationRatio);
         }
         else
         {
-            rb.transform.position = Vector3.Lerp(rb.transform.position, lastServerPosition, interpolationRatio);
+            sphere.transform.position = Vector3.Lerp(sphere.transform.position, lastServerPosition, interpolationRatio);
         }
 
-        Quaternion extrapolatedRotation = Quaternion.Slerp(playerModelObject.transform.rotation, lastServerRotation, interpolationRatio);
-        playerModelObject.transform.rotation = extrapolatedRotation;
+        Quaternion extrapolatedRotation = Quaternion.Slerp(sledModel.rotation, lastServerRotation, interpolationRatio);
+        sledModel.rotation = extrapolatedRotation;
     }
 #endregion
 
@@ -216,9 +214,8 @@ public class Player : MonoBehaviour
         this.nickName = _nickName;
 
         miniMapComponent.enabled = true;
-        playerModelObject = sledModel.gameObject;
 
-        nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, playerModelObject.transform);
+        nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, sledModel);
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
         nameObject.transform.position = GetNameUIPos();
 
@@ -226,7 +223,7 @@ public class Player : MonoBehaviour
         InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
 
         if (IsMe)
-            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = Sled.transform;
+            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
@@ -253,9 +250,6 @@ public class Player : MonoBehaviour
             isMove = false;
         else
             isMove = true;
-        if (!IsMe)
-            ExtrapolatePosition();
-
     }
 
     public void SetPosition(Vector3 pos)
@@ -273,26 +267,26 @@ public class Player : MonoBehaviour
     public Vector3 GetPosition()
     {
 
-        return playerModelObject.transform.position;
+        return sphere.transform.position;
     }
 
     public Vector3 GetRotation()
     {
-        return playerModelObject.transform.rotation.eulerAngles;
+        return sledModel.rotation.eulerAngles;
     }
     public Vector3 GetVelocity()
     {
-        return rb.velocity;
+        return sphere.velocity;
     }
 
     public float GetSpeed()
     {   
         // km/h로 변환
-        return rb.velocity.magnitude * 3.6f;
+        return sphere.velocity.magnitude * 3.6f;
     }
 
     // 앞으로 나아가는 차량 속도의 양
-    public float ForwardSpeed => Vector3.Dot(rb.velocity, transform.forward);
+    public float ForwardSpeed => Vector3.Dot(sphere.velocity, transform.forward);
     // 차량의 최대 속도에 상대적인 전진 속도를 반환 
     // 반환되는 값은 [-1, 1] 범위
 
