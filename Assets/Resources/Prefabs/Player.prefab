@@ -165,7 +165,7 @@ MonoBehaviour:
   sphere: {fileID: 8835457807169266014}
   sledModel: {fileID: 9148137571823036153}
   sled: {fileID: 2172718939356495318}
-  acceleration: 75
+  acceleration: 100
   steering: 20
   gravity: 33
   amount: 0
