@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
 {
 #region PrivateVariables
     private float currentSteerAngle;
-    //private bool isDrifting;
+    private bool isDrifting;
 
     // expolation, slerp
     private Vector3 lastServerPosition;
@@ -21,8 +21,8 @@ public class Player : MonoBehaviour
     private float extrapolationLimit = 0.5f;
 
     //최대속도 제한, 드리프트
-    private float maxSpeed = 100f;
-    private float speed = 100f;
+    private float maxSpeed = 50f;
+    private float speed;
     private float currentSpeed;
     private float rotate;
 
@@ -50,7 +50,7 @@ public class Player : MonoBehaviour
     public Transform sled;
 
     [Header("Parameters")]
-    public float acceleration = 40f;
+    public float acceleration = 50f;
     public float steering = 40f;
     public float gravity = 10f;
     public float amount;
@@ -113,7 +113,13 @@ public class Player : MonoBehaviour
         if (moveVector.x != 0)
         {
             int dir = moveVector.x > 0 ? 1 : -1;
-            amount = Mathf.Abs(moveVector.x);
+            
+            if(!isDrifting){
+                amount = Mathf.Abs(moveVector.x);
+            }
+            else
+                amount = Math.Abs(moveVector.x) * 3.5f;//더 크게 회전
+            
             Steer(dir, amount);
         }
     }
@@ -144,6 +150,7 @@ public class Player : MonoBehaviour
 
         sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
         isMove = false;
+        isDrifting = false;
         if (!IsMe)
             ExtrapolatePosition();
     }
@@ -279,6 +286,10 @@ public class Player : MonoBehaviour
         return sphere.velocity;
     }
 
+    public void SetDrift(bool isDrift)
+    {
+        isDrifting = isDrift;
+    }
     public float GetSpeed()
     {   
         // km/h로 변환
