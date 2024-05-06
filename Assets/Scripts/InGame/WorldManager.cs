@@ -195,7 +195,6 @@ public class WorldManager : MonoBehaviour
 
         players[id].SetServerData(position, velocity, acceleration, timeStamp);
         players[id].SetMoveVector(acceleration);
-        // TODO: interpolation 적용
     }
     // 다른 플레이어 접속 이벤트 처리
     private void ReceivePlayerReconnectEvent(Message msg)

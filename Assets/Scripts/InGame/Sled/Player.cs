@@ -184,7 +184,6 @@ public class Player : MonoBehaviour
     }
     private void ExtrapolatePosition()
     {
-        Quaternion lastServerRotation = Quaternion.LookRotation(lastServerAcceleration);
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
         float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
@@ -199,6 +198,7 @@ public class Player : MonoBehaviour
             sphere.transform.position = Vector3.Lerp(sphere.transform.position, lastServerPosition, interpolationRatio);
         }
 
+        // Quaternion lastServerRotation = Quaternion.LookRotation(lastServerAcceleration);
         // Quaternion extrapolatedRotation = Quaternion.Slerp(sled.rotation, lastServerRotation, interpolationRatio);
         // sled.rotation = extrapolatedRotation;
     }
