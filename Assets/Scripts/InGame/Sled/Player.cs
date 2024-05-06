@@ -141,6 +141,8 @@ public class Player : MonoBehaviour
             rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
             Sled.eulerAngles = Vector3.Lerp(Sled.eulerAngles, new Vector3(0, Sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
         }
+        else
+            rb.AddForce(sledModel.forward * rb.velocity.magnitude, ForceMode.Acceleration);
 
         rb.AddForce(sledModel.forward * rb.velocity.magnitude, ForceMode.Acceleration);
 
