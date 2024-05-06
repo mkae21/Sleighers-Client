@@ -50,6 +50,8 @@ public class InputManager : MonoBehaviour
         float h = Input.GetAxis(HORIZONTAL);
         float v = Input.GetAxis(VERTICAL);
 
+        bool drifting = Input.GetKey(KeyCode.LeftShift);
+
         if (h == 0 && v == 0)
             return;
             
@@ -58,6 +60,7 @@ public class InputManager : MonoBehaviour
         Vector3 acceleration = new Vector3(h, 0, v);
         acceleration = Vector3.Normalize(acceleration);
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
+        WorldManager.instance.GetMyPlayer().SetDrift(drifting);
         KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, position, velocity, acceleration, 0);
         await ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
     }

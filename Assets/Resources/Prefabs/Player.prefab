@@ -75,7 +75,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 200
   m_Drag: 1
-  m_AngularDrag: 0.05
+  m_AngularDrag: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -166,7 +166,7 @@ MonoBehaviour:
   sledModel: {fileID: 9148137571823036153}
   sled: {fileID: 2172718939356495318}
   acceleration: 50
-  steering: 20
+  steering: 12
   gravity: 33
   amount: 0
   <moveVector>k__BackingField: {x: 0, y: 0, z: 0}
