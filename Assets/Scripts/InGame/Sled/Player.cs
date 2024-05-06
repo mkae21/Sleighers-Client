@@ -202,10 +202,10 @@ public class Player : MonoBehaviour
         Quaternion extrapolatedRotation = Quaternion.Slerp(playerModelObject.transform.rotation, lastServerRotation, interpolationRatio);
         playerModelObject.transform.rotation = extrapolatedRotation;
     }
-    #endregion
+#endregion
 
 
-    #region PublicMethod
+#region PublicMethod
     // 내 플레이어와 다른 플레이어 객체 초기화
     public void Initialize(bool _isMe, int _playerId, string _nickName)
     {

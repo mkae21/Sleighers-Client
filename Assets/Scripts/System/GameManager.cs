@@ -10,20 +10,20 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
 
-    #region PrivateVariables
+#region PrivateVariables
     private static bool isCreate = false;
     private static GameManager instance;
     private GameState gameState;
-    #endregion
+#endregion
 
-    #region PublicVariables
+#region PublicVariables
     public static event Action Ready = delegate { }; // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { }; // InGame 상태에서 실행되는 함수들
     public enum GameState { Login, MatchLobby, Ready, Start, InGame, End, Result, Reconnect };
     public SoundManager soundManager = new SoundManager();
 #endregion
 
-    #region PrivateMethod
+#region PrivateMethod
     private void Awake()
     {
         if (!instance)
@@ -56,9 +56,9 @@ public class GameManager : MonoBehaviour
         else if(gameState == GameState.InGame)
             InGame();
     }
-    #endregion
+#endregion
 
-    #region PublicMethod
+#region PublicMethod
     public static GameManager Instance()
     {
         if (instance == null)
@@ -71,19 +71,6 @@ public class GameManager : MonoBehaviour
 
     public void ChangeState(GameState state, Action<bool> func = null)
     {
-        switch (gameState)
-        {
-            case GameState.Ready:
-                // ready 상태 정리
-                break;
-            case GameState.InGame:
-                // InGame 상태정리
-                break;
-            default:
-                Debug.Log("[GameManager] 알 수 없는 상태입니다. : " + gameState );
-                break;
-        }
-
         gameState = state;
 
         switch (gameState)
@@ -107,5 +94,5 @@ public class GameManager : MonoBehaviour
     {
         return gameState;
     }
-    #endregion
+#endregion
 }

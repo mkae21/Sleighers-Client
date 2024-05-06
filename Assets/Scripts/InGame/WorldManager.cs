@@ -17,7 +17,7 @@ public class WorldManager : MonoBehaviour
     {
         public int totalPlayerCount;
     }
-    #region PrivateVariables
+#region PrivateVariables
     private RankManager lapManager;
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
@@ -34,9 +34,9 @@ public class WorldManager : MonoBehaviour
     private Transform[] startingPoints;
 
     private Queue<byte[]> messageQueue = new Queue<byte[]>();
-    #endregion
+#endregion
 
-    #region PublicVariables
+#region PublicVariables
     static public WorldManager instance;
     // private Transform minimapTarget;
     public GameObject playerPool;
@@ -45,9 +45,9 @@ public class WorldManager : MonoBehaviour
     // 레이스가 종료되면 호출되는 액션
     public UnityAction OnRaceFinished { get; set; }
 
-    #endregion
+#endregion
 
-    #region PrivateMethod
+#region PrivateMethod
     // 애플리케이션 종료 시
     private void OnApplicationQuit()
     {
@@ -110,7 +110,7 @@ public class WorldManager : MonoBehaviour
         OnSend(Protocol.Type.PlayerGoal);
     }
 
-    #region Receive 프로토콜 처리
+#region Receive 프로토콜 처리
     private IEnumerator ProcessMessageQueue()
     {
         while (true)
@@ -272,9 +272,9 @@ public class WorldManager : MonoBehaviour
         int userId = br.ReadInt();
         Debug.LogFormat("플레이어 {0}가 승리했습니다.", userId);
     }
-    #endregion
+#endregion
 
-    #region Send 프로토콜 처리
+#region Send 프로토콜 처리
     // 게임 시작 이벤트를 서버에 알림
     private async Task SendGameStartEvent()
     {
@@ -299,12 +299,12 @@ public class WorldManager : MonoBehaviour
         Message msg = new Message(Protocol.Type.ResetServer, myPlayerId);
         await ServerManager.Instance().SendDataToInGame(msg);
     }
-    #endregion
+#endregion
 
 
-    #endregion
+#endregion
 
-    #region PublicMethod
+#region PublicMethod
     // 서버로부터 받는 데이터 처리 핸들러
     public void OnReceive()
     {
@@ -382,5 +382,5 @@ public class WorldManager : MonoBehaviour
     {
         return players[_id];
     }
-    #endregion
+#endregion
 }
