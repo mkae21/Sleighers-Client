@@ -41,8 +41,8 @@ public class InputManager : MonoBehaviour
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
         if (Input.GetKey(KeyCode.T))
             WorldManager.instance.OnSend(Protocol.Type.GameStart);
-        // if  (Input.GetKey(KeyCode.G))
-        //     WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
+        if  (Input.GetKey(KeyCode.G))
+            WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
         
         if (WorldManager.instance.IsRaceFinish)
             return;
