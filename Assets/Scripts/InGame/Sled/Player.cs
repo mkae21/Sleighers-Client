@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private float extrapolationLimit = 0.5f;
 
     //최대속도 제한, 드리프트
-    private float maxSpeed = 50f;
+    private float maxSpeed = 75f;
     private float speed;
     private float currentSpeed;
     private float rotate;
@@ -118,7 +118,7 @@ public class Player : MonoBehaviour
                 amount = Mathf.Abs(moveVector.x);
             }
             else
-                amount = Math.Abs(moveVector.x) * 3.5f;//더 크게 회전
+                amount = Math.Abs(moveVector.x) * 10f;//더 크게 회전
             
             Steer(dir, amount);
         }
