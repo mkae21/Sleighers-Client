@@ -12,6 +12,7 @@ public class InGameUI : MonoBehaviour
     public TextMeshProUGUI text_gameEndCountDown;
     public TextMeshProUGUI text_lab;
     public TextMeshProUGUI text_speedLabel;
+
     public Transform rankHolder; // 랭킹 프리팹을 가지고 있는 부모
     public RankManager lapManager;
 
@@ -131,21 +132,30 @@ public class InGameUI : MonoBehaviour
 
     public void SetGameEndCountDown(int _count)
     {
-        GameManager.Instance().soundManager.Play("Effect/EndCount", SoundType.EFFECT);
-
-        if(text_gameEndCountDown != null)
+        if(!WorldManager.instance.IsRaceFinish)
         {
-            if(_count > 0)
+            GameManager.Instance().soundManager.Play("Effect/EndCount", SoundType.EFFECT);
+
+            if(text_gameEndCountDown != null)
             {
-                text_gameEndCountDown.text = _count.ToString();
-                text_gameEndCountDown.gameObject.SetActive(true);
-            }
-            else
-            {
-                text_gameEndCountDown.text = "Game End";
-                Invoke("HideCountDown", 1f);
+                if(_count > 0)
+                {
+                    text_gameEndCountDown.text = _count.ToString();
+                    text_gameEndCountDown.gameObject.SetActive(true);
+                }
+                else
+                {
+                    text_gameEndCountDown.text = "Game End";
+                    Invoke("HideCountDown", 1f);
+                }
             }
         }
+        else
+        {
+            text_gameEndCountDown.gameObject.SetActive(true);
+            text_gameEndCountDown.text = "완주!";
+        }
+        
     }
     public void UpdateSpeedometer()
     {
