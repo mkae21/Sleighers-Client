@@ -137,12 +137,16 @@ public class Player : MonoBehaviour
 
     private void ApplyPhysics(RaycastHit hitNear)
     {
-        if(hitNear.collider != null){//공중에 떠있을때
+
+        if(hitNear.collider != null)// If the sled is on the ground
+        {
             rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
             Sled.eulerAngles = Vector3.Lerp(Sled.eulerAngles, new Vector3(0, Sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
         }
+        
+        rb.AddForce(sledModel.forward * rb.velocity.magnitude, ForceMode.Acceleration);
 
-        rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration); // Apply gravity
+        rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
         isMove = false;
     }
 
@@ -159,7 +163,7 @@ public class Player : MonoBehaviour
     {
         RaycastHit hitNear;
 
-        Physics.Raycast(Sled.position + (Sled.up * .1f),Vector3.down ,out hitNear, 7.0f);
+        Physics.Raycast(Sled.position + (Sled.up * .1f),Vector3.down ,out hitNear, 2.0f);
 
         sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
         sledNormal.Rotate(0, Sled.eulerAngles.y, 0);
