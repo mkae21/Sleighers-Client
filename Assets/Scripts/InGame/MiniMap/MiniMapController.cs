@@ -175,7 +175,14 @@ public class MiniMapController : MonoBehaviour {
 		GameObject curMGO = Instantiate (iconPref);
 		MapObject curMO = curMGO.AddComponent<MapObject> ();
 		curMO.SetMiniMapEntityValues (this,mme,owner,mapCamera,miniMapPanel);
-		ownerIconMap.Add (owner, curMGO);
+
+		// ownerIconMap.Add (owner, curMGO);
+		if(!ownerIconMap.ContainsKey(owner))
+			ownerIconMap.Add(owner, curMGO);
+		else 
+		{
+       		ownerIconMap[owner] = curMGO; // 현재 인스턴스로 업데이트	
+		}
 		return owner.GetComponent<MapObject>();
 	}
 

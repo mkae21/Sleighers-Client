@@ -34,6 +34,7 @@ public class WorldManager : MonoBehaviour
 
 #region PublicVariables
     static public WorldManager instance;
+    // private Transform minimapTarget;
     public GameObject playerPool;
     public Transform startingPointHolder;
     public MiniMapController miniMapController;
@@ -92,7 +93,7 @@ public class WorldManager : MonoBehaviour
             // 아직 완료하지 못했다면 레이스를 완료
             if (!isRaceFinish)
             {
-                OnRaceFinished?.Invoke();
+                OnRaceFinished?.Invoke(); 
             }
         }
     }
@@ -140,7 +141,8 @@ public class WorldManager : MonoBehaviour
         Transform sp = startingPoints[totalPlayerCount].transform;
         GameObject myPlayer = Instantiate(playerPrefab, sp.position, sp.rotation, playerPool.transform);
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId);
-        miniMapController.SetTarget(myPlayer.transform);
+        Transform miniMapTarget = myPlayer.transform.Find("Sled");
+        miniMapController.SetTarget(miniMapTarget);
         players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
 

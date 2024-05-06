@@ -73,7 +73,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2712054036512009712}
   serializedVersion: 4
-  m_Mass: 300
+  m_Mass: 200
   m_Drag: 1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -197,9 +197,10 @@ MonoBehaviour:
   rb: {fileID: 8835457807169266014}
   sledModel: {fileID: 9148137571823036153}
   sledNormal: {fileID: 3752226300241623078}
-  acceleration: 65
-  steering: 65
-  gravity: 10
+  Sled: {fileID: 2172718939356495318}
+  acceleration: 100
+  steering: 20
+  gravity: 33
   amount: 0
   <moveVector>k__BackingField: {x: 0, y: 0, z: 0}
   <isMove>k__BackingField: 0
@@ -274,6 +275,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4866558309324950, guid: f49f056dbe83f514bad9543f0840c957, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6330226245857290284, guid: f49f056dbe83f514bad9543f0840c957,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
