@@ -133,8 +133,8 @@ public class WorldManager : MonoBehaviour
                     LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
                     yield return null;
                 }
-
-                    switch (msg.type)
+                Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
+                switch (msg.type)
                 {
                     case Protocol.Type.LoadGameScene:
                         LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
@@ -330,6 +330,7 @@ public class WorldManager : MonoBehaviour
     // 서버로 보내는 데이터 처리 핸들러
     public async void OnSend(Protocol.Type _type)
     {
+        Debug.LogFormat("[OnSend] {0}", _type);
         switch (_type)
         {
             case Protocol.Type.PlayerReconnect:
