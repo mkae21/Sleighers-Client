@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Xml.Linq;
 using UnityEngine;
 
 /* GameManager.cs
@@ -13,6 +12,8 @@ public class GameManager : MonoBehaviour
 #region PrivateVariables
     private static bool isCreate = false;
     private static GameManager instance;
+    private IEnumerator ReadyUpdateCoroutine;
+    private IEnumerator InGameUpdateCoroutine;
     private GameState gameState;
 #endregion
 
@@ -34,6 +35,8 @@ public class GameManager : MonoBehaviour
         Application.targetFrameRate = 60;
         // 게임중 슬립모드 해제
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        ReadyUpdateCoroutine = ReadyUpdate();
+        InGameUpdateCoroutine = InGameUpdate();
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -48,13 +51,33 @@ public class GameManager : MonoBehaviour
         ChangeState(GameState.Ready);
         isCreate = true;
     }
-
-    private void FixedUpdate()
+    // Ready 상태에서 실행되는 코루틴
+    private IEnumerator ReadyUpdate()
     {
-        if(gameState == GameState.Ready)
-            Ready();
-        else if(gameState == GameState.InGame)
-            InGame();
+       while (true)
+       {
+           if (gameState != GameState.Ready)
+           {
+               StopCoroutine(ReadyUpdateCoroutine);
+               yield return null;
+           }
+           Ready();
+           yield return new WaitForSeconds(0.0333f);
+       }
+    }
+    // 인게임에서 실행되는 코루틴
+    private IEnumerator InGameUpdate()
+    {
+       while (true)
+       {
+           if (gameState != GameState.InGame)
+           {
+               StopCoroutine(InGameUpdateCoroutine);
+               yield return null;
+           }
+           InGame();
+           yield return new WaitForSeconds(0.0333f);
+       }
     }
 #endregion
 
@@ -76,11 +99,12 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case GameState.Ready:
+                StartCoroutine(ReadyUpdateCoroutine);
                 break;
             case GameState.InGame:
                 soundManager.Play("BGM/InGame", SoundType.BGM);
+                StartCoroutine(InGameUpdateCoroutine);
                 break;
-
             case GameState.End:
                 soundManager.StopAll();
                 break;
