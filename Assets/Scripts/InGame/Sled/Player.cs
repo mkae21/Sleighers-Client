@@ -9,7 +9,7 @@ using System;
  */
 public class Player : MonoBehaviour
 {
-    #region PrivateVariables
+#region PrivateVariables
     private float currentSteerAngle;
     //private bool isDrifting;
 
@@ -42,11 +42,9 @@ public class Player : MonoBehaviour
     }
     private string nickName = string.Empty;
     private GameObject playerModelObject;
+#endregion
 
-
-    #endregion
-
-    #region PublicVariables
+#region PublicVariables
 
     public Rigidbody rb;
     public Transform sledModel;
@@ -64,7 +62,7 @@ public class Player : MonoBehaviour
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
     public MiniMapComponent miniMapComponent;
-#endregion
+    #endregion
 
 
 #region PrivateMethod
@@ -124,7 +122,7 @@ public class Player : MonoBehaviour
     }
     private void CuerrentValue()
     {
-        currentSpeed = Mathf.SmoothStep(currentSpeed, speed , Time.deltaTime * 10f);
+        currentSpeed = Mathf.SmoothStep(currentSpeed, speed, Time.deltaTime * 10f);
         speed = 0f; // Reset for next frame
         currentRotate = Mathf.Lerp(currentRotate, rotate, Time.deltaTime * 4f);
         rotate = 0f; // Reset for next frame
@@ -138,68 +136,30 @@ public class Player : MonoBehaviour
     private void ApplyPhysics(RaycastHit hitNear)
     {
 
-        if(hitNear.collider != null)// If the sled is on the ground
+        if (hitNear.collider != null)// If the sled is on the ground
         {
             rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
             Sled.eulerAngles = Vector3.Lerp(Sled.eulerAngles, new Vector3(0, Sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
         }
-        
+
         rb.AddForce(sledModel.forward * rb.velocity.magnitude, ForceMode.Acceleration);
 
         rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
-        Physics.Raycast(transform.position, Vector3.down, out hitNear, 2.0f);
-
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, transform.eulerAngles.y, 0);
-        Physics.Raycast(transform.position, Vector3.down, out hitNear, 2.0f);
-
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, transform.eulerAngles.y, 0);
-        Physics.Raycast(transform.position, Vector3.down, out hitNear, 2.0f);
-
-        Sled.transform.position = rb.transform.position - new Vector3(0, 1.2f, 0);
-    }
-
-    private RaycastHit AdJustBottom()
-    {
-        RaycastHit hitNear;
-
-        Physics.Raycast(Sled.position + (Sled.up * .1f), Vector3.down, out hitNear, 7.0f);
-
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, Sled.eulerAngles.y, 0);
-
-        return hitNear;
-        sledNormal.Rotate(0, transform.eulerAngles.y, 0);
-        Physics.Raycast(transform.position, Vector3.down, out hitNear, 2.0f);
-
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, transform.eulerAngles.y, 0);
-        Physics.Raycast(transform.position, Vector3.down, out hitNear, 2.0f);
-
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, transform.eulerAngles.y, 0);
-        Physics.Raycast(transform.position, Vector3.down, out hitNear, 2.0f);
-
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, transform.eulerAngles.y, 0);
         isMove = false;
     }
-
     public void Steer(int direction, float amount)
     {
         rotate = (steering * direction) * amount;
     }
-
     private void SledPosition()
     {
-        sledModel.transform.position = rb.transform.position - new Vector3(0, 1f, 0);
+        Sled.transform.position = rb.transform.position - new Vector3(0, 1.2f, 0);
     }
     private RaycastHit AdJustBottom()
     {
         RaycastHit hitNear;
 
-        Physics.Raycast(Sled.position + (Sled.up * .1f),Vector3.down ,out hitNear, 2.0f);
+        Physics.Raycast(Sled.position + (Sled.up * .1f), Vector3.down, out hitNear, 2.0f);
 
         sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
         sledNormal.Rotate(0, Sled.eulerAngles.y, 0);
@@ -222,16 +182,13 @@ public class Player : MonoBehaviour
             rb.velocity = rb.velocity.normalized * maxSpeed;
         }
     }
-
     private void ExtrapolatePosition()
     {
         Quaternion lastServerRotation = Quaternion.LookRotation(lastServerAcceleration);
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
-
         float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
-        Debug.Log("현재 레이턴시 :" + timeSinceLastUpdate);
-        Debug.Log("인터폴레이션 비율 :" + interpolationRatio);
+
         if (timeSinceLastUpdate < extrapolationLimit)
         {
             Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate);
@@ -241,9 +198,9 @@ public class Player : MonoBehaviour
         {
             rb.transform.position = Vector3.Lerp(rb.transform.position, lastServerPosition, interpolationRatio);
         }
+
         Quaternion extrapolatedRotation = Quaternion.Slerp(playerModelObject.transform.rotation, lastServerRotation, interpolationRatio);
         playerModelObject.transform.rotation = extrapolatedRotation;
-
     }
     #endregion
 
@@ -295,9 +252,7 @@ public class Player : MonoBehaviour
         else
             isMove = true;
         if (!IsMe)
-        {
             ExtrapolatePosition();
-        }
 
     }
 
@@ -325,7 +280,6 @@ public class Player : MonoBehaviour
     }
     public Vector3 GetVelocity()
     {
-        Debug.Log("velocity : " + rb.velocity);
         return rb.velocity;
     }
 
@@ -337,10 +291,9 @@ public class Player : MonoBehaviour
 
     // 앞으로 나아가는 차량 속도의 양
     public float ForwardSpeed => Vector3.Dot(rb.velocity, transform.forward);
-
     // 차량의 최대 속도에 상대적인 전진 속도를 반환 
     // 반환되는 값은 [-1, 1] 범위
-    
+
     public float NormalizedForwardSpeed
     {
         get => (Mathf.Abs(ForwardSpeed) > 0.1f) ? Mathf.Abs(ForwardSpeed) * 5 / maxSpeed : 0.0f;

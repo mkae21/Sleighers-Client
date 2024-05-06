@@ -54,7 +54,6 @@ public class InputManager : MonoBehaviour
             return;
             
         Vector3 position = WorldManager.instance.GetMyPlayerPosition();
-        Debug.Log("포지션 : " + position);
         Vector3 velocity = WorldManager.instance.GetMyPlayerVelocity();
         Vector3 acceleration = new Vector3(h, 0, v);
         acceleration = Vector3.Normalize(acceleration);

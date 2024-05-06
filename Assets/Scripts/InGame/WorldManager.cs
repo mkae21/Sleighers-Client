@@ -119,12 +119,22 @@ public class WorldManager : MonoBehaviour
             {
                 byte[] data;
                 lock (messageQueue)
-                {
                     data = messageQueue.Dequeue();
-                }
+
                 Message msg = DataParser.ReadJsonData<Message>(data);
-                
-                switch (msg.type)
+                if (msg == null)
+                {
+                    Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
+                    yield return null;
+                }
+                if (msg.from == MyPlayerId)
+                {
+                    Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
+                    LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
+                    yield return null;
+                }
+
+                    switch (msg.type)
                 {
                     case Protocol.Type.LoadGameScene:
                         LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
@@ -226,7 +236,6 @@ public class WorldManager : MonoBehaviour
     private void ReceiveGameStartCountDownEvent(GameCountDownMessage msg)
     {
         int count = msg.count;
-        //Debug.LogFormat("[OnReceive] SendCountDownEvent : {0}", count);
         InGameUI.instance.SetCountDown(count);
     }
     // 게임 시작 이벤트 처리
@@ -327,60 +336,10 @@ public class WorldManager : MonoBehaviour
                 messageQueue.Enqueue(data);
             }
         }
-        //Message msg = DataParser.ReadJsonData<Message>(data);
-
-        //if (msg == null)
-        //{
-        //    Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
-        //    return;
-        //}
-        //if (msg.from == MyPlayerId)
-        //{
-        //    //Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
-        //    //LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
-        //    return;
-        //}
-        ////Debug.LogFormat("[OnReceive] 받은 메세지 타입 : {0}", msg.type);
-        ////LogManager.instance.Log("[OnReceive] 받은 메세지 타입 : " + msg.type);
-
-        //switch (msg.type)
-        //{
-        //    case Protocol.Type.LoadGameScene:
-        //        LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
-        //        ReceiveLoadGameSceneEvent(loadMessage);
-        //        break;
-
-        //    case Protocol.Type.SendCountDown:
-        //        GameStartCountDownMessage startCountMessage = DataParser.ReadJsonData<GameStartCountDownMessage>(data);
-        //        ReceiveSendCountDownEvent(startCountMessage);
-        //        break;
-
-        //    case Protocol.Type.GameStart:
-        //        ReceiveGameStartEvent();
-        //        break;
-
-        //    case Protocol.Type.Key:
-        //        KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
-        //        ReceiveKeyEvent(keyMessage);
-        //        break;
-
-        //    case Protocol.Type.PlayerReconnect:
-        //        ReceivePlayerReconnectEvent(msg);
-        //        break;
-
-        //    case Protocol.Type.PlayerDisconnect:
-        //        ReceivePlayerDisconnectEvent(msg);
-        //        break;
-
-        //    default:
-        //        Debug.LogWarning("[OnReceive] 알 수 없는 프로토콜");
-        //        break;
-        //}
     }
     // 서버로 보내는 데이터 처리 핸들러
     public async void OnSend(Protocol.Type _type)
     {
-        //Debug.LogFormat("[OnSend] 보낸 메세지 타입 : {0}", _type);
         switch (_type)
         {
             case Protocol.Type.PlayerReconnect:
