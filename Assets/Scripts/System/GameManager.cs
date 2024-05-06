@@ -116,7 +116,7 @@ public class GameManager : MonoBehaviour
                 // InGame 상태정리
                 break;
             default:
-                Debug.Log("[GameManager] 알 수 없는 상태입니다.");
+                Debug.Log("[GameManager] 알 수 없는 상태입니다. : " + gameState );
                 break;
         }
 

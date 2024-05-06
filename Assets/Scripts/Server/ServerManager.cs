@@ -70,7 +70,8 @@ public class ServerManager : MonoBehaviour
     private void Init()
     {
         //serverIP = "localhost"; // 로컬 테스트 용
-        serverIP = SecretLoader.s_serverIp;
+        serverIP = "192.168.0.161";
+        //serverIP = SecretLoader.s_serverIp;
         serverPort = SecretLoader.s_serverPort;
 
         Client = new TcpClient(serverIP, serverPort);

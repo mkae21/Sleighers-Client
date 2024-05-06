@@ -9,11 +9,11 @@ using System;
  */
 public class Player : MonoBehaviour
 {
-#region PrivateVariables
+    #region PrivateVariables
     private float currentSteerAngle;
     //private bool isDrifting;
 
-    // extrapolation, slerp
+    // expolation, slerp
     private Vector3 lastServerPosition;
     private Vector3 lastServerVelocity;
     private Vector3 lastServerAcceleration;
@@ -27,7 +27,7 @@ public class Player : MonoBehaviour
     private float rotate;
 
     private float currentRotate;
-    public int playerId { get; private set;} = -1;
+    public int playerId { get; private set; } = -1;
     [SerializeField] private bool isMe = false;
     public bool IsMe
     {
@@ -43,15 +43,17 @@ public class Player : MonoBehaviour
     private string nickName = string.Empty;
     private GameObject playerModelObject;
 
-    
-#endregion
 
-#region PublicVariables
+    #endregion
+
+    #region PublicVariables
 
     public Rigidbody rb;
     public Transform sledModel;
     public Transform sledNormal;
-    
+
+    public Transform Sled;
+
     [Header("Parameters")]
     public float acceleration = 40f;
     public float steering = 40f;
@@ -96,8 +98,9 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(isMove)
-            ApplyPhysics();
+        RaycastHit hitData = AdJustBottom();
+        if (isMove)
+            ApplyPhysics(hitData);
     }
 
     private void GetVerticalSpeed()
@@ -132,22 +135,15 @@ public class Player : MonoBehaviour
         return this.transform.position + (Vector3.up * 2.0f);
     }
 
-    private void ApplyPhysics()
+    private void ApplyPhysics(RaycastHit hitNear)
     {
-        rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
+        if (hitNear.collider != null)
+        {//공중에 떠있을때
+            rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
+            Sled.eulerAngles = Vector3.Lerp(Sled.eulerAngles, new Vector3(0, Sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
+        }
 
         rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration); // Apply gravity
-
-        //steering, 썰매를 모델링한 오브젝트를 회전시키기 위해 사용
-        sledModel.eulerAngles = Vector3.Lerp(sledModel.eulerAngles, new Vector3(0, sledModel.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
-
-        RaycastHit hitOn, hitNear;
-
-        Physics.Raycast(transform.position, Vector3.down, out hitOn, 1.1f);
-        Physics.Raycast(transform.position, Vector3.down, out hitNear, 2.0f);
-
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, transform.eulerAngles.y, 0);
         isMove = false;
     }
 
@@ -158,7 +154,19 @@ public class Player : MonoBehaviour
 
     private void SledPosition()
     {
-        sledModel.transform.position = rb.transform.position - new Vector3(0, 1f, 0);
+        Sled.transform.position = rb.transform.position - new Vector3(0, 1.2f, 0);
+    }
+
+    private RaycastHit AdJustBottom()
+    {
+        RaycastHit hitNear;
+
+        Physics.Raycast(Sled.position + (Sled.up * .1f), Vector3.down, out hitNear, 7.0f);
+
+        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
+        sledNormal.Rotate(0, Sled.eulerAngles.y, 0);
+
+        return hitNear;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -184,20 +192,21 @@ public class Player : MonoBehaviour
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
 
-        float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate/extrapolationLimit);
+        float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
         Debug.Log("현재 레이턴시 :" + timeSinceLastUpdate);
         Debug.Log("인터폴레이션 비율 :" + interpolationRatio);
         if (timeSinceLastUpdate < extrapolationLimit)
         {
-            Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate) + (0.5f * lastServerAcceleration * timeSinceLastUpdate);
-            transform.position = Vector3.Slerp(transform.position, extrapolatedPosition, interpolationRatio);
+            Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate);
+            rb.transform.position = Vector3.Lerp(rb.transform.position, extrapolatedPosition, interpolationRatio);
         }
         else
         {
-            transform.position = Vector3.Slerp(transform.position, lastServerPosition, interpolationRatio);
+            rb.transform.position = Vector3.Lerp(rb.transform.position, lastServerPosition, interpolationRatio);
         }
-        //Quaternion extrapolatedRotation = Quaternion.Slerp(transform.rotation, lastServerRotation, interpolationRatio);
-        //transform.rotation = extrapolatedRotation;
+        Quaternion extrapolatedRotation = Quaternion.Slerp(playerModelObject.transform.rotation, lastServerRotation, interpolationRatio);
+        playerModelObject.transform.rotation = extrapolatedRotation;
+
     }
     #endregion
 
@@ -269,15 +278,17 @@ public class Player : MonoBehaviour
 
     public Vector3 GetPosition()
     {
-        return gameObject.transform.position;
+
+        return playerModelObject.transform.position;
     }
 
     public Vector3 GetRotation()
     {
-        return gameObject.transform.rotation.eulerAngles;
+        return playerModelObject.transform.rotation.eulerAngles;
     }
     public Vector3 GetVelocity()
     {
+        Debug.Log("velocity : " + rb.velocity);
         return rb.velocity;
     }
 

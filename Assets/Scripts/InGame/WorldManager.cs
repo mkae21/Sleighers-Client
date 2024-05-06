@@ -122,7 +122,7 @@ public class WorldManager : MonoBehaviour
                     data = messageQueue.Dequeue();
                 }
                 Message msg = DataParser.ReadJsonData<Message>(data);
-
+                
                 switch (msg.type)
                 {
                     case Protocol.Type.LoadGameScene:
@@ -133,6 +133,11 @@ public class WorldManager : MonoBehaviour
                     case Protocol.Type.GameStartCountDown:
                         GameCountDownMessage startCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
                         ReceiveGameStartCountDownEvent(startCountMessage);
+                        break;
+
+                    case Protocol.Type.GameEndCountDown:
+                        GameCountDownMessage endCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
+                        ReceiveGameEndCountDownEvent(endCountMessage);
                         break;
 
                     case Protocol.Type.GameStart:
@@ -395,7 +400,7 @@ public class WorldManager : MonoBehaviour
                 break;
 
             default:
-                Debug.LogWarning("[OnSend] 알 수 없는 프로토콜");
+                Debug.LogWarning("[OnSend] 알 수 없는 프로토콜 : "+ _type);
                 break;
         }
     }
