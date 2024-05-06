@@ -47,8 +47,8 @@ public class MiniMapComponent : MonoBehaviour {
 		mme.rotateWithObject = rotateWithObject;
 		mme.clampInBorder = clampIconInBorder;
 		mme.clampDist = clampDistance;
-
-		mmo = miniMapController.RegisterMapObject(this.gameObject, mme);
+		
+		mmo = miniMapController.RegisterMapObject(GameObject.Find("Sled"), mme);
 	}
 
 	void OnDisable(){

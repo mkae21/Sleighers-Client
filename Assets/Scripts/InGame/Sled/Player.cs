@@ -51,6 +51,8 @@ public class Player : MonoBehaviour
     public Rigidbody rb;
     public Transform sledModel;
     public Transform sledNormal;
+
+    public Transform Sled;
     
     [Header("Parameters")]
     public float acceleration = 40f;
@@ -86,7 +88,7 @@ public class Player : MonoBehaviour
             tmp = Vector3.Normalize(tmp);
             SetMoveVector(tmp);
         }
-        
+
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -96,8 +98,9 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        RaycastHit hitData = AdJustBottom();
         if(isMove)
-            ApplyPhysics();
+            ApplyPhysics(hitData);
     }
 
     private void GetVerticalSpeed()
@@ -132,22 +135,18 @@ public class Player : MonoBehaviour
         return this.transform.position + (Vector3.up * 2.0f);
     }
 
-    private void ApplyPhysics()
+    private void ApplyPhysics(RaycastHit hitNear)
     {
-        rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
 
-        rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration); // Apply gravity
+        if(hitNear.collider != null)// If the sled is on the ground
+        {
+            rb.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
+            Sled.eulerAngles = Vector3.Lerp(Sled.eulerAngles, new Vector3(0, Sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
+        }
+        
+        rb.AddForce(sledModel.forward * rb.velocity.magnitude, ForceMode.Acceleration);
 
-        //steering, 썰매를 모델링한 오브젝트를 회전시키기 위해 사용
-        sledModel.eulerAngles = Vector3.Lerp(sledModel.eulerAngles, new Vector3(0, sledModel.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
-
-        RaycastHit hitOn, hitNear;
-
-        Physics.Raycast(transform.position, Vector3.down, out hitOn, 1.1f);
-        Physics.Raycast(transform.position, Vector3.down, out hitNear, 2.0f);
-
-        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
-        sledNormal.Rotate(0, transform.eulerAngles.y, 0);
+        rb.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
         isMove = false;
     }
 
@@ -158,9 +157,19 @@ public class Player : MonoBehaviour
 
     private void SledPosition()
     {
-        sledModel.transform.position = rb.transform.position - new Vector3(0, 1f, 0);
+        Sled.transform.position = rb.transform.position - new Vector3(0, 1.2f, 0);
     }
+    private RaycastHit AdJustBottom()
+    {
+        RaycastHit hitNear;
 
+        Physics.Raycast(Sled.position + (Sled.up * .1f),Vector3.down ,out hitNear, 2.0f);
+
+        sledNormal.up = Vector3.Lerp(sledNormal.up, hitNear.normal, Time.deltaTime * 8.0f);
+        sledNormal.Rotate(0, Sled.eulerAngles.y, 0);
+
+        return hitNear;
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Finish")
@@ -217,7 +226,7 @@ public class Player : MonoBehaviour
         InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
 
         if (IsMe)
-            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sledModel.transform;
+            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = Sled.transform;
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
