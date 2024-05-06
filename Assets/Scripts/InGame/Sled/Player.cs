@@ -62,7 +62,7 @@ public class Player : MonoBehaviour
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
     public MiniMapComponent miniMapComponent;
-    #endregion
+#endregion
 
 
 #region PrivateMethod
