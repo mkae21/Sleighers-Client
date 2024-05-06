@@ -78,7 +78,8 @@ public class Finish : MonoBehaviour
 
     private void OnTriggerEnter(Collider _other)
     {
-        if(_other.attachedRigidbody != null && _other.attachedRigidbody.TryGetComponent<Player>(out var player))
+        var player = _other.GetComponentInParent<Player>();
+        if(_other.attachedRigidbody != null && player != null)
             OnPlayerEnterFinish(player);
     }
 
