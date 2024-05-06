@@ -265,13 +265,6 @@ public class WorldManager : MonoBehaviour
         players.Remove(userId);
         sessionInfo.totalPlayerCount--;
     }
-
-    // 게임 종료 이벤트 처리
-    private void ReceiveGameEndEvent(ByteReader br)
-    {
-        int userId = br.ReadInt();
-        Debug.LogFormat("플레이어 {0}가 승리했습니다.", userId);
-    }
 #endregion
 
 #region Send 프로토콜 처리
@@ -287,9 +280,6 @@ public class WorldManager : MonoBehaviour
     // 내 플레이어가 골인했음을 서버에 알림
     private async Task SendPlayerGoalEvent()
     {
-        if(isRaceFinish)
-            return;
-        isRaceFinish = true;
         Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId);
         await ServerManager.Instance().SendDataToInGame(msg);
     }
