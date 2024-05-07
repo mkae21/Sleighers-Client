@@ -361,9 +361,9 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerId];
     }
-    public GameObject GetMySphere()
+    public GameObject GetMySled()
     {
-        return players[myPlayerId].gameObject.transform.Find("Sphere").gameObject;
+        return players[myPlayerId].gameObject.transform.Find("Sled").gameObject;
     }
     public Vector3 GetMyPlayerPosition()
     {
