@@ -125,13 +125,13 @@ public class WorldManager : MonoBehaviour
                 if (msg == null)
                 {
                     Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
-                    yield return null;
+                    continue;
                 }
                 if (msg.from == MyPlayerId)
                 {
                     Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
                     LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
-                    yield return null;
+                    continue;
                 }
                 Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
                 switch (msg.type)
@@ -195,7 +195,6 @@ public class WorldManager : MonoBehaviour
 
         players[id].SetServerData(position, velocity, acceleration, timeStamp);
         players[id].SetMoveVector(acceleration);
-        // TODO: interpolation 적용
     }
     // 다른 플레이어 접속 이벤트 처리
     private void ReceivePlayerReconnectEvent(Message msg)
