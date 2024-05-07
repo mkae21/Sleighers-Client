@@ -4,6 +4,7 @@ using UnityEngine;
 public enum SoundType
 {
     BGM,        // 반복 재생
+    WIND,
     EFFECT,     // 한번 재생
     MAXCOUNT,   // 사운드 종류의 개수
 }
@@ -69,6 +70,7 @@ public class SoundManager
             }
 
             audioSources[(int)SoundType.BGM].loop = true; // bgm 재생기는 무한 반복 재생
+            audioSources[(int)SoundType.WIND].loop = true; // bgm 재생기는 무한 반복 재생
         }
     }
     public void Clear()
@@ -87,9 +89,9 @@ public class SoundManager
         if (audioClip == null)
             return;
 
-		if (type == SoundType.BGM) // BGM 배경음악 재생
+		if (type == SoundType.BGM || type == SoundType.WIND) // BGM 배경음악 재생
 		{
-			AudioSource audioSource = audioSources[(int)SoundType.BGM];
+			AudioSource audioSource = audioSources[(int)type];
 			if (audioSource.isPlaying)
 				audioSource.Stop();
 
@@ -99,7 +101,7 @@ public class SoundManager
 		}
 		else // Effect 효과음 재생
 		{
-			AudioSource audioSource = audioSources[(int)SoundType.EFFECT];
+			AudioSource audioSource = audioSources[(int)type];
 			audioSource.pitch = pitch;
 			audioSource.PlayOneShot(audioClip);
 		}

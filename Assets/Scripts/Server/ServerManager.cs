@@ -72,17 +72,21 @@ public class ServerManager : MonoBehaviour
         //serverIP = "localhost"; // 로컬 테스트 용
         serverIP = SecretLoader.s_serverIp;
         serverPort = SecretLoader.s_serverPort;
+        LogManager.instance.Log(serverIP);
+        LogManager.instance.Log(serverPort.ToString());
 
         Client = new TcpClient(serverIP, serverPort);
         if (Client.Connected)
         {
             Debug.LogFormat("[ServerManager] 서버 접속 성공 {0}:{1}", serverIP, serverPort);
+            LogManager.instance.Log("[ServerManager] 서버 접속 성공");
             Stream = Client.GetStream();
             IsConnect = true;
         }
         else
         {
             Debug.LogError("[ServerManager] 서버 접속 실패");
+            LogManager.instance.Log("[ServerManager] 서버 접속 실패");
             IsConnect = false;
         }
     }
