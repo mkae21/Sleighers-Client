@@ -2,29 +2,30 @@ using UnityEngine;
 
 public class SledAudioEffect : MonoBehaviour
 {
-        Player player;
-        [SerializeField]
-        float minPitch = 0.25f;
+#region PrivateVariables
+        [SerializeField] private float minPitch = 0.25f;
 
-        [SerializeField]
-        float maxPitch = 1.1f;
+        [SerializeField] private float maxPitch = 1.5f;
 
-        [SerializeField]
-        float multiplier = 1.2f;
+        [SerializeField] private float multiplier = 1.2f;
 
-        AudioSource audioSource;
+        private AudioSource audioSource;
+        private Player player;
+#endregion
 
+#region PrivateMethod
         private void Awake()
         {
             player = GetComponentInParent<Player>();
             audioSource = GetComponent<AudioSource>();
         }
 
-        void Update()
+        private void Update()
         {
-            if (player != null && audioSource != null)
-            {
+            if (player.moveVector == Vector3.zero || player.GetVelocity().magnitude < 0.5f)
+                audioSource.pitch = 0;
+            else if (player != null && audioSource != null)
                 audioSource.pitch = Mathf.Lerp(minPitch, maxPitch, player.NormalizedForwardSpeed * multiplier);
-            }
         }
+#endregion
 }
