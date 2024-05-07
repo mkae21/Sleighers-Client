@@ -360,6 +360,10 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerId];
     }
+    public GameObject GetMySphere()
+    {
+        return players[myPlayerId].gameObject.transform.Find("Sphere").gameObject;
+    }
     public Vector3 GetMyPlayerPosition()
     {
         return players[myPlayerId].GetPosition();
