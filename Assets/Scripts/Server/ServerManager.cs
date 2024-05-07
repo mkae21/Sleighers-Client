@@ -64,6 +64,7 @@ public class ServerManager : MonoBehaviour
     }
     private void Start()
     {
+        LogManager.instance.Log("[ServerManager] Start()");
         Init();
         StartCoroutine(ServerPollCoroutine);
     }

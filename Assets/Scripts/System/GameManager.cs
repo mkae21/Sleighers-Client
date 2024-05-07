@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        LogManager.instance.Log("[GameManager] Start()");
         if (isCreate)
         {
             DestroyImmediate(gameObject, true);
