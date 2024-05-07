@@ -68,6 +68,7 @@ public class WorldManager : MonoBehaviour
     }
     private void Start()
     {
+        LogManager.instance.Log("[WorldManager] Start()");
         InitializeGame();
         StartCoroutine(OnReceive());
     }
