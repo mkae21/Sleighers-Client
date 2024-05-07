@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Asset Stores/Arcade Racing Kit/Example/SampleScenes/Example.unity
-    guid: 48bc7dae49bed5649adddb999ad33197
+    path: Assets/Scenes/InGame.unity
+    guid: af08e023efc5efa429862c5e1d5a73fb
   m_configObjects: {}
