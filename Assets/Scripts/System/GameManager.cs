@@ -102,6 +102,7 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(ReadyUpdateCoroutine);
                 break;
             case GameState.InGame:
+                soundManager.Play("BGM/Wind", SoundType.WIND);
                 soundManager.Play("BGM/InGame", SoundType.BGM);
                 StartCoroutine(InGameUpdateCoroutine);
                 break;

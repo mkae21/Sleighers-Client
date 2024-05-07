@@ -134,6 +134,7 @@ public class WorldManager : MonoBehaviour
                     continue;
                 }
                 Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
+                LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
                 switch (msg.type)
                 {
                     case Protocol.Type.LoadGameScene:
