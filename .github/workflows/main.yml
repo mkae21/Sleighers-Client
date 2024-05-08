@@ -23,10 +23,11 @@ jobs:
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
             Library-
-      - name: secret setting
+
+      # EC2 서버의 IP와 Port를 설정
+      - name: Secret Setting
         run: |
-          touch ./Assets/secret.json
-          echo "${{ secrets.INGAME_SERVER }}" > ./Assets/secret.json
+          New-Item -Path . -Name 'secret.json' -ItemType 'file' -Value '${{ secrets.INGAME_SERVER }}'
 
       # Build
       - name: Build project
@@ -37,9 +38,10 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: StandaloneWindows64
+          buildName: Sleighers
 
       # Output
       - uses: actions/upload-artifact@v4
         with:
-          name: Windows Build
+          name: Sleighers
           path: build

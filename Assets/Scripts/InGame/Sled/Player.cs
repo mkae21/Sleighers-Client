@@ -10,24 +10,22 @@ using System;
 public class Player : MonoBehaviour
 {
 #region PrivateVariables
-    private float currentSteerAngle;
     private bool isDrifting;
 
     // expolation, slerp
     private Vector3 lastServerPosition;
     private Vector3 lastServerVelocity;
-    private Vector3 lastServerAcceleration;
+    private Quaternion lastServerRotation;
     private long lastServerTimeStamp;
     private float extrapolationLimit = 0.5f;
 
-    //최대속도 제한, 드리프트
+    // 최대속도 제한, 드리프트
     private float maxSpeed = 75f;
     private float speed;
     private float currentSpeed;
     private float rotate;
 
     private float currentRotate;
-    public int playerId { get; private set; } = -1;
     [SerializeField] private bool isMe = false;
     public bool IsMe
     {
@@ -44,7 +42,7 @@ public class Player : MonoBehaviour
 #endregion
 
 #region PublicVariables
-
+    public int playerId { get; private set; } = -1;
     public Rigidbody sphere;
     public Transform sledModel;
     public Transform sled;
@@ -204,10 +202,7 @@ public class Player : MonoBehaviour
         {
             sphere.transform.position = Vector3.Lerp(sphere.transform.position, lastServerPosition, interpolationRatio);
         }
-
-        // Quaternion lastServerRotation = Quaternion.LookRotation(lastServerAcceleration);
-        // Quaternion extrapolatedRotation = Quaternion.Slerp(sled.rotation, lastServerRotation, interpolationRatio);
-        // sled.rotation = extrapolatedRotation;
+        sled.transform.rotation = Quaternion.Slerp(sled.transform.rotation, lastServerRotation, interpolationRatio);
     }
 #endregion
 
@@ -236,17 +231,12 @@ public class Player : MonoBehaviour
         this.moveVector = new Vector3(0, 0, 0);
     }
 
-    public void SetServerData(Vector3 _position, Vector3 _velocity, Vector3 _acceleration, long _timeStamp)
+    public void SetServerData(Vector3 _position, Vector3 _velocity, Quaternion _rotation, long _timeStamp)
     {
         lastServerPosition = _position;
         lastServerVelocity = _velocity;
-        lastServerAcceleration = _acceleration;
+        lastServerRotation = _rotation;
         lastServerTimeStamp = _timeStamp;
-    }
-
-    public void SetMoveVector(float move)
-    {
-        SetMoveVector(this.transform.forward * move);
     }
 
     public void SetMoveVector(Vector3 vector)
@@ -259,31 +249,17 @@ public class Player : MonoBehaviour
             isMove = true;
     }
 
-    public void SetPosition(Vector3 pos)
-    {
-        gameObject.transform.position = pos;
-    }
-
-    // isStatic이 true이면 해당 위치로 바로 이동
-    public void SetPosition(float x, float y, float z)
-    {
-        Vector3 pos = new Vector3(x, y, z);
-        SetPosition(pos);
-    }
-
     public Vector3 GetPosition()
     {
-
         return sphere.transform.position;
-    }
-
-    public Vector3 GetRotation()
-    {
-        return sledModel.rotation.eulerAngles;
     }
     public Vector3 GetVelocity()
     {
         return sphere.velocity;
+    }
+    public Vector3 GetRotation()
+    {
+        return sled.transform.rotation.eulerAngles;
     }
 
     public void SetDrift(bool isDrift)
@@ -298,9 +274,9 @@ public class Player : MonoBehaviour
 
     // 앞으로 나아가는 차량 속도의 양
     public float ForwardSpeed => Vector3.Dot(sphere.velocity, transform.forward);
+
     // 차량의 최대 속도에 상대적인 전진 속도를 반환 
     // 반환되는 값은 [-1, 1] 범위
-
     public float NormalizedForwardSpeed
     {
         get => (Mathf.Abs(ForwardSpeed) > 0.1f) ? Mathf.Abs(ForwardSpeed) * 5 / maxSpeed : 0.0f;

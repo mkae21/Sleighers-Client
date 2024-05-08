@@ -52,14 +52,17 @@ public class InputManager : MonoBehaviour
 
         if (h == 0 && v == 0)
             return;
-            
-        Vector3 position = WorldManager.instance.GetMyPlayerPosition();
-        Vector3 velocity = WorldManager.instance.GetMyPlayerVelocity();
+        
+        int id = WorldManager.instance.MyPlayerId;
         Vector3 acceleration = new Vector3(h, 0, v);
         acceleration = Vector3.Normalize(acceleration);
+        Vector3 position = WorldManager.instance.GetMyPlayerPosition();
+        Vector3 velocity = WorldManager.instance.GetMyPlayerVelocity();
+        Vector3 rotation = WorldManager.instance.GetMyPlayerRotation();
+
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
         WorldManager.instance.GetMyPlayer().SetDrift(drifting);
-        KeyMessage msg = new KeyMessage(WorldManager.instance.MyPlayerId, position, velocity, acceleration, 0);
+        KeyMessage msg = new KeyMessage(id, acceleration, position, velocity, rotation, 0);
         await ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
     }
 #endregion
