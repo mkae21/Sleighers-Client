@@ -210,7 +210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startVelocity: 0.2
-  maxEmissionRate: 100
+  maxEmissionRate: 200
   particleSystem: {fileID: 8174035451847668220}
 --- !u!1 &7766395760540196110
 GameObject:
