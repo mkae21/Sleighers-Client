@@ -27,7 +27,7 @@ jobs:
       # EC2 서버의 IP와 Port를 설정
       - name: Secret Setting
         run: |
-          New-Item -Path . -Name 'secret.json' -ItemType 'file' -Value '${{ secrets.INGAME_SERVER }}'
+          New-Item -Path .\Assets\ -Name 'secret.json' -ItemType 'file' -Value '${{ secrets.INGAME_SERVER }}'
 
       # Build
       - name: Build project
