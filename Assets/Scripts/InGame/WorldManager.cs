@@ -68,8 +68,9 @@ public class WorldManager : MonoBehaviour
     }
     private void Start()
     {
+        LogManager.instance.Log("[WorldManager] Start()");
         InitializeGame();
-        StartCoroutine(ProcessMessageQueue());
+        StartCoroutine(OnReceive());
     }
 
     // 인게임 초기화
@@ -111,7 +112,8 @@ public class WorldManager : MonoBehaviour
     }
 
 #region Receive 프로토콜 처리
-    private IEnumerator ProcessMessageQueue()
+    // 서버로부터 받은 데이터 처리 핸들러
+    private IEnumerator OnReceive()
     {
         while (true)
         {
@@ -130,11 +132,11 @@ public class WorldManager : MonoBehaviour
                 if (msg.from == MyPlayerId)
                 {
                     Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
-                    LogManager.instance.Log("[OnReceive] 내 플레이어의 메세지입니다.");
                     continue;
                 }
+                if (msg.type != Protocol.Type.Key)
+                    LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
                 Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
-                LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
                 switch (msg.type)
                 {
                     case Protocol.Type.LoadGameScene:
@@ -175,7 +177,7 @@ public class WorldManager : MonoBehaviour
                         break;
 
                     default:
-                        Debug.LogWarning("[ProcessMessageQueue] 알 수 없는 메시지 타입: " + msg.type);
+                        Debug.LogWarning("[OnReceive] 알 수 없는 메시지 타입: " + msg.type);
                         break;
                 }
             }
@@ -295,8 +297,8 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region PublicMethod
-    // 서버로부터 받는 데이터 처리 핸들러
-    public void OnReceive()
+    // 서버로부터 데이터를 받아오는 함수
+    public void Polling()
     {
         NetworkStream stream = ServerManager.Instance().Stream;
         byte[] size = new byte[4];
@@ -310,27 +312,26 @@ public class WorldManager : MonoBehaviour
 
         if (receiveSize == 0)
         {
-            Debug.Log("[OnReceive] 빈 데이터가 브로드캐스킹 되었습니다.");
+            Debug.LogWarning("[Polling] 빈 데이터가 수신되었습니다.");
             return;
         }
 
         if (players == null)
         {
-            Debug.LogWarning("[OnReceive] 플레이어 리스트가 존재하지 않습니다.");
+            Debug.LogWarning("[Polling] 플레이어 리스트가 존재하지 않습니다.");
             return;
         }
         if (data != null)
         {
             lock (messageQueue)
-            {
                 messageQueue.Enqueue(data);
-            }
         }
     }
     // 서버로 보내는 데이터 처리 핸들러
     public async void OnSend(Protocol.Type _type)
     {
-        Debug.LogFormat("[OnSend] {0}", _type);
+        Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
+        LogManager.instance.Log("[OnSend] 메세지 타입 : " + _type.ToString());
         switch (_type)
         {
             case Protocol.Type.PlayerReconnect:
@@ -361,9 +362,9 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerId];
     }
-    public GameObject GetMySphere()
+    public GameObject GetMySled()
     {
-        return players[myPlayerId].gameObject.transform.Find("Sphere").gameObject;
+        return players[myPlayerId].gameObject.transform.Find("Sled").gameObject;
     }
     public Vector3 GetMyPlayerPosition()
     {

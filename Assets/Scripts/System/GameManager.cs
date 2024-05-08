@@ -28,13 +28,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         if (!instance)
-        {
             instance = this;
-        }
-        // 60프레임 고정
-        Application.targetFrameRate = 60;
-        // 게임중 슬립모드 해제
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
         ReadyUpdateCoroutine = ReadyUpdate();
         InGameUpdateCoroutine = InGameUpdate();
         DontDestroyOnLoad(this.gameObject);
@@ -42,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        LogManager.instance.Log("[GameManager] Start()");
         if (isCreate)
         {
             DestroyImmediate(gameObject, true);

@@ -1,14 +1,12 @@
 using UnityEngine;
 
 /* [ FollowMyPlayer.cs ]
- * 내 플레이어를 따라가는 스크립트이다.
+ * 내리는 눈 파티클 시스템이 내 플레이어를 따라가는 스크립트이다.
  */
 public class FollowMyPlayer : MonoBehaviour
 {
 #region PrivateVariables
-    private Transform sphere = null;
-    private float smoothTime = 0.3f;
-    private Vector3 currentVelocity;
+    private Transform sled = null;
 #endregion
 
 #region PrivateMethod
@@ -18,8 +16,11 @@ public class FollowMyPlayer : MonoBehaviour
     }
     private void Update()
     {
-        if (sphere != null)
-            transform.position = Vector3.SmoothDamp(transform.position, sphere.position, ref currentVelocity, smoothTime);
+        if (sled != null)
+        {
+            transform.position = new Vector3(sled.position.x, sled.position.y + 20, sled.position.z);
+            transform.position += sled.forward * 30f;
+        }
     }
     private void TryGetMyPlayer()
     {
@@ -27,7 +28,7 @@ public class FollowMyPlayer : MonoBehaviour
         if (myPlayerID == -1)
             Invoke("TryGetMyPlayer", 1f);
         else
-            sphere = WorldManager.instance.GetMySphere().transform;
+            sled = WorldManager.instance.GetMySled().transform;
     }
 #endregion
 }

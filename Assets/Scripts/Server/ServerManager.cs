@@ -64,29 +64,28 @@ public class ServerManager : MonoBehaviour
     }
     private void Start()
     {
+        LogManager.instance.Log("[ServerManager] Start()");
         Init();
         StartCoroutine(ServerPollCoroutine);
     }
     private void Init()
     {
-        //serverIP = "localhost"; // 로컬 테스트 용
+        // serverIP = "localhost"; // 로컬 테스트 용
         serverIP = SecretLoader.s_serverIp;
         serverPort = SecretLoader.s_serverPort;
-        LogManager.instance.Log(serverIP);
-        LogManager.instance.Log(serverPort.ToString());
 
         Client = new TcpClient(serverIP, serverPort);
         if (Client.Connected)
         {
             Debug.LogFormat("[ServerManager] 서버 접속 성공 {0}:{1}", serverIP, serverPort);
-            LogManager.instance.Log("[ServerManager] 서버 접속 성공");
+            LogManager.instance.Log("[ServerManager] 서버 접속 성공 " + serverIP + ":" + serverPort.ToString());
             Stream = Client.GetStream();
             IsConnect = true;
         }
         else
         {
             Debug.LogError("[ServerManager] 서버 접속 실패");
-            LogManager.instance.Log("[ServerManager] 서버 접속 실패");
+            LogManager.instance.Log("[ServerManager] 서버 접속 실패 " + serverIP + ":" + serverPort.ToString());
             IsConnect = false;
         }
     }
@@ -95,7 +94,7 @@ public class ServerManager : MonoBehaviour
         while (true)
         {
             if (Stream.DataAvailable && IsConnect)
-                WorldManager.instance.OnReceive();
+                WorldManager.instance.Polling();
             yield return null;
         }
     
