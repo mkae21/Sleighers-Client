@@ -94,10 +94,10 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case GameState.Ready:
+                soundManager.Play("BGM/Wind", SoundType.WIND);
                 StartCoroutine(ReadyUpdateCoroutine);
                 break;
             case GameState.InGame:
-                soundManager.Play("BGM/Wind", SoundType.WIND);
                 soundManager.Play("BGM/InGame", SoundType.BGM);
                 StartCoroutine(InGameUpdateCoroutine);
                 break;
