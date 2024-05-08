@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InGameUI : MonoBehaviour
 {
@@ -10,20 +12,29 @@ public class InGameUI : MonoBehaviour
     public TextMeshProUGUI text_timer;
     public TextMeshProUGUI text_countDown;
     public TextMeshProUGUI text_gameEndCountDown;
-    public TextMeshProUGUI text_lab;
     public TextMeshProUGUI text_speedLabel;
-
-    public Transform rankHolder; // 랭킹 프리팹을 가지고 있는 부모
-    public RankManager lapManager;
-
+    
+    [Space(10), Header("랭킹 관련"), Tooltip("1/2 LAP")] 
+    public TextMeshProUGUI text_lab;
+    [Tooltip("1/5 (등수)")]
+    public TextMeshProUGUI text_rank;
+    [Tooltip("랭킹 프리팹을 가지고 있는 부모")]
+    public Transform rankHolder;
+    public RankManager rankManager;
+    [Tooltip("랭킹 요소 프리팹")]
+    public GameObject rankingElem;
 #endregion
 
 #region PrivateVariables
     private float countDownDuration = 3.0f;
     private float speed = 0.0f;
     private float timer = 0.0f;
-    private TextMeshProUGUI[] text_ranks;
-    private bool lastLapAonnouncd = false;
+    private Dictionary<int, TextMeshProUGUI> text_ranks;
+
+    // Blink 코루틴 변수
+    private float blinkDuration = 0.1f; // 블링크 지속 시간 (초)
+    private Color originalColor = Color.white; // 원래 색상
+    private Color blinkColor = Color.black; // 블링크 색상
 #endregion
 
 #region PrivateMethod
@@ -35,23 +46,12 @@ public class InGameUI : MonoBehaviour
     {
         GameManager.InGame += UpdateTimer;
         GameManager.InGame += UpdateSpeedometer;
-        if (lapManager != null)
-            lapManager.OnLapComplete += OnLapComplete;
+        if (rankManager != null)
+            rankManager.OnLapComplete += OnLapComplete;
         else
             Debug.Log("[InGameUI] LapManager가 없습니다.");
         UpdateLapText(1);
-        InitRankUI();
-    }
-
-    private void InitRankUI()
-    {
-        int totalRankCount = rankHolder.childCount;
-        text_ranks = new TextMeshProUGUI[totalRankCount];
-        for (int i = 0; i < totalRankCount; i++)
-        {
-            text_ranks[i] = rankHolder.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>();
-            text_ranks[i].text = string.Empty;
-        }
+        text_ranks = new Dictionary<int, TextMeshProUGUI>();
     }
 
     // Go! 텍스트 숨기기
@@ -61,8 +61,6 @@ public class InGameUI : MonoBehaviour
             text_countDown.gameObject.SetActive(false);
         if(text_gameEndCountDown.text == "Game End")
             text_gameEndCountDown.gameObject.SetActive(false);
-        if(text_countDown.text == "<color=#D18B0D>마지막 바퀴!</color>")
-            text_countDown.gameObject.SetActive(false);
     }
     // 플레이어가 랩을 통과하면 호출
     private void OnLapComplete(Player _player, RankInfo _lapInfo)
@@ -71,33 +69,68 @@ public class InGameUI : MonoBehaviour
         if (WorldManager.instance.GetMyPlayer() != _player)
             return;      
         // Lap 텍스트 업데이트
-        int lapsCompleted = lapManager.GetLapInfo(_player).lap;
-        int currentLap = Mathf.Min(lapsCompleted + 1, lapManager.Laps);
+        int lapsCompleted = rankManager.GetLapInfo(_player).lap;
+        int currentLap = Mathf.Min(lapsCompleted + 1, rankManager.Laps);
         UpdateLapText(currentLap);
-
-        if(currentLap == lapManager.Laps && !lastLapAonnouncd)
-        {
-            text_countDown.gameObject.SetActive(true);
-            text_countDown.text = "<color=#D18B0D>마지막 바퀴!</color>";
-            Invoke("HideCountDown", 1f);
-            lastLapAonnouncd = true;
-        }
     }
 
     private void UpdateLapText(int _currentLap)
     {
-
-        if (lapManager != null)
-            text_lab.text = $"<size=160>{_currentLap}</size=160>/{lapManager.Laps} LAP";
+        if (rankManager != null)
+            text_lab.text = $"<size=160>{_currentLap}</size=160>/{rankManager.Laps} LAP";
+    }
+    // 랭킹 UI 깜박임 효과
+    private IEnumerator BlinkCoroutine(Image _target)
+    {
+        // 점차 어두워짐
+        for (float t = 0; t <= blinkDuration; t += Time.deltaTime)
+        {
+            Color color = Color.Lerp(originalColor, blinkColor, t / blinkDuration);
+            color.a = 80/255f;
+            _target.color = color;
+            yield return null;
+        }
+        // 점차 밝아짐
+        for (float t = 0; t <= blinkDuration; t += Time.deltaTime)
+        {
+            Color color = Color.Lerp(blinkColor, originalColor, t / blinkDuration);
+            color.a = 80/255f;
+            _target.color = color;
+            yield return null;
+        }
     }
 
 #endregion
 
 #region PublicMethod
-    public void UpdateRankUI(List<string> _ranking)
+    public void AddRankUI(int _id)
+    {
+        GameObject rankElem = Instantiate(rankingElem, rankHolder);
+        TextMeshProUGUI text_rankElem = rankElem.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        text_rankElem.text = $"Player{_id} 0LAP 0CP";
+        text_ranks.Add(_id, text_rankElem);
+    }
+    public void DeleteRankUI(int _id)
+    {
+        Destroy(text_ranks[_id].transform.parent.gameObject);
+        text_ranks.Remove(_id);
+    }
+    public void UpdateRankUI(List<RankSort> _ranking)
     {
         for (int i = 0; i < _ranking.Count; i++)
-            text_ranks[i].text = _ranking[i];
+        {
+            int id = _ranking[i].id;
+            int lap = _ranking[i].lap;
+            int checkpoint = _ranking[i].checkpoint;
+
+            if (id == WorldManager.instance.MyPlayerId)
+            {
+                text_rank.text = $"<size=160>{i + 1}</size>/{_ranking.Count}";
+                StartCoroutine(BlinkCoroutine(text_ranks[id].transform.parent.GetComponent<Image>()));
+            }
+            text_ranks[id].text = $"{i + 1}. Player{id} {lap}LAP {checkpoint}CP";
+            text_ranks[id].transform.parent.SetSiblingIndex(i);
+        }
     }
     public void UpdateTimer()
     {
