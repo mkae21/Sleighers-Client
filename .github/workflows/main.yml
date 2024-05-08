@@ -24,6 +24,11 @@ jobs:
           restore-keys: |
             Library-
 
+      # EC2 서버의 IP와 Port를 설정
+      - name: Secret Setting
+        run: |
+          New-Item -Path .\Assets\ -Name 'secret.json' -ItemType 'file' -Value '${{ secrets.INGAME_SERVER }}'
+
       # Build
       - name: Build project
         uses: game-ci/unity-builder@v4
@@ -33,9 +38,10 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: StandaloneWindows64
+          buildName: Sleighers
 
       # Output
       - uses: actions/upload-artifact@v4
         with:
-          name: Windows Build
+          name: Sleighers
           path: build

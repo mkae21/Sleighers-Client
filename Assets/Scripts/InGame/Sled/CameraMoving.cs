@@ -19,6 +19,10 @@ public class CameraMoving : MonoBehaviour
         blendListCamera.m_Instructions[0].m_VirtualCamera = vCam1;
         blendListCamera.m_Instructions[1].m_VirtualCamera = vCam2;
         blendListCamera.m_Instructions[0].m_Hold = 1.0f;
+        vCam1.m_Lens.NearClipPlane = 0.1f;
+        vCam2.m_Lens.NearClipPlane = 0.1f;
+        vCam1.m_Lens.FarClipPlane = 300.0f;
+        vCam2.m_Lens.FarClipPlane = 300.0f;
     }
     private void Update()
     {
