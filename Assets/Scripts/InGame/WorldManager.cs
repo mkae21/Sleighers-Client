@@ -18,7 +18,7 @@ public class WorldManager : MonoBehaviour
         public int totalPlayerCount;
     }
 #region PrivateVariables
-    private RankManager lapManager;
+    private RankManager rankManager;
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
     private Dictionary<int, Player> players;
@@ -61,9 +61,9 @@ public class WorldManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        lapManager = GetComponent<RankManager>();
+        rankManager = GetComponent<RankManager>();
         players = new Dictionary<int, Player>();
-        lapManager.OnLapComplete += OnLapComplete;
+        rankManager.OnLapComplete += OnLapComplete;
         OnRaceFinished += FinishRace;
     }
     private void Start()
@@ -94,7 +94,7 @@ public class WorldManager : MonoBehaviour
     private void OnLapComplete(Player _player, RankInfo _lapInfo)
     {
         // 플레이어가 레이스를 완료했나 확인
-        if (_player.IsMe && _lapInfo.lap == lapManager.Laps)
+        if (_player.IsMe && _lapInfo.lap == rankManager.Laps)
         {
             // 아직 완료하지 못했다면 레이스를 완료
             if (!isRaceFinish)
@@ -264,6 +264,7 @@ public class WorldManager : MonoBehaviour
     {
         int userId = msg.from;
         Destroy(players[userId].gameObject);
+        RankManager.instance.DeleteRankInfo(players[userId]);
         players.Remove(userId);
         sessionInfo.totalPlayerCount--;
     }
