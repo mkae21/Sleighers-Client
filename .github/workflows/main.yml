@@ -29,6 +29,7 @@ jobs:
         run: |
           New-Item -Path .\Assets\Resources\Json\ -Name 'secret.json' -ItemType 'file' -Value '${{ secrets.INGAME_SERVER }}'
 
+
       # Build
       - name: Build project
         uses: game-ci/unity-builder@v4
