@@ -23,6 +23,10 @@ jobs:
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
             Library-
+      - name: secret setting
+        run: |
+          touch ./Assets/secret.json
+          echo "${{ secrets.INGAME_SERVER }}" > ./Assets/secret.json
 
       # Build
       - name: Build project
