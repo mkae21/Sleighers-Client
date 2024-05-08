@@ -169,6 +169,8 @@ MonoBehaviour:
   steering: 20
   gravity: 33
   amount: 0
+  <moveVector>k__BackingField: {x: 0, y: 0, z: 0}
+  <isMove>k__BackingField: 0
   nameObject: {fileID: 6711063065380186699, guid: 288abb305934d2b4cba29bea79a9c247,
     type: 3}
   miniMapComponent: {fileID: 138193475721386800}
