@@ -54,11 +54,11 @@ public class InputManager : MonoBehaviour
             return;
         
         int id = WorldManager.instance.MyPlayerId;
-        Vector3 acceleration = new Vector3(h, 0, v);
+        Vector2 acceleration = new Vector2(h, v);
         acceleration = Vector3.Normalize(acceleration);
         Vector3 position = WorldManager.instance.GetMyPlayerPosition();
         Vector3 velocity = WorldManager.instance.GetMyPlayerVelocity();
-        Vector3 rotation = WorldManager.instance.GetMyPlayerRotation();
+        float rotation = WorldManager.instance.GetMyPlayerRotation();
 
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
         WorldManager.instance.GetMyPlayer().SetDrift(drifting);
