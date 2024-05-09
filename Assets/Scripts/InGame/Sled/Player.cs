@@ -164,8 +164,7 @@ public class Player : MonoBehaviour
     {
         RaycastHit hitNear;
 
-        Physics.Raycast(sled.position + (sled.up * .1f), Vector3.down, out hitNear, 2.0f);
-
+        Physics.Raycast(sled.position + (sled.up * .5f), Vector3.down, out hitNear, 2.0f);
         sledModel.up = Vector3.Lerp(sledModel.up, hitNear.normal, Time.deltaTime * 8.0f);
         sledModel.Rotate(0, sled.eulerAngles.y, 0);
 
