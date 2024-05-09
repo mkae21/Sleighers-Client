@@ -3,9 +3,8 @@ using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.Events;
 using Protocol;
-using Reader;
-using System.Collections;
 using System.Threading.Tasks;
+using System;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
@@ -38,7 +37,6 @@ public class WorldManager : MonoBehaviour
 
 #region PublicVariables
     static public WorldManager instance;
-    // private Transform minimapTarget;
     public GameObject playerPool;
     public Transform startingPointHolder;
     public MiniMapController miniMapController;
@@ -70,9 +68,11 @@ public class WorldManager : MonoBehaviour
     {
         LogManager.instance.Log("[WorldManager] Start()");
         InitializeGame();
-        StartCoroutine(OnReceive());
     }
-
+    private void FixedUpdate()
+    {
+        OnReceive();
+    }
     // 인게임 초기화
     private void InitializeGame()
     {
@@ -113,75 +113,71 @@ public class WorldManager : MonoBehaviour
 
 #region Receive 프로토콜 처리
     // 서버로부터 받은 데이터 처리 핸들러
-    private IEnumerator OnReceive()
+    private void OnReceive()
     {
-        while (true)
+        if (messageQueue.Count > 0)
         {
-            if (messageQueue.Count > 0)
+            byte[] data;
+            lock (messageQueue)
+                data = messageQueue.Dequeue();
+
+            Message msg = DataParser.ReadJsonData<Message>(data);
+            if (msg == null)
             {
-                byte[] data;
-                lock (messageQueue)
-                    data = messageQueue.Dequeue();
-
-                Message msg = DataParser.ReadJsonData<Message>(data);
-                if (msg == null)
-                {
-                    Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
-                    continue;
-                }
-                if (msg.from == MyPlayerId)
-                {
-                    Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
-                    continue;
-                }
-                if (msg.type != Protocol.Type.Key)
-                    LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
-                Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
-                switch (msg.type)
-                {
-                    case Protocol.Type.LoadGameScene:
-                        LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
-                        ReceiveLoadGameSceneEvent(loadMessage);
-                        break;
-
-                    case Protocol.Type.GameStartCountDown:
-                        GameCountDownMessage startCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
-                        ReceiveGameStartCountDownEvent(startCountMessage);
-                        break;
-
-                    case Protocol.Type.GameEndCountDown:
-                        GameCountDownMessage endCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
-                        ReceiveGameEndCountDownEvent(endCountMessage);
-                        break;
-
-                    case Protocol.Type.GameStart:
-                        ReceiveGameStartEvent();
-                        break;
-
-                    case Protocol.Type.GameEnd:
-                        KeyMessage endMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                        ReceiveGameEndEvent(endMessage);
-                        break;
-
-                    case Protocol.Type.Key:
-                        KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                        ReceiveKeyEvent(keyMessage);
-                        break;
-
-                    case Protocol.Type.PlayerReconnect:
-                        ReceivePlayerReconnectEvent(msg);
-                        break;
-
-                    case Protocol.Type.PlayerDisconnect:
-                        ReceivePlayerDisconnectEvent(msg);
-                        break;
-
-                    default:
-                        Debug.LogWarning("[OnReceive] 알 수 없는 메시지 타입: " + msg.type);
-                        break;
-                }
+                Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
+                return;
             }
-            yield return null;
+            if (msg.from == MyPlayerId)
+            {
+                Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
+                return;
+            }
+            if (msg.type != Protocol.Type.Key)
+                LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
+            Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
+            switch (msg.type)
+            {
+                case Protocol.Type.LoadGameScene:
+                    LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
+                    ReceiveLoadGameSceneEvent(loadMessage);
+                    break;
+
+                case Protocol.Type.GameStartCountDown:
+                    GameCountDownMessage startCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
+                    ReceiveGameStartCountDownEvent(startCountMessage);
+                    break;
+
+                case Protocol.Type.GameEndCountDown:
+                    GameCountDownMessage endCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
+                    ReceiveGameEndCountDownEvent(endCountMessage);
+                    break;
+
+                case Protocol.Type.GameStart:
+                    ReceiveGameStartEvent();
+                    break;
+
+                case Protocol.Type.GameEnd:
+                    KeyMessage endMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                    ReceiveGameEndEvent(endMessage);
+                    break;
+
+                case Protocol.Type.Key:
+                    KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                    ReceiveKeyEvent(keyMessage);
+                    break;
+
+                case Protocol.Type.PlayerReconnect:
+                    ReceivePlayerReconnectEvent(msg);
+                    break;
+
+                case Protocol.Type.PlayerDisconnect:
+                    ReceivePlayerDisconnectEvent(msg);
+                    break;
+
+                default:
+                    Debug.LogWarning("[OnReceive] 알 수 없는 메시지 타입: " + msg.type);
+                    break;
+            }
         }
     }
 
@@ -190,13 +186,13 @@ public class WorldManager : MonoBehaviour
     private void ReceiveKeyEvent(KeyMessage keyMessage)
     {
         int id = keyMessage.from;
-        Vector3 acceleration = keyMessage.acceleration;
+        Vector2 acceleration = keyMessage.acceleration;
         Vector3 position = keyMessage.position;
         Vector3 velocity = keyMessage.velocity;
-        Quaternion rotation = Quaternion.Euler(keyMessage.rotation);
+        float rotationY = keyMessage.rotation;
         long timeStamp = keyMessage.timeStamp;
 
-        players[id].SetServerData(position, velocity, rotation, timeStamp);
+        players[id].SetServerData(position, velocity, rotationY, timeStamp);
         players[id].SetMoveVector(acceleration);
     }
     // 다른 플레이어 접속 이벤트 처리
@@ -292,6 +288,25 @@ public class WorldManager : MonoBehaviour
         Message msg = new Message(Protocol.Type.ResetServer, myPlayerId);
         await ServerManager.Instance().SendDataToInGame(msg);
     }
+    private int ReadBytes(byte[] buffer, int offset, int count, int timeoutCounts)
+    {
+        NetworkStream stream = ServerManager.Instance().Stream;
+        int bytesRead = 0;
+        int cnt = 0;
+        while (bytesRead < count)
+        {
+            cnt++;
+            int readSize = stream.Read(buffer, offset + bytesRead, count - bytesRead);
+            if (readSize == 0)
+            {
+                if (cnt > timeoutCounts)
+                    throw new TimeoutException("읽기 타임아웃");
+            }
+            else
+                bytesRead += readSize;
+        }
+        return bytesRead;
+    }
 #endregion
 
 
@@ -301,31 +316,45 @@ public class WorldManager : MonoBehaviour
     // 서버로부터 데이터를 받아오는 함수
     public void Polling()
     {
-        NetworkStream stream = ServerManager.Instance().Stream;
-        byte[] size = new byte[4];
-        stream.Read(size, 0, size.Length);
-
-        ByteReader br = new ByteReader(size);
-        int jsonSize = br.ReadInt();
-
-        byte[] data = new byte[jsonSize];
-        int receiveSize = stream.Read(data, 0, data.Length);
-
-        if (receiveSize == 0)
+        const int timeoutCount = 100; // 100번 루프 제한
+        byte[] buffer = new byte[4096];
+        try
         {
-            Debug.LogWarning("[Polling] 빈 데이터가 수신되었습니다.");
-            return;
-        }
+            // 메세지 크기 읽기
+            int bytesRead = ReadBytes(buffer, 0, 4, timeoutCount);
+            if (bytesRead != 4)
+            {
+                Debug.LogWarningFormat("[Polling] 메세지 크기 읽기 실패 : {0}", bytesRead);
+                return;
+            }
 
-        if (players == null)
-        {
-            Debug.LogWarning("[Polling] 플레이어 리스트가 존재하지 않습니다.");
-            return;
-        }
-        if (data != null)
-        {
+            // 메세지 데이터 읽기
+            int jsonSize = BitConverter.ToInt32(buffer, 0);
+            bytesRead = ReadBytes(buffer, 0, jsonSize, timeoutCount);
+            if (bytesRead != jsonSize)
+            {
+                Debug.LogWarningFormat("[Polling] 메세지 데이터 읽기 실패 : {0}", bytesRead);
+                return;
+            }
+
+            // 메세지 데이터 처리
+            if (players == null)
+            {
+                Debug.LogWarning("[Polling] 플레이어 리스트가 존재하지 않습니다.");
+                return;
+            }
+
+            // 메모리 할당 최적화를 위해 데이터 복사
+            byte[] messageData = new byte[jsonSize];
+            Array.Copy(buffer, 0, messageData, 0, jsonSize);
             lock (messageQueue)
-                messageQueue.Enqueue(data);
+            {
+                messageQueue.Enqueue(messageData);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogErrorFormat("[Polling] 데이터 수신 중 에러 발생 : {0}", ex.Message);
         }
     }
     // 서버로 보내는 데이터 처리 핸들러
@@ -375,7 +404,7 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerId].GetVelocity();
     }
-    public Vector3 GetMyPlayerRotation()
+    public float GetMyPlayerRotation()
     {
         return players[myPlayerId].GetRotation();
     }
