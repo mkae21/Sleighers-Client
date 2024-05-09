@@ -39,18 +39,18 @@ namespace Protocol
 
     public class KeyMessage : Message
     {
-        public Vector3 acceleration;    // 가속도
+        public Vector2 acceleration;    // 가속도
         public Vector3 position;        // 위치
         public Vector3 velocity;        // 속도
-        public Vector3 rotation;        // 회전
+        public float rotation;          // 회전 (y축)
         public long timeStamp;
-        public KeyMessage(int _id, Vector3 _a, Vector3 _p, Vector3 _v, Vector3 _r, long _timeStamp) : base(Type.Key, _id)
+        public KeyMessage(int _id, Vector2 _a, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Key, _id)
         {
             this.from = _id;
             this.acceleration = _a;
             this.position = _p;
             this.velocity = _v;
-            this.rotation = _r;
+            this.rotation = _rY;
             this.timeStamp = _timeStamp;
         }
     }

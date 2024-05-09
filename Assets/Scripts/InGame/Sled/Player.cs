@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     // expolation, slerp
     private Vector3 lastServerPosition;
     private Vector3 lastServerVelocity;
-    private Quaternion lastServerRotation;
+    private float lastServerRotationY;
     private long lastServerTimeStamp;
     private float extrapolationLimit = 0.5f;
 
@@ -202,7 +202,8 @@ public class Player : MonoBehaviour
         {
             sphere.transform.position = Vector3.Lerp(sphere.transform.position, lastServerPosition, interpolationRatio);
         }
-        sled.transform.rotation = Quaternion.Slerp(sled.transform.rotation, lastServerRotation, interpolationRatio);
+        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, lastServerRotationY, interpolationRatio);
+        sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
     }
 #endregion
 
@@ -231,19 +232,19 @@ public class Player : MonoBehaviour
         this.moveVector = new Vector3(0, 0, 0);
     }
 
-    public void SetServerData(Vector3 _position, Vector3 _velocity, Quaternion _rotation, long _timeStamp)
+    public void SetServerData(Vector3 _position, Vector3 _velocity, float _rotationY, long _timeStamp)
     {
         lastServerPosition = _position;
         lastServerVelocity = _velocity;
-        lastServerRotation = _rotation;
+        lastServerRotationY = _rotationY;
         lastServerTimeStamp = _timeStamp;
     }
 
-    public void SetMoveVector(Vector3 vector)
+    public void SetMoveVector(Vector2 vector)
     {
-        moveVector = vector;
+        moveVector = new Vector3(vector.x, 0, vector.y);
 
-        if (vector == Vector3.zero)
+        if (vector == Vector2.zero)
             isMove = false;
         else
             isMove = true;
@@ -257,9 +258,9 @@ public class Player : MonoBehaviour
     {
         return sphere.velocity;
     }
-    public Vector3 GetRotation()
+    public float GetRotation()
     {
-        return sled.transform.rotation.eulerAngles;
+        return sled.transform.rotation.eulerAngles.y;
     }
 
     public void SetDrift(bool isDrift)

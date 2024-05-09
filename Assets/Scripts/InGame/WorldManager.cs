@@ -189,13 +189,13 @@ public class WorldManager : MonoBehaviour
     private void ReceiveKeyEvent(KeyMessage keyMessage)
     {
         int id = keyMessage.from;
-        Vector3 acceleration = keyMessage.acceleration;
+        Vector2 acceleration = keyMessage.acceleration;
         Vector3 position = keyMessage.position;
         Vector3 velocity = keyMessage.velocity;
-        Quaternion rotation = Quaternion.Euler(keyMessage.rotation);
+        float rotationY = keyMessage.rotation;
         long timeStamp = keyMessage.timeStamp;
 
-        players[id].SetServerData(position, velocity, rotation, timeStamp);
+        players[id].SetServerData(position, velocity, rotationY, timeStamp);
         players[id].SetMoveVector(acceleration);
     }
     // 다른 플레이어 접속 이벤트 처리
@@ -407,7 +407,7 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerId].GetVelocity();
     }
-    public Vector3 GetMyPlayerRotation()
+    public float GetMyPlayerRotation()
     {
         return players[myPlayerId].GetRotation();
     }
