@@ -221,7 +221,7 @@ public class Player : MonoBehaviour
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
         nameObject.transform.position = GetNameUIPos();
 
-        RankManager.instance.InitPlayerLapInfo(GetComponent<Player>());
+        RankManager.instance.AddRankInfo(GetComponent<Player>());
         InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
 
         if (IsMe)

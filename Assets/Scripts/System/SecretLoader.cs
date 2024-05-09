@@ -1,17 +1,16 @@
 using UnityEngine;
-using System.IO;
 
-public class Secret
+struct ServerInfo
 {
-    public string m_serverIp;
-    public string m_serverPort;
+    public string ip;
+    public string port;
 }
 
 public class SecretLoader : MonoBehaviour
 {
 #region PrivateVariables
-    private string secretPath = "Assets/secret.json";
-    private string jsonString;
+    private const string path = "Json/secret";
+    private TextAsset jsonString;
 #endregion
 
 #region PublicVariables
@@ -22,10 +21,10 @@ public class SecretLoader : MonoBehaviour
 #region PrivateMethod
     private void Start()
     {
-        jsonString = File.ReadAllText(secretPath);
-        Secret secret = JsonUtility.FromJson<Secret>(jsonString);
-        s_serverIp = secret.m_serverIp;
-        s_serverPort = int.Parse(secret.m_serverPort);
+        jsonString = Resources.Load<TextAsset>(path);
+        ServerInfo serverInfo = JsonUtility.FromJson<ServerInfo>(jsonString.ToString());
+        s_serverIp = serverInfo.ip;
+        s_serverPort = int.Parse(serverInfo.port);
     }
-    #endregion
+#endregion
 }

@@ -210,7 +210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startVelocity: 0.2
-  maxEmissionRate: 100
+  maxEmissionRate: 200
   particleSystem: {fileID: 8174035451847668220}
 --- !u!1 &7766395760540196110
 GameObject:
@@ -304,7 +304,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 9b6fc9c2d2c538843a82839f117e8125, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 5e942e0ad446d4e4f930c2377291c29e, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1

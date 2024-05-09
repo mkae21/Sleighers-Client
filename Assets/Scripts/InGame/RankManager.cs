@@ -8,6 +8,12 @@ public struct RankInfo
     public int lap;         // 완료된 랩 수
     public int checkpoint;  // 완료된 체크포인트 수
 }
+public struct RankSort // 랭킹 정렬을 위한 임시 구조체. 추후 코드 리팩토링 필요
+{
+    public int id;          // 플레이어 ID
+    public int lap;         // 완료된 랩 수
+    public int checkpoint;  // 완료된 체크포인트 수
+}
 public class RankManager : MonoBehaviour
 {
 #region PrivateVariables
@@ -40,7 +46,7 @@ public class RankManager : MonoBehaviour
         if (finish != null)
             finish.OnPlayerEnter += OnPlayerEnterFinish;
         else
-            Debug.Log("[Lab Manager] 씬에 결승선이 없습니다.");
+            Debug.LogWarning("[RankManager] 씬에 결승선이 없습니다.");
     }
     // 차량이 결승선에 진입할 때(한 바퀴 완료 후) 호출되는 콜백
     private void OnPlayerEnterFinish(Player _player)
@@ -59,13 +65,13 @@ public class RankManager : MonoBehaviour
         rankInfoDictionary[_player] = rankInfo;
 
         OnLapComplete?.Invoke(_player, rankInfo);
-        InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
+        InGameUI.instance.UpdateRankUI(GetRanking());
     }
     
 #endregion
 
 #region PublicMethod
-    public void InitPlayerLapInfo(Player _player)
+    public void AddRankInfo(Player _player)
     {
         if (!rankInfoDictionary.ContainsKey(_player))
         {
@@ -73,9 +79,17 @@ public class RankManager : MonoBehaviour
             {
                 lap = 0,
                 checkpoint = 0
-
             };
             rankInfoDictionary.Add(_player, lapInfo);
+            InGameUI.instance.AddRankUI(_player.playerId);
+        }
+    }
+    public void DeleteRankInfo(Player _player)
+    {
+        if (rankInfoDictionary.ContainsKey(_player))
+        {
+            rankInfoDictionary.Remove(_player);
+            InGameUI.instance.DeleteRankUI(_player.playerId);
         }
     }
     // 주어진 차량의 랩 정보를 가져오기.
@@ -91,15 +105,23 @@ public class RankManager : MonoBehaviour
 
         return labInfo;
     }
-    public List<string> GetRanking()
+    public List<RankSort> GetRanking()
     {   
-        List<string> ranking = new List<string>();
+        List<RankSort> ranking = new List<RankSort>();
         var sortedRanking = from pair in rankInfoDictionary 
                         orderby pair.Value.lap descending, pair.Value.checkpoint descending 
                         select pair;
 
         foreach (var item in sortedRanking)
-            ranking.Add($"Player{item.Key.playerId} {item.Value.lap}:{item.Value.checkpoint}");
+        {
+            RankSort rankSort = new RankSort()
+            {
+                id = item.Key.playerId,
+                lap = item.Value.lap,
+                checkpoint = item.Value.checkpoint
+            };
+            ranking.Add(rankSort);
+        }
 
         return ranking;
     }
