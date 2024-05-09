@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 public class ServerManager : MonoBehaviour
 {
 #region PrivateVariables
-    private IEnumerator ServerPollCoroutine;
     private TcpClient client;
     public TcpClient Client
     {
@@ -56,7 +55,6 @@ public class ServerManager : MonoBehaviour
 #region PrivateMethod
     private void Awake()
     {
-        ServerPollCoroutine = Poll();
         if (instance != null)
             Destroy(instance);
         instance = this;
@@ -66,7 +64,11 @@ public class ServerManager : MonoBehaviour
     {
         LogManager.instance.Log("[ServerManager] Start()");
         Init();
-        StartCoroutine(ServerPollCoroutine);
+    }
+    private void FixedUpdate()
+    {
+        if (Stream.DataAvailable && IsConnect)
+            WorldManager.instance.Polling();
     }
     private void Init()
     {
@@ -88,16 +90,6 @@ public class ServerManager : MonoBehaviour
             LogManager.instance.Log("[ServerManager] 서버 접속 실패 " + serverIP + ":" + serverPort.ToString());
             IsConnect = false;
         }
-    }
-    private IEnumerator Poll()
-    {
-        while (true)
-        {
-            if (Stream.DataAvailable && IsConnect)
-                WorldManager.instance.Polling();
-            yield return null;
-        }
-    
     }
 #endregion
 
