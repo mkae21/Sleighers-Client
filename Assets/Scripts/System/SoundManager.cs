@@ -69,8 +69,9 @@ public class SoundManager
                 go.transform.parent = root.transform;
             }
 
-            audioSources[(int)SoundType.BGM].loop = true; // bgm 재생기는 무한 반복 재생
-            audioSources[(int)SoundType.WIND].loop = true; // bgm 재생기는 무한 반복 재생
+            audioSources[(int)SoundType.BGM].loop = true;       // bgm 재생기는 무한 반복 재생
+            audioSources[(int)SoundType.WIND].loop = true;      // wind 재생기는 무한 반복 재생
+            audioSources[(int)SoundType.WIND].volume = 0.5f;    // wind 재생기는 볼륨 0.5로 설정
         }
     }
     public void Clear()
