@@ -3,7 +3,6 @@ using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.Events;
 using Protocol;
-using System.Collections;
 using System.Threading.Tasks;
 using System;
 /* WorldManager.cs
@@ -69,9 +68,11 @@ public class WorldManager : MonoBehaviour
     {
         LogManager.instance.Log("[WorldManager] Start()");
         InitializeGame();
-        StartCoroutine(OnReceive());
     }
-
+    private void FixedUpdate()
+    {
+        OnReceive();
+    }
     // 인게임 초기화
     private void InitializeGame()
     {
@@ -112,75 +113,71 @@ public class WorldManager : MonoBehaviour
 
 #region Receive 프로토콜 처리
     // 서버로부터 받은 데이터 처리 핸들러
-    private IEnumerator OnReceive()
+    private void OnReceive()
     {
-        while (true)
+        if (messageQueue.Count > 0)
         {
-            if (messageQueue.Count > 0)
+            byte[] data;
+            lock (messageQueue)
+                data = messageQueue.Dequeue();
+
+            Message msg = DataParser.ReadJsonData<Message>(data);
+            if (msg == null)
             {
-                byte[] data;
-                lock (messageQueue)
-                    data = messageQueue.Dequeue();
-
-                Message msg = DataParser.ReadJsonData<Message>(data);
-                if (msg == null)
-                {
-                    Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
-                    continue;
-                }
-                if (msg.from == MyPlayerId)
-                {
-                    Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
-                    continue;
-                }
-                if (msg.type != Protocol.Type.Key)
-                    LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
-                Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
-                switch (msg.type)
-                {
-                    case Protocol.Type.LoadGameScene:
-                        LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
-                        ReceiveLoadGameSceneEvent(loadMessage);
-                        break;
-
-                    case Protocol.Type.GameStartCountDown:
-                        GameCountDownMessage startCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
-                        ReceiveGameStartCountDownEvent(startCountMessage);
-                        break;
-
-                    case Protocol.Type.GameEndCountDown:
-                        GameCountDownMessage endCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
-                        ReceiveGameEndCountDownEvent(endCountMessage);
-                        break;
-
-                    case Protocol.Type.GameStart:
-                        ReceiveGameStartEvent();
-                        break;
-
-                    case Protocol.Type.GameEnd:
-                        KeyMessage endMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                        ReceiveGameEndEvent(endMessage);
-                        break;
-
-                    case Protocol.Type.Key:
-                        KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                        ReceiveKeyEvent(keyMessage);
-                        break;
-
-                    case Protocol.Type.PlayerReconnect:
-                        ReceivePlayerReconnectEvent(msg);
-                        break;
-
-                    case Protocol.Type.PlayerDisconnect:
-                        ReceivePlayerDisconnectEvent(msg);
-                        break;
-
-                    default:
-                        Debug.LogWarning("[OnReceive] 알 수 없는 메시지 타입: " + msg.type);
-                        break;
-                }
+                Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
+                return;
             }
-            yield return null;
+            if (msg.from == MyPlayerId)
+            {
+                Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
+                return;
+            }
+            if (msg.type != Protocol.Type.Key)
+                LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
+            Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
+            switch (msg.type)
+            {
+                case Protocol.Type.LoadGameScene:
+                    LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
+                    ReceiveLoadGameSceneEvent(loadMessage);
+                    break;
+
+                case Protocol.Type.GameStartCountDown:
+                    GameCountDownMessage startCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
+                    ReceiveGameStartCountDownEvent(startCountMessage);
+                    break;
+
+                case Protocol.Type.GameEndCountDown:
+                    GameCountDownMessage endCountMessage = DataParser.ReadJsonData<GameCountDownMessage>(data);
+                    ReceiveGameEndCountDownEvent(endCountMessage);
+                    break;
+
+                case Protocol.Type.GameStart:
+                    ReceiveGameStartEvent();
+                    break;
+
+                case Protocol.Type.GameEnd:
+                    KeyMessage endMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                    ReceiveGameEndEvent(endMessage);
+                    break;
+
+                case Protocol.Type.Key:
+                    KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
+                    ReceiveKeyEvent(keyMessage);
+                    break;
+
+                case Protocol.Type.PlayerReconnect:
+                    ReceivePlayerReconnectEvent(msg);
+                    break;
+
+                case Protocol.Type.PlayerDisconnect:
+                    ReceivePlayerDisconnectEvent(msg);
+                    break;
+
+                default:
+                    Debug.LogWarning("[OnReceive] 알 수 없는 메시지 타입: " + msg.type);
+                    break;
+            }
         }
     }
 
