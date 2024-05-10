@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Net.Sockets;
-using System.Collections;
 using System.Threading.Tasks;
 
 /* ServeManager.cs
@@ -56,7 +55,7 @@ public class ServerManager : MonoBehaviour
     private void Awake()
     {
         if (instance != null)
-            Destroy(instance);
+            Destroy(this.gameObject);
         instance = this;
         DontDestroyOnLoad(this.gameObject);
     }
@@ -73,8 +72,8 @@ public class ServerManager : MonoBehaviour
     private void Init()
     {
         // serverIP = "localhost"; // 로컬 테스트 용
-        serverIP = SecretLoader.s_serverIp;
-        serverPort = SecretLoader.s_serverPort;
+        serverIP = SecretLoader.ingameServer.ip;
+        serverPort = SecretLoader.ingameServer.port;
 
         Client = new TcpClient(serverIP, serverPort);
         if (Client.Connected)
