@@ -10,13 +10,14 @@ public class Finish : MonoBehaviour
 #endregion
 
 #region PublicVariables
+    public GameObject checkpointHolder;
     public UnityAction<Player> OnPlayerEnter;
 #endregion
 
 #region PrivateMethod
     private void Start()
     {
-        totalCheckpoints = gameObject.transform.childCount;
+        totalCheckpoints = checkpointHolder.transform.childCount;
         SetCheckpoints();
         foreach (Checkpoint checkpoint in checkpoints)
             checkpoint.OnPlayerEnterCheckpoint += OnPlayerEnterCheckpoint;
@@ -24,8 +25,8 @@ public class Finish : MonoBehaviour
     private void SetCheckpoints()
     {
         checkpoints = new List<Checkpoint>();
-        for (int i = 1; i < totalCheckpoints; i++)
-            checkpoints.Add(gameObject.transform.GetChild(i).GetComponent<Checkpoint>());
+        for (int i = 0; i < totalCheckpoints; i++)
+            checkpoints.Add(checkpointHolder.transform.GetChild(i).GetComponent<Checkpoint>());
     }
     // 플레이어가 체크포인트에 진입할 때 호출되는 콜백
     private void OnPlayerEnterCheckpoint(Player _player, Checkpoint _checkpoint)
