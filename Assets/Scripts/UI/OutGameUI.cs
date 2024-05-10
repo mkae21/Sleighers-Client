@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class OutGameUI : MonoBehaviour
@@ -64,6 +65,10 @@ public class OutGameUI : MonoBehaviour
     public void ToggleObject(GameObject obj)
     {
         obj.SetActive(!obj.activeSelf);
+    }
+    public void LoadInGame()
+    {
+        SceneManager.LoadScene("InGame");
     }
 #endregion
 }
