@@ -14,13 +14,14 @@ public class SledInventoryInteraction : MonoBehaviour
         Equipped
     }
     public Button right, left;
+    public TMP_Text buttonText;
     public SledState currentState;
     public int currentIndex = 0;
     public List<SledState> sledInfoList;
 #endregion
 
 #region PrivateVariables
-    private string[] btnText = { "±¸¸Å", "ÀåÂø", "ÀåÂøÁß"};
+    private string[] btnText = { "êµ¬ë§¤", "ì¥ì°©", "ì¥ì°©ì¤‘"};
 #endregion
 
 #region PrivateMethods
@@ -44,7 +45,7 @@ public class SledInventoryInteraction : MonoBehaviour
 
     private void SetButton(SledState state)
     {
-        transform.GetChild(0).GetComponent<TMP_Text>().text = btnText[(int)state];
+        buttonText.text = btnText[(int)state];
         if(state == SledState.Equipped)
             transform.GetComponent<Button>().interactable = false;
         else
@@ -89,7 +90,7 @@ public class SledInventoryInteraction : MonoBehaviour
             state = SledState.Equipped;
         }
 
-        sledInfoList[sledIdx] = state; // TODO: DB¿¡ ¹İ¿µ
+        sledInfoList[sledIdx] = state; // TODO: DBì— ë°˜ì˜
         currentIndex = sledIdx;
         currentState = state;
 
@@ -99,14 +100,14 @@ public class SledInventoryInteraction : MonoBehaviour
         {
             case SledState.None:
                 /*                
-                3. ±¸¸ÅÇÑ ½ä¸Å µ¥ÀÌÅÍ ÀúÀå
+                3. êµ¬ë§¤í•œ ì°ë§¤ ë°ì´í„° ì €ì¥
                 */
                 break;
             case SledState.Has:
                 break;
             case SledState.Equipped:
                 /*
-                4. ÇöÀç ÀåÂøÇÑ ½ä¸Å µ¥ÀÌÅÍ¸¦ ÀÌ°É·Î ¹Ù²Ù±â
+                4. í˜„ì¬ ì¥ì°©í•œ ì°ë§¤ ë°ì´í„°ë¥¼ ì´ê±¸ë¡œ ë°”ê¾¸ê¸°
                 */
                 for(int i = 0; i < sledInfoList.Count; i++)
                 {
