@@ -358,12 +358,6 @@ public class WorldManager : MonoBehaviour
         LogManager.instance.Log("[OnSend] 메세지 타입 : " + _type.ToString());
         switch (_type)
         {
-            case Protocol.Type.PlayerReconnect:
-                break;
-
-            case Protocol.Type.LoadGameScene:
-                break;
-
             case Protocol.Type.GameStart:
                 await SendGameStartEvent();
                 break;
