@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using Cinemachine;
 using System;
+using Protocol;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
@@ -263,6 +264,10 @@ public class Player : MonoBehaviour
     public float GetRotation()
     {
         return sled.transform.rotation.eulerAngles.y;
+    }
+    public SyncMessage GetSyncData()
+    {
+        return new SyncMessage(playerId, GetPosition(), GetVelocity(), GetRotation(), 0);
     }
 
     public void SetDrift(bool isDrift)

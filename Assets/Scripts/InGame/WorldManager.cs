@@ -33,6 +33,7 @@ public class WorldManager : MonoBehaviour
     private Transform[] startingPoints;
 
     private Queue<byte[]> messageQueue = new Queue<byte[]>();
+    private int tick = 0;
 #endregion
 
 #region PublicVariables
@@ -71,6 +72,9 @@ public class WorldManager : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (tick % 5 == 0)
+            OnSend(Protocol.Type.Sync);
+        tick++;
         OnReceive();
     }
     // 인게임 초기화
@@ -165,6 +169,11 @@ public class WorldManager : MonoBehaviour
                     KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
                     ReceiveKeyEvent(keyMessage);
                     break;
+                
+                case Protocol.Type.Sync:
+                    SyncMessage syncMessage = DataParser.ReadJsonData<SyncMessage>(data);
+                    ReceiveSyncEvent(syncMessage);
+                    break;
 
                 case Protocol.Type.PlayerReconnect:
                     ReceivePlayerReconnectEvent(msg);
@@ -187,13 +196,18 @@ public class WorldManager : MonoBehaviour
     {
         int id = keyMessage.from;
         Vector2 acceleration = keyMessage.acceleration;
-        Vector3 position = keyMessage.position;
-        Vector3 velocity = keyMessage.velocity;
-        float rotationY = keyMessage.rotation;
-        long timeStamp = keyMessage.timeStamp;
 
-        players[id].SetServerData(position, velocity, rotationY, timeStamp);
         players[id].SetMoveVector(acceleration);
+    }
+    private void ReceiveSyncEvent(SyncMessage msg)
+    {
+        int id = msg.from;
+        Vector3 position = msg.position;
+        Vector3 velocity = msg.velocity;
+        float rotation = msg.rotation;
+        long timeStamp = msg.timeStamp;
+
+        players[id].SetServerData(position, velocity, rotation, timeStamp);
     }
     // 다른 플레이어 접속 이벤트 처리
     private void ReceivePlayerReconnectEvent(Message msg)
@@ -266,6 +280,15 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region Send 프로토콜 처리
+    // 동기화 이벤트를 서버에 알림
+    private async Task SendSyncEvent()
+    {
+        if (players == null)
+            return;
+        
+        SyncMessage msg = GetMyPlayer().GetSyncData();
+        await ServerManager.Instance().SendDataToInGame(msg);
+    }
     // 게임 시작 이벤트를 서버에 알림
     private async Task SendGameStartEvent()
     {
@@ -360,9 +383,14 @@ public class WorldManager : MonoBehaviour
     public async void OnSend(Protocol.Type _type)
     {
         Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
-        LogManager.instance.Log("[OnSend] 메세지 타입 : " + _type.ToString());
+        if (_type != Protocol.Type.Sync)
+            LogManager.instance.Log("[OnSend] 메세지 타입 : " + _type.ToString());
         switch (_type)
         {
+            case Protocol.Type.Sync:
+                await SendSyncEvent();
+                break;
+
             case Protocol.Type.GameStart:
                 await SendGameStartEvent();
                 break;

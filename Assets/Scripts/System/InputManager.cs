@@ -56,13 +56,10 @@ public class InputManager : MonoBehaviour
         int id = WorldManager.instance.MyPlayerId;
         Vector2 acceleration = new Vector2(h, v);
         acceleration = Vector3.Normalize(acceleration);
-        Vector3 position = WorldManager.instance.GetMyPlayerPosition();
-        Vector3 velocity = WorldManager.instance.GetMyPlayerVelocity();
-        float rotation = WorldManager.instance.GetMyPlayerRotation();
 
         WorldManager.instance.GetMyPlayer().SetDrift(drifting);
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
-        KeyMessage msg = new KeyMessage(id, acceleration, position, velocity, rotation, 0);
+        KeyMessage msg = new KeyMessage(id, acceleration);
         await ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
     }
 #endregion
