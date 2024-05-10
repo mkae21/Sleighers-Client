@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class OutGameUI : MonoBehaviour
@@ -6,22 +7,9 @@ public class OutGameUI : MonoBehaviour
 #region PublicVariables
     public static OutGameUI instance;
     
-    [Space(10), Header("===== TopBar =====")]
-    public Button lobbyBtn;
-    public Button gargageBtn;
-    public Button recordBtn;
-    public Button friendBtn;
-    public Button settingBtn;
-
-    [Space(10), Header("===== Lobby =====")]
-    public Button goWaitingBtn;
-
+    [Space(10), Header("===== Panels =====")]
+    public GameObject[] panels;
     [Space(10), Header("===== Setting =====")]
-    public GameObject checkExitPanel;
-    public GameObject settingPanel;
-    public Button gameExitBtn;
-    public Button realExitBtn;
-    public Button settingBackBtn;
     public Toggle soundToggle;
     public Slider volumeSlider;
 
@@ -39,10 +27,6 @@ public class OutGameUI : MonoBehaviour
 #region PrivateMethod
     private void Start()
     {
-        settingPanel.SetActive(false);
-        checkExitPanel.SetActive(false);
-        waitingRoomPanel.SetActive(false);
-        storePanel.SetActive(false);
         instance = this;
     }
 #endregion
@@ -70,6 +54,21 @@ public class OutGameUI : MonoBehaviour
     {
         Debug.Log("Exit Game");
         Application.Quit();
+    }
+    public void ClosePanels()
+    {
+        foreach (var panel in panels)
+        {
+            panel.SetActive(false);
+        }
+    }
+    public void ToggleObject(GameObject obj)
+    {
+        obj.SetActive(!obj.activeSelf);
+    }
+    public void LoadInGame()
+    {
+        SceneManager.LoadScene("InGame");
     }
 #endregion
 }
