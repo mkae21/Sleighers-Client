@@ -145,7 +145,6 @@ public class Player : MonoBehaviour
         else
             sphere.AddForce(sledModel.forward * sphere.velocity.magnitude, ForceMode.Acceleration);
 
-
         sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
         isMove = false;
         isDrifting = false;

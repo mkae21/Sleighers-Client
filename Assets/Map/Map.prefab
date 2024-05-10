@@ -1,0 +1,311 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8141136524894886993
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3395846062170027913}
+  - component: {fileID: 5646155597478380247}
+  - component: {fileID: 4793175147697606976}
+  - component: {fileID: 6852177539501489381}
+  m_Layer: 11
+  m_Name: Map
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 127
+  m_IsActive: 1
+--- !u!4 &3395846062170027913
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8141136524894886993}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -254, y: 0, z: -241}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!218 &5646155597478380247
+Terrain:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8141136524894886993}
+  m_Enabled: 1
+  serializedVersion: 6
+  m_TerrainData: {fileID: 15600000, guid: 94e05cc64dbabae4595aeafd29baab45, type: 2}
+  m_TreeDistance: 5000
+  m_TreeBillboardDistance: 50
+  m_TreeCrossFadeLength: 5
+  m_TreeMaximumFullLODCount: 50
+  m_DetailObjectDistance: 80
+  m_DetailObjectDensity: 1
+  m_HeightmapPixelError: 5
+  m_SplatMapDistance: 1000
+  m_HeightmapMaximumLOD: 0
+  m_ShadowCastingMode: 0
+  m_DrawHeightmap: 1
+  m_DrawInstanced: 1
+  m_DrawTreesAndFoliage: 1
+  m_StaticShadowCaster: 0
+  m_IgnoreQualitySettings: 0
+  m_ReflectionProbeUsage: 0
+  m_MaterialTemplate: {fileID: 10652, guid: 0000000000000000f000000000000000, type: 0}
+  m_BakeLightProbesForTrees: 1
+  m_PreserveTreePrototypeLayers: 0
+  m_DeringLightProbesForTrees: 1
+  m_ReceiveGI: 1
+  m_ScaleInLightmap: 0.0256
+  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  m_GroupingID: 0
+  m_RenderingLayerMask: 1
+  m_AllowAutoConnect: 1
+  m_EnableHeightmapRayTracing: 1
+  m_EnableTreesAndDetailsRayTracing: 0
+  m_TreeMotionVectorModeOverride: 3
+--- !u!114 &4793175147697606976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8141136524894886993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 583a400948cadd94ea57c7e4defd3d27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roadWidth: 9
+  roadResolution: 250
+  roundingCorner: 1
+  showLabel: 1
+  showArrows: 1
+  showSpheres: 1
+  showLines: 1
+  directInput: 0
+  Points:
+  - label: Line 1
+    startPoint: {x: 135.66904, y: 188.61192, z: 83.39989}
+    startTangent: {x: 173.51129, y: 167.13596, z: 123.85304}
+    endPoint: {x: 173.51129, y: 167.27426, z: 123.85304}
+    endTangent: {x: 173.51129, y: 166.73666, z: 123.85304}
+  - label: Line 3
+    startPoint: {x: 158.48122, y: 164.00636, z: 155.16014}
+    startTangent: {x: 102.79353, y: 166.62683, z: 144.15988}
+    endPoint: {x: 116.570526, y: 155.95372, z: 74.59895}
+    endTangent: {x: 110.027466, y: 159.07338, z: 92.36397}
+  - label: Line 4
+    startPoint: {x: 116.72475, y: 155.89394, z: 74.54216}
+    startTangent: {x: 127.958435, y: 159.3516, z: 29.568497}
+    endPoint: {x: 189.85391, y: 147.14427, z: 105.42479}
+    endTangent: {x: 165.9189, y: 149.04279, z: 68.46272}
+  - label: Line 5
+    startPoint: {x: 193.1459, y: 147.14339, z: 110.56642}
+    startTangent: {x: 217.05684, y: 151.91133, z: 137.768}
+    endPoint: {x: 181.8913, y: 143.39832, z: 177.35878}
+    endTangent: {x: 217.10315, y: 147.20374, z: 132.69614}
+  - label: Line 6
+    startPoint: {x: 182.17976, y: 143.39865, z: 177.1565}
+    startTangent: {x: 162.58945, y: 143.08047, z: 205.94438}
+    endPoint: {x: 256.8331, y: 137.52098, z: 143.19841}
+    endTangent: {x: 202.56566, y: 133.83485, z: 216.28227}
+  - label: Line 7
+    startPoint: {x: 256.8075, y: 137.52051, z: 143.17879}
+    startTangent: {x: 285.53314, y: 131.22519, z: 113.7921}
+    endPoint: {x: 285.21872, y: 131.0759, z: 113.747284}
+    endTangent: {x: 285.53314, y: 131.66795, z: 114.346115}
+  - label: Line 8
+    startPoint: {x: 285.43985, y: 131.10248, z: 113.7944}
+    startTangent: {x: 317.7451, y: 135.15094, z: 44.680344}
+    endPoint: {x: 141.98485, y: 132.3195, z: 30.996109}
+    endTangent: {x: 239.0918, y: 130.29518, z: 41.75148}
+  - label: Line 9
+    startPoint: {x: 140.20793, y: 132.08067, z: 33.47751}
+    startTangent: {x: 91.302, y: 136.19664, z: 29.345444}
+    endPoint: {x: 92.40753, y: 128.54764, z: 106.13957}
+    endTangent: {x: 79.98018, y: 131.3284, z: 82.350845}
+  - label: Line 10
+    startPoint: {x: 92.94249, y: 128.45866, z: 105.986435}
+    startTangent: {x: 95.34558, y: 126.34778, z: 122.42549}
+    endPoint: {x: 121.38069, y: 125.02047, z: 158.36845}
+    endTangent: {x: 106.12819, y: 119.84918, z: 135.34467}
+  - label: Line 11
+    startPoint: {x: 121.568924, y: 124.83609, z: 158.22694}
+    startTangent: {x: 152.55757, y: 104.06517, z: 171.83109}
+    endPoint: {x: 145.48413, y: 125.19553, z: 228.27626}
+    endTangent: {x: 180.62564, y: 120.76194, z: 205.99774}
+  - label: Line 12
+    startPoint: {x: 143.66556, y: 125.23186, z: 229.704}
+    startTangent: {x: 110.930145, y: 129.75081, z: 256.51352}
+    endPoint: {x: 210.46051, y: 114.06142, z: 252.7971}
+    endTangent: {x: 112.84677, y: 132.1177, z: 298.32196}
+  - label: Line 13
+    startPoint: {x: 213.42023, y: 114.063354, z: 252.67311}
+    startTangent: {x: 273.12488, y: 104.230385, z: 225.3957}
+    endPoint: {x: 242.41614, y: 100.84551, z: 179.7661}
+    endTangent: {x: 256.59753, y: 103.96076, z: 221.55836}
+  - label: Line 14
+    startPoint: {x: 241.38242, y: 100.671776, z: 180.52104}
+    startTangent: {x: 289.94153, y: 103.42198, z: 142.41057}
+    endPoint: {x: 303.49377, y: 95.023476, z: 225.87608}
+    endTangent: {x: 299.1605, y: 103.174805, z: 169.9214}
+  - label: Line 15
+    startPoint: {x: 303.22052, y: 94.791214, z: 226.7028}
+    startTangent: {x: 306.72247, y: 87.69532, z: 315.91727}
+    endPoint: {x: 211.36562, y: 81.252556, z: 329.86835}
+    endTangent: {x: 298.6479, y: 85.5269, z: 333.63687}
+  - label: Line 16
+    startPoint: {x: 210.765, y: 81.0226, z: 329.78183}
+    startTangent: {x: 181.6844, y: 76.21024, z: 326.20453}
+    endPoint: {x: 95.19797, y: 66.16381, z: 274.9793}
+    endTangent: {x: 126.63818, y: 70.88168, z: 336.43417}
+  - label: Line 17
+    startPoint: {x: 95.301056, y: 66.16004, z: 274.11395}
+    startTangent: {x: 70.619995, y: 52.90429, z: 160.34973}
+    endPoint: {x: 43.180176, y: 52.907867, z: 279.14017}
+    endTangent: {x: 22.635345, y: 65.324066, z: 143.30544}
+  - label: Line 18
+    startPoint: {x: 43.872253, y: 52.915607, z: 280.7094}
+    startTangent: {x: 60.07126, y: 42.794754, z: 386.62756}
+    endPoint: {x: 238.92406, y: 24.744444, z: 403.3532}
+    endTangent: {x: 142.49416, y: 29.972115, z: 414.59607}
+  - label: Line 19
+    startPoint: {x: 239.1457, y: 24.697952, z: 403.31177}
+    startTangent: {x: 372.5204, y: 20.133234, z: 396.34302}
+    endPoint: {x: 403.97964, y: 3.4711533, z: 242.65962}
+    endTangent: {x: 403.84442, y: 8.610237, z: 314.26862}
+  - label: Line 20
+    startPoint: {x: 404.29172, y: 3.3334656, z: 242.41707}
+    startTangent: {x: 404.32584, y: 4.8949604, z: 170.62035}
+    endPoint: {x: 317.69543, y: 2.4429321, z: 119.212555}
+    endTangent: {x: 361.8832, y: -3.7080212, z: 147.9723}
+  - label: Line 21
+    startPoint: {x: 316.94577, y: 2.4446106, z: 112.57918}
+    startTangent: {x: 263.51178, y: 3.1204872, z: 111.11708}
+    endPoint: {x: 451.41006, y: 9.280855, z: 48.303543}
+    endTangent: {x: 317.2207, y: -100.70189, z: 16.755188}
+  - label: Line 22
+    startPoint: {x: 450.90417, y: 9.246487, z: 48.759323}
+    startTangent: {x: 497.12814, y: 2.0509071, z: 42.219116}
+    endPoint: {x: 439.93832, y: -2.0052452, z: 116.78668}
+    endTangent: {x: 502.95142, y: 6.685151, z: 111.65454}
+  - label: Line 23
+    startPoint: {x: 437.24652, y: -3.3971176, z: 116.945786}
+    startTangent: {x: 336.19247, y: -19.803402, z: 123.3521}
+    endPoint: {x: 443.96585, y: -4.0358744, z: 148.76308}
+    endTangent: {x: 416.67722, y: -8.89815, z: 156.18631}
+  - label: Line 24
+    startPoint: {x: 445.77393, y: -3.2585268, z: 149.30165}
+    startTangent: {x: 493.1382, y: 0.87340355, z: 162.87154}
+    endPoint: {x: 477.0808, y: -0.8859215, z: 248.602}
+    endTangent: {x: 486.47775, y: 0.6729126, z: 204.85008}
+  - label: Line 25
+    startPoint: {x: 477.3298, y: 0, z: 247.93474}
+    startTangent: {x: 479.21432, y: 0, z: 356.92014}
+    endPoint: {x: 479.21432, y: 0, z: 356.92014}
+    endTangent: {x: 479.21432, y: 0, z: 356.92014}
+  - label: Line 0
+    startPoint: {x: 130.27795, y: 185.1454, z: 73.25481}
+    startTangent: {x: 136.339, y: 183.19322, z: 82.12648}
+    endPoint: {x: 136.28009, y: 183.19322, z: 82.20288}
+    endTangent: {x: 136.357, y: 182.94499, z: 81.72452}
+  splatIndex: -1
+  style:
+    m_Name: 
+    m_Normal:
+      m_Background: {fileID: 0}
+      m_ScaledBackgrounds: []
+      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
+    m_Hover:
+      m_Background: {fileID: 0}
+      m_ScaledBackgrounds: []
+      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
+    m_Active:
+      m_Background: {fileID: 0}
+      m_ScaledBackgrounds: []
+      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
+    m_Focused:
+      m_Background: {fileID: 0}
+      m_ScaledBackgrounds: []
+      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
+    m_OnNormal:
+      m_Background: {fileID: 0}
+      m_ScaledBackgrounds: []
+      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
+    m_OnHover:
+      m_Background: {fileID: 0}
+      m_ScaledBackgrounds: []
+      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
+    m_OnActive:
+      m_Background: {fileID: 0}
+      m_ScaledBackgrounds: []
+      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
+    m_OnFocused:
+      m_Background: {fileID: 0}
+      m_ScaledBackgrounds: []
+      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
+    m_Border:
+      m_Left: 0
+      m_Right: 0
+      m_Top: 0
+      m_Bottom: 0
+    m_Margin:
+      m_Left: 0
+      m_Right: 0
+      m_Top: 0
+      m_Bottom: 0
+    m_Padding:
+      m_Left: 0
+      m_Right: 0
+      m_Top: 0
+      m_Bottom: 0
+    m_Overflow:
+      m_Left: 0
+      m_Right: 0
+      m_Top: 0
+      m_Bottom: 0
+    m_Font: {fileID: 0}
+    m_FontSize: 0
+    m_FontStyle: 0
+    m_Alignment: 0
+    m_WordWrap: 0
+    m_RichText: 1
+    m_TextClipping: 0
+    m_ImagePosition: 0
+    m_ContentOffset: {x: 0, y: 0}
+    m_FixedWidth: 0
+    m_FixedHeight: 0
+    m_StretchWidth: 1
+    m_StretchHeight: 0
+  _terrain: {fileID: 5646155597478380247}
+  _collider: {fileID: 0}
+--- !u!154 &6852177539501489381
+TerrainCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8141136524894886993}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_TerrainData: {fileID: 15600000, guid: 94e05cc64dbabae4595aeafd29baab45, type: 2}
+  m_EnableTreeColliders: 0
