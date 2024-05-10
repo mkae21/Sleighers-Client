@@ -150,7 +150,7 @@ public class Player : MonoBehaviour
         isMove = false;
         isDrifting = false;
         if (!IsMe)
-            ExtrapolatePosition();
+            Polation();
     }
     public void Steer(int direction, float amount)
     {
@@ -186,21 +186,25 @@ public class Player : MonoBehaviour
             sphere.velocity = sphere.velocity.normalized * maxSpeed;
         }
     }
-    private void ExtrapolatePosition()
+    // 위치/회전 보간 및 외삽
+    private void Polation()
     {
         long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
         float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
 
+        // Extrapolation Position
         if (timeSinceLastUpdate < extrapolationLimit)
         {
             Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate);
             sphere.transform.position = Vector3.Lerp(sphere.transform.position, extrapolatedPosition, interpolationRatio);
         }
+        // Interpolation Position
         else
         {
             sphere.transform.position = Vector3.Lerp(sphere.transform.position, lastServerPosition, interpolationRatio);
         }
+        // Interpolation Rotation
         float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, lastServerRotationY, interpolationRatio);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
     }
