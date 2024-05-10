@@ -68,6 +68,7 @@ public class OutGameUI : MonoBehaviour
     }
     public void LoadInGame()
     {
+        GameManager.Instance().ChangeState(GameManager.GameState.Ready);
         SceneManager.LoadScene("InGame");
     }
 #endregion

@@ -1,30 +1,52 @@
 using UnityEngine;
 
-struct ServerInfo
+public struct ServerInfo
 {
     public string ip;
-    public string port;
+    public int port;
+}
+public struct GoogleInfo
+{
+    public string id;
+    public string secret;
 }
 
 public class SecretLoader : MonoBehaviour
 {
 #region PrivateVariables
-    private const string path = "Json/secret";
-    private TextAsset jsonString;
+    private const string ingamePath = "Json/InGameServer";
+    private const string outgamePath = "Json/OutGameServer";
+    private const string googlePath = "Json/GoogleAuth";
 #endregion
 
 #region PublicVariables
-    public static string s_serverIp = "localhost";
-    public static int s_serverPort = 5000;
+    public static SecretLoader instance;
+    public static ServerInfo ingameServer;
+    public static ServerInfo outgameServer;
+    public static GoogleInfo googleAuth;
 #endregion
 
 #region PrivateMethod
-    private void Start()
+    private void Awake()
     {
-        jsonString = Resources.Load<TextAsset>(path);
-        ServerInfo serverInfo = JsonUtility.FromJson<ServerInfo>(jsonString.ToString());
-        s_serverIp = serverInfo.ip;
-        s_serverPort = int.Parse(serverInfo.port);
+        if (!instance)
+            instance = this;
+        else
+            Destroy(this.gameObject);
+        DontDestroyOnLoad(this.gameObject);
+
+        ingameServer = LoadJson<ServerInfo>(ingamePath);
+        outgameServer = LoadJson<ServerInfo>(outgamePath);
+        googleAuth = LoadJson<GoogleInfo>(googlePath);
+
+        Debug.Log("Ingame Server IP: " + ingameServer.ip + " Port: " + ingameServer.port);
+        Debug.Log("Outgame Server IP: " + outgameServer.ip + " Port: " + outgameServer.port);
+        Debug.Log("Google Auth ID: " + googleAuth.id + " Secret: " + googleAuth.secret);
+    }
+    private T LoadJson<T>(string path)
+    {
+        TextAsset jsonString = Resources.Load<TextAsset>(path);
+        return JsonUtility.FromJson<T>(jsonString.ToString());
     }
 #endregion
 }

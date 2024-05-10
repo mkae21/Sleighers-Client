@@ -27,8 +27,9 @@ jobs:
       # EC2 서버의 IP와 Port를 설정
       - name: Secret Setting
         run: |
-          New-Item -Path .\Assets\Resources\Json\ -Name 'secret.json' -ItemType 'file' -Value '${{ secrets.INGAME_SERVER }}'
-
+          New-Item -Path .\Assets\Resources\Json\ -Name 'InGameServer.json' -ItemType 'file' -Value '${{ secrets.INGAME_SERVER }}'
+          New-Item -Path .\Assets\Resources\Json\ -Name 'OutGameServer.json' -ItemType 'file' -Value '${{ secrets.OUTGAME_SERVER }}'
+          New-Item -Path .\Assets\Resources\Json\ -Name 'GoogleAuth.json' -ItemType 'file' -Value '${{ secrets.GOOGLE_AUTH }}'
 
       # Build
       - name: Build project
