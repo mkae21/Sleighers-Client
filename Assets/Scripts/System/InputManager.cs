@@ -60,7 +60,6 @@ public class InputManager : MonoBehaviour
         Vector3 velocity = WorldManager.instance.GetMyPlayerVelocity();
         float rotation = WorldManager.instance.GetMyPlayerRotation();
 
-        WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
         WorldManager.instance.GetMyPlayer().SetDrift(drifting);
         KeyMessage msg = new KeyMessage(id, acceleration, position, velocity, rotation, 0);
         await ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
