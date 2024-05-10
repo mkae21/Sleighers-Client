@@ -245,7 +245,6 @@ public class WorldManager : MonoBehaviour
     private void ReceiveGameEndCountDownEvent(GameCountDownMessage msg)
     {
         int count = msg.count;
-        Debug.LogFormat("[OnReceive] SendGameEndCountDownEvent : {0}", count);
         InGameUI.instance.SetGameEndCountDown(count);        
     }
     // 게임 종료 이벤트 처리

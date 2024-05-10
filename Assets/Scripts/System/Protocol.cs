@@ -24,6 +24,7 @@ namespace Protocol
         GameEnd,                // 게임 종료
         GameSync,               // 게임 싱크
         ResetServer = 100,      // 서버 리셋
+        Receiver = 255          // 수신 전용
     }
 
     public class Message
@@ -59,7 +60,7 @@ namespace Protocol
     {
         public int count;
         public List<int> list;
-        public LoadGameSceneMessage(int _id, int _count, List<int> _userList) : base(Type.LoadGameScene, _id)
+        public LoadGameSceneMessage(int _id, int _count, List<int> _userList) : base(Type.Receiver, _id)
         {
             this.from = _id;
             this.count = _count;
@@ -70,26 +71,10 @@ namespace Protocol
     public class GameCountDownMessage : Message
     {
         public int count;
-        public GameCountDownMessage(int _id, int _count) : base(Type.GameStartCountDown, _id)
+        public GameCountDownMessage(int _id, int _count) : base(Type.Receiver, _id)
         {
             this.from = _id;
             this.count = _count;
-        }
-    }
-
-    public class GameEndMessage : Message
-    {
-        public int count;
-        public int[] sessionList;
-        public GameEndMessage(int _id, Stack<int> result) : base(Type.GameEnd, _id)
-        {
-            this.from = _id;
-            count = result.Count;
-            sessionList = new int[count];
-            for (int i = 0; i < count; ++i)
-            {
-                sessionList[i] = (int)result.Pop();
-            }
         }
     }
 }
