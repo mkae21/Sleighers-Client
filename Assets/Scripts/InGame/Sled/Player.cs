@@ -14,7 +14,8 @@ public class Player : MonoBehaviour
     private bool isDrifting;
 
     // expolation, slerp
-    private float movementThreshold = 0.05f;
+    private float timeToReachTarget = 0.05f;
+    private float movementThreshold = 0.1f;
     private float squareMovementThreshold;
     private Vector3 previousPosition;
     private Vector3 previousVelocity;
@@ -74,7 +75,9 @@ public class Player : MonoBehaviour
     private void Update()
     {
         if (!isMe && WorldManager.instance.isGameStart)
+        {
             Polation();
+        }
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -182,38 +185,30 @@ public class Player : MonoBehaviour
     {
         CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
     }
-    // 위치/회전 보간 및 외삽
+    // ExtraPolation, InterPolation
     private void Polation()
     {
-        float timeSinceLastUpdate = (toTimeStamp - previousTimeStamp) / 1000f;
+        float latency = (toTimeStamp - previousTimeStamp) / 1000f;
+        float lerpAmount = latency / timeToReachTarget;
         Vector3 fromPosition = sphere.transform.position;
+
+        // Interpolation Position
         if ((toPosition - previousPosition).sqrMagnitude < squareMovementThreshold)
         {
             if (toPosition != fromPosition)
             {
-                Debug.Log("Interpolation");
-                sphere.transform.position = Vector3.Lerp(fromPosition, toPosition, 0.75f);            
+                // Debug.Log("Interpolation");
+                sphere.transform.position = Vector3.Lerp(fromPosition, toPosition, lerpAmount);            
             }
         }
+        // Extrapolation Position
         else
         {
-            Debug.Log("Extrapolation");
-            sphere.transform.position = Vector3.LerpUnclamped(fromPosition, toPosition, 1f);
+            // Debug.Log("Extrapolation");
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
+            sphere.transform.position = Vector3.LerpUnclamped(fromPosition, extrapolatedPosition, lerpAmount);
         }
 
-        // float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
-
-        // // Extrapolation Position
-        // if (timeSinceLastUpdate < extrapolationLimit)
-        // {
-        //     Vector3 extrapolatedPosition = toPosition + (toVelocity * timeSinceLastUpdate);
-        //     sphere.transform.position = Vector3.Lerp(sphere.transform.position, extrapolatedPosition, interpolationRatio);
-        // }
-        // // Interpolation Position
-        // else
-        // {
-        //     sphere.transform.position = Vector3.Lerp(sphere.transform.position, toPosition, interpolationRatio);
-        // }
         // Interpolation Rotation
         float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.75f);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);

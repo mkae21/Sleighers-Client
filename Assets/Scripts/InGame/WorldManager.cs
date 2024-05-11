@@ -111,7 +111,6 @@ public class WorldManager : MonoBehaviour
     // 서버로부터 받은 데이터 처리 핸들러
     private void OnReceive()
     {
-        Debug.Log("[OnReceive] 데이터 처리 시작");
         while (messageQueue.Count > 0)
         {
             byte[] data;
@@ -130,8 +129,10 @@ public class WorldManager : MonoBehaviour
                 return;
             }
             if (msg.type != Protocol.Type.Key && msg.type != Protocol.Type.Sync)
+            {
+                Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
                 LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
-            Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
+            }
             switch (msg.type)
             {
                 case Protocol.Type.LoadGameScene:
@@ -393,9 +394,11 @@ public class WorldManager : MonoBehaviour
     // 서버로 보내는 데이터 처리 핸들러
     public void OnSend(Protocol.Type _type, Message msg = null)
     {
-        Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
         if (_type != Protocol.Type.Sync && _type != Protocol.Type.Key)
+        {
+            Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
             LogManager.instance.Log("[OnSend] 메세지 타입 : " + _type.ToString());
+        }
         switch (_type)
         {
             case Protocol.Type.Key:
