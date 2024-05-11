@@ -22,7 +22,7 @@ namespace Protocol
         PlayerGoal,             // 플레이어 골인
         GameEndCountDown,       // 1등 도착 후 카운트 다운 시작
         GameEnd,                // 게임 종료
-        GameSync,               // 게임 싱크
+        Sync = 30,              // 게임 싱크
         ResetServer = 100,      // 서버 리셋
         Receiver = 255          // 수신 전용
     }
@@ -41,14 +41,21 @@ namespace Protocol
     public class KeyMessage : Message
     {
         public Vector2 acceleration;    // 가속도
-        public Vector3 position;        // 위치
-        public Vector3 velocity;        // 속도
-        public float rotation;          // 회전 (y축)
-        public long timeStamp;
-        public KeyMessage(int _id, Vector2 _a, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Key, _id)
+        public KeyMessage(int _id, Vector2 _a) : base(Type.Key, _id)
         {
             this.from = _id;
             this.acceleration = _a;
+        }
+    }
+    public class SyncMessage : Message
+    {
+        public Vector3 position;        // 위치
+        public Vector3 velocity;        // 속도
+        public float rotation;          // 회전 (y축)
+        public long timeStamp;          // 타임스탬프
+        public SyncMessage(int _id, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Sync, _id)
+        {
+            this.from = _id;
             this.position = _p;
             this.velocity = _v;
             this.rotation = _rY;

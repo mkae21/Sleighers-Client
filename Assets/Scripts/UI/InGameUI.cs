@@ -124,7 +124,7 @@ public class InGameUI : MonoBehaviour
             int lap = _ranking[i].lap;
             int checkpoint = _ranking[i].checkpoint;
 
-            if (id == WorldManager.instance.MyPlayerId)
+            if (id == WorldManager.instance.myPlayerId)
             {
                 text_rank.text = $"<size=160>{i + 1}</size>/{_ranking.Count}";
                 StartCoroutine(BlinkCoroutine(text_ranks[id].transform.parent.GetComponent<Image>()));
@@ -135,7 +135,7 @@ public class InGameUI : MonoBehaviour
     }
     public void UpdateTimer()
     {
-        if (WorldManager.instance.IsRaceFinish)
+        if (WorldManager.instance.isRaceFinish)
             return;
 
         timer += Time.deltaTime;
@@ -172,7 +172,7 @@ public class InGameUI : MonoBehaviour
 
     public void SetGameEndCountDown(int _count)
     {
-        if(!WorldManager.instance.IsRaceFinish)
+        if(!WorldManager.instance.isRaceFinish)
         {
             GameManager.Instance().soundManager.Play("Effect/EndCount", SoundType.EFFECT);
 
