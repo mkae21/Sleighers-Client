@@ -65,7 +65,7 @@ public class WorldManager : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (tick % 5 == 0)
+        if (tick % 2 == 0)
             OnSend(Protocol.Type.Sync);
         tick++;
         OnReceive();

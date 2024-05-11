@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     private bool isDrifting;
 
     // expolation, slerp
+    private float movementThreshold = 0.05f;
+    private float squareMovementThreshold;
     private Vector3 previousPosition;
     private Vector3 previousVelocity;
     private float previousRotationY;
@@ -65,17 +67,12 @@ public class Player : MonoBehaviour
     {
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
     }
+    private void Start()
+    {
+        squareMovementThreshold = movementThreshold * movementThreshold;
+    }
     private void Update()
     {
-        if (ServerManager.Instance() == null)
-        {
-            float h = Input.GetAxis("Horizontal");
-            float v = Input.GetAxis("Vertical");
-            Vector3 tmp = new Vector3(h, 0, v);
-            tmp = Vector3.Normalize(tmp);
-            SetMoveVector(tmp);
-        }
-
         if (!isMe && WorldManager.instance.isGameStart)
             Polation();
         SledPosition();
@@ -87,9 +84,11 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        RaycastHit hitData = AdJustBottom();
         if (isMove && isMe)
+        {
+            RaycastHit hitData = AdJustBottom();
             ApplyPhysics(hitData);
+        }
     }
 
     private void GetVerticalSpeed()
@@ -188,17 +187,19 @@ public class Player : MonoBehaviour
     {
         float timeSinceLastUpdate = (toTimeStamp - previousTimeStamp) / 1000f;
         Vector3 fromPosition = sphere.transform.position;
-        if (timeSinceLastUpdate < 0.5f)
+        if ((toPosition - previousPosition).sqrMagnitude < squareMovementThreshold)
         {
             if (toPosition != fromPosition)
-                sphere.transform.position = Vector3.Lerp(fromPosition, toPosition, 0.5f);
-            
-            return;
+            {
+                Debug.Log("Interpolation");
+                sphere.transform.position = Vector3.Lerp(fromPosition, toPosition, 0.75f);            
+            }
         }
-
-        sphere.transform.position = Vector3.LerpUnclamped(fromPosition, toPosition, 0.75f);
-
-
+        else
+        {
+            Debug.Log("Extrapolation");
+            sphere.transform.position = Vector3.LerpUnclamped(fromPosition, toPosition, 1f);
+        }
 
         // float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
 
@@ -214,7 +215,7 @@ public class Player : MonoBehaviour
         //     sphere.transform.position = Vector3.Lerp(sphere.transform.position, toPosition, interpolationRatio);
         // }
         // Interpolation Rotation
-        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.5f);
+        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.75f);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
     }
 #endregion
