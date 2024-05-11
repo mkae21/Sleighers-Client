@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using Protocol;
 using System.Threading.Tasks;
 using System;
+using System.Runtime.CompilerServices;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
@@ -110,6 +111,7 @@ public class WorldManager : MonoBehaviour
     // 서버로부터 받은 데이터 처리 핸들러
     private void OnReceive()
     {
+        Debug.Log("[OnReceive] 데이터 처리 시작");
         while (messageQueue.Count > 0)
         {
             byte[] data;
@@ -183,20 +185,30 @@ public class WorldManager : MonoBehaviour
 
 
     // 키 입력 이벤트 처리
-    private void ReceiveKeyEvent(KeyMessage keyMessage)
+    private async void ReceiveKeyEvent(KeyMessage keyMessage)
     {
-        int id = keyMessage.from;
-        Vector2 acceleration = keyMessage.acceleration;
-        players[id].SetMoveVector(acceleration);
+        await Task.Run(() =>
+        {
+            if (players == null || !isGameStart)
+                return;
+            int id = keyMessage.from;
+            Vector2 acceleration = keyMessage.acceleration;
+            players[id].SetMoveVector(acceleration);
+        });
     }
-    private void ReceiveSyncEvent(SyncMessage msg)
+    private async void ReceiveSyncEvent(SyncMessage msg)
     {
-        int id = msg.from;
-        Vector3 position = msg.position;
-        Vector3 velocity = msg.velocity;
-        float rotation = msg.rotation;
-        long timeStamp = msg.timeStamp;
-        players[id].SetServerData(position, velocity, rotation, timeStamp);
+        await Task.Run(() =>
+        {
+            if (players == null || !isGameStart)
+                return;
+            int id = msg.from;
+            Vector3 position = msg.position;
+            Vector3 velocity = msg.velocity;
+            float rotation = msg.rotation;
+            long timeStamp = msg.timeStamp;
+            players[id].SetServerData(position, velocity, rotation, timeStamp);
+        });
     }
     // 다른 플레이어 접속 이벤트 처리
     private void ReceivePlayerReconnectEvent(Message msg)
@@ -215,8 +227,8 @@ public class WorldManager : MonoBehaviour
         int totalPlayerCount = msg.count;
         sessionInfo.totalPlayerCount = totalPlayerCount + 1;
         List<int> userList = msg.list;
-
         Transform sp = startingPoints[totalPlayerCount].transform;
+
         GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
@@ -236,12 +248,12 @@ public class WorldManager : MonoBehaviour
     // 게임 시작 카운트 다운 이벤트 처리
     private void ReceiveGameStartCountDownEvent(GameCountDownMessage msg)
     {
-        int count = msg.count;
-        InGameUI.instance.SetCountDown(count);
+            int count = msg.count;
+            InGameUI.instance.SetCountDown(count);
     }
     // 게임 시작 이벤트 처리
     private void ReceiveGameStartEvent()
-    {
+    {   
         isGameStart = true;
         GameManager.Instance().ChangeState(GameManager.GameState.InGame);
     }
@@ -271,32 +283,50 @@ public class WorldManager : MonoBehaviour
 
 #region Send 프로토콜 처리
     // 동기화 이벤트를 서버에 알림
-    private async Task SendSyncEvent()
+    private async void SendKeyEvent(KeyMessage msg)
+    {
+        await Task.Run(() =>
+        {
+            if (players == null || !isGameStart)
+                return;
+            ServerManager.Instance().SendDataToInGame(msg);
+        });
+    }
+    private void SendSyncEvent()
     {
         if (players == null || !isGameStart)
             return;
         SyncMessage msg = GetMyPlayer().GetSyncData();
-        await ServerManager.Instance().SendDataToInGame(msg);
+        ServerManager.Instance().SendDataToInGame(msg);
     }
     // 게임 시작 이벤트를 서버에 알림
-    private async Task SendGameStartEvent()
+    private async void SendGameStartEvent()
     {
-        if (isGameStart)
-            return;
-        Message msg = new Message(Protocol.Type.GameStart, myPlayerId);
-        await ServerManager.Instance().SendDataToInGame(msg);
+        await Task.Run(() =>
+        {
+            if (isGameStart)
+                return;
+            Message msg = new Message(Protocol.Type.GameStart, myPlayerId);
+            ServerManager.Instance().SendDataToInGame(msg);
+        });
     }
     // 내 플레이어가 골인했음을 서버에 알림
-    private async Task SendPlayerGoalEvent()
+    private async void SendPlayerGoalEvent()
     {
-        Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId);
-        await ServerManager.Instance().SendDataToInGame(msg);
+        await Task.Run(() =>
+        {
+            Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId);
+            ServerManager.Instance().SendDataToInGame(msg);
+        });
     }
     // 임시 서버 리셋
-    private async Task SendResetServerEvent()
+    private async void SendResetServerEvent()
     {
-        Message msg = new Message(Protocol.Type.ResetServer, myPlayerId);
-        await ServerManager.Instance().SendDataToInGame(msg);
+        await Task.Run(() =>
+        {
+            Message msg = new Message(Protocol.Type.ResetServer, myPlayerId);
+            ServerManager.Instance().SendDataToInGame(msg);
+        });
     }
     private int ReadBytes(byte[] buffer, int offset, int count, int timeoutCounts)
     {
@@ -361,27 +391,31 @@ public class WorldManager : MonoBehaviour
         }
     }
     // 서버로 보내는 데이터 처리 핸들러
-    public async void OnSend(Protocol.Type _type)
+    public void OnSend(Protocol.Type _type, Message msg = null)
     {
         Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
-        if (_type != Protocol.Type.Sync)
+        if (_type != Protocol.Type.Sync && _type != Protocol.Type.Key)
             LogManager.instance.Log("[OnSend] 메세지 타입 : " + _type.ToString());
         switch (_type)
         {
+            case Protocol.Type.Key:
+                KeyMessage keyMsg = msg as KeyMessage;
+                SendKeyEvent(keyMsg);
+                break;
             case Protocol.Type.Sync:
-                await SendSyncEvent();
+                SendSyncEvent();
                 break;
 
             case Protocol.Type.GameStart:
-                await SendGameStartEvent();
+                SendGameStartEvent();
                 break;
 
             case Protocol.Type.PlayerGoal:
-                await SendPlayerGoalEvent();
+                SendPlayerGoalEvent();
                 break;
 
             case Protocol.Type.ResetServer:
-                await SendResetServerEvent();
+                SendResetServerEvent();
                 break;
 
             default:
