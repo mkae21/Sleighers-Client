@@ -203,8 +203,8 @@ public class WorldManager : MonoBehaviour
     {
         int newId = msg.from;
         Transform sp = startingPoints[sessionInfo.totalPlayerCount];
-        GameObject newInstance = Instantiate(playerPrefab, sp.position, sp.rotation, playerPool.transform);
-        newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId);
+        GameObject newInstance = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+        newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId, sp.position, sp.rotation.eulerAngles.y);
         players.Add(newId, newInstance.GetComponent<Player>());
         sessionInfo.totalPlayerCount++;
     }
@@ -217,8 +217,8 @@ public class WorldManager : MonoBehaviour
         List<int> userList = msg.list;
 
         Transform sp = startingPoints[totalPlayerCount].transform;
-        GameObject myPlayer = Instantiate(playerPrefab, sp.position, sp.rotation, playerPool.transform);
-        myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId);
+        GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+        myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
         miniMapController.SetTarget(miniMapTarget);
         players.Add(myPlayerId, myPlayer.GetComponent<Player>());
@@ -228,8 +228,8 @@ public class WorldManager : MonoBehaviour
         {
             int otherPlayerId = userList[i];
             Transform _sp = startingPoints[i].transform;
-            GameObject otherPlayer = Instantiate(playerPrefab, _sp.position, _sp.rotation, playerPool.transform);
-            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId);
+            GameObject otherPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
             players.Add(otherPlayerId, otherPlayer.GetComponent<Player>());
         }
     }

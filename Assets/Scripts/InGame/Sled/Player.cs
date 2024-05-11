@@ -61,12 +61,6 @@ public class Player : MonoBehaviour
     {
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
     }
-    private void Start()
-    {
-        // 서버 인스턴스가 없으면 인게임 테스트용으로 초기화
-        if (ServerManager.Instance() == null)
-            Initialize(true, 0, "TestPlayer");
-    }
     private void Update()
     {
         if (ServerManager.Instance() == null)
@@ -212,7 +206,7 @@ public class Player : MonoBehaviour
 
 #region PublicMethod
     // 내 플레이어와 다른 플레이어 객체 초기화
-    public void Initialize(bool _isMe, int _playerId, string _nickName)
+    public void Initialize(bool _isMe, int _playerId, string _nickName, Vector3 position, float rotation)
     {
         isMe = _isMe;
         this.playerId = _playerId;
@@ -223,6 +217,10 @@ public class Player : MonoBehaviour
         nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, sledModel);
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
         nameObject.transform.position = GetNameUIPos();
+
+        sled.transform.position = position;
+        sphere.transform.position = position;
+        sled.transform.rotation = Quaternion.Euler(0, rotation, 0);
 
         lastServerPosition = GetPosition();
         lastServerVelocity = GetVelocity();
