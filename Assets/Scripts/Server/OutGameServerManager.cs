@@ -10,18 +10,18 @@ using UnityEngine.SceneManagement;
 
 public class OutGameServerManager : MonoBehaviour
 {
-    #region PrivateVariables
+#region PrivateVariables
     private string serverIP = string.Empty;
     private int serverPort = 0;
     private SocketIOUnity socket;
-    #endregion
+#endregion
 
-    #region PublicVariables
+#region PublicVariables
     public static OutGameServerManager instance = null;
-    #endregion
+#endregion
 
 
-    #region PrivateMethod
+#region PrivateMethod
     private void Awake()
     {
         if (instance != null)
@@ -32,11 +32,6 @@ public class OutGameServerManager : MonoBehaviour
     void Start()
     {
         Init();
-    }
-
-    void Update()
-    {
-
     }
 
     private void Init()
@@ -91,7 +86,7 @@ public class OutGameServerManager : MonoBehaviour
         {
             Debug.Log("inquiryPlayer: " + res);
             string jsonString = res.GetValue<string>();
-            userInfo userInfo = JsonUtility.FromJson<userInfo>(jsonString);
+            UserInfo userInfo = JsonUtility.FromJson<UserInfo>(jsonString);
             Debug.Log("inquiryPlayer: " + userInfo);
             Debug.Log("inquiryPlayer: " + userInfo.name);
             Debug.Log("inquiryPlayer: " + userInfo.cart);
@@ -117,9 +112,9 @@ public class OutGameServerManager : MonoBehaviour
         socket.Connect();
 
     }
-    #endregion
+#endregion
 
-    #region PublicMethod
+#region PublicMethod
     public static OutGameServerManager Instance()
     {
         if (instance == null)
@@ -133,11 +128,11 @@ public class OutGameServerManager : MonoBehaviour
 
     public void LoginSucc(string email)
     {
-        packet sendPacket = new packet();
+        Packet sendPacket = new Packet();
         sendPacket.email = email;
         Debug.Log("º¸³½´Ù."+sendPacket);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("loginSucc", jsonData);
     }
-    #endregion
+#endregion
 }

@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class packet
+public class Packet
 {
     public string email;
 }
 
-public class userInfo:packet
+public class UserInfo : Packet
 {
     public string name;
     public string cart;

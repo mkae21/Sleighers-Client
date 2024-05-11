@@ -1,31 +1,21 @@
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Gmail.v1;
 using Google.Apis.Services;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
 public class GoogleAuth : MonoBehaviour
 {
 
-    #region PrivateVariables
-    #endregion
+#region PrivateVariables
+#endregion
 
-    #region PublicMethod
-    public void GoogleOAuth()
-    {
-        _GoogleOAuth();
-    }
-    #endregion
+#region PublicMethod
 
-    #region PrivateMethod
-    void Start()
-    {
-        
-    }
+#endregion
 
-    private async void _GoogleOAuth()
+#region PrivateMethod
+    public async void GoogleOAuth()
     {
         var clientId = SecretLoader.googleAuth.id;
         var clientSecret = SecretLoader.googleAuth.secret;
@@ -65,6 +55,5 @@ public class GoogleAuth : MonoBehaviour
             Debug.LogError("사용자 이메일 주소를 가져오는데 실패했습니다.");
         }
     }
-
-    #endregion
+#endregion
 }
