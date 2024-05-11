@@ -1,5 +1,6 @@
 using UnityEngine;
 using Protocol;
+using System.Threading.Tasks;
 /* InputManager.cs
  * - 인게임에서 플레이어 입력 처리
  * - 플레이어 스크립트는 여러 개 생성되기에 여기서 플레이어의 입력을 받아서 서버로 전송 및 플레이어 이동 처리
@@ -9,7 +10,6 @@ public class InputManager : MonoBehaviour
 #region PrivateVariables
     private const string HORIZONTAL = "Horizontal";
     private const string VERTICAL = "Vertical";
-    private const string BRAKE = "Jump";
 #endregion
 
 #region PublicVariables
@@ -34,7 +34,7 @@ public class InputManager : MonoBehaviour
             WorldManager.instance.OnSend(Protocol.Type.GameStart);
     }
 
-    private async void KeyInput()
+    private void KeyInput()
     {
         if (Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
@@ -43,7 +43,7 @@ public class InputManager : MonoBehaviour
         if  (Input.GetKey(KeyCode.G))
             WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
         
-        if (WorldManager.instance.IsRaceFinish)
+        if (WorldManager.instance.isRaceFinish)
             return;
         
         float h = Input.GetAxis(HORIZONTAL);
@@ -53,17 +53,11 @@ public class InputManager : MonoBehaviour
         if (h == 0 && v == 0)
             return;
         
-        int id = WorldManager.instance.MyPlayerId;
         Vector2 acceleration = new Vector2(h, v);
         acceleration = Vector3.Normalize(acceleration);
-        Vector3 position = WorldManager.instance.GetMyPlayerPosition();
-        Vector3 velocity = WorldManager.instance.GetMyPlayerVelocity();
-        float rotation = WorldManager.instance.GetMyPlayerRotation();
 
         WorldManager.instance.GetMyPlayer().SetDrift(drifting);
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
-        KeyMessage msg = new KeyMessage(id, acceleration, position, velocity, rotation, 0);
-        await ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
     }
 #endregion
 

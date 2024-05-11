@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using Cinemachine;
 using System;
+using Protocol;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
@@ -12,12 +13,16 @@ public class Player : MonoBehaviour
 #region PrivateVariables
     private bool isDrifting;
 
-    // expolation, slerp
-    private Vector3 lastServerPosition;
-    private Vector3 lastServerVelocity;
-    private float lastServerRotationY;
-    private long lastServerTimeStamp;
-    private float extrapolationLimit = 0.5f;
+    // Polation
+    private float timeToReachTarget = 0.05f;
+    private float movementThreshold = 1f;
+    private float squareMovementThreshold;
+    private Vector3 previousPosition;
+    private long previousTimeStamp;
+    private Vector3 toPosition;
+    private Vector3 toVelocity;
+    private float toRotationY;
+    private long toTimeStamp;
 
     // 최대속도 제한, 드리프트
     private float maxSpeed = 75f;
@@ -26,12 +31,7 @@ public class Player : MonoBehaviour
     private float rotate;
 
     private float currentRotate;
-    [SerializeField] private bool isMe = false;
-    public bool IsMe
-    {
-        get { return isMe; }
-        set { isMe = value; }
-    }
+    public bool isMe { get; private set; } = false;
     [SerializeField] private bool isBraking = false;
     public bool IsBraking
     {
@@ -67,21 +67,14 @@ public class Player : MonoBehaviour
     }
     private void Start()
     {
-        // 서버 인스턴스가 없으면 인게임 테스트용으로 초기화
-        if (ServerManager.Instance() == null)
-            Initialize(true, 0, "TestPlayer");
+        squareMovementThreshold = movementThreshold * movementThreshold;
     }
     private void Update()
     {
-        if (ServerManager.Instance() == null)
+        if (!isMe && WorldManager.instance.isGameStart)
         {
-            float h = Input.GetAxis("Horizontal");
-            float v = Input.GetAxis("Vertical");
-            Vector3 tmp = new Vector3(h, 0, v);
-            tmp = Vector3.Normalize(tmp);
-            SetMoveVector(tmp);
+            Polation();
         }
-
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -92,8 +85,10 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         RaycastHit hitData = AdJustBottom();
-        if (isMove)
+        if (isMove && isMe)
+        {
             ApplyPhysics(hitData);
+        }
     }
 
     private void GetVerticalSpeed()
@@ -148,8 +143,6 @@ public class Player : MonoBehaviour
         sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
         isMove = false;
         isDrifting = false;
-        if (!IsMe)
-            Polation();
     }
     public void Steer(int direction, float amount)
     {
@@ -185,26 +178,36 @@ public class Player : MonoBehaviour
             sphere.velocity = sphere.velocity.normalized * maxSpeed;
         }
     }
-    // 위치/회전 보간 및 외삽
+    private void SetCamera()
+    {
+        CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
+    }
+    // ExtraPolation, InterPolation
     private void Polation()
     {
-        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
-        float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
+        float latency = (toTimeStamp - previousTimeStamp) / 1000f;
+        float lerpAmount = Mathf.Clamp01(latency / timeToReachTarget);
+        Vector3 fromPosition = sphere.transform.position;
 
-        // Extrapolation Position
-        if (timeSinceLastUpdate < extrapolationLimit)
-        {
-            Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate);
-            sphere.transform.position = Vector3.Lerp(sphere.transform.position, extrapolatedPosition, interpolationRatio);
-        }
         // Interpolation Position
+        if ((toPosition - previousPosition).sqrMagnitude < squareMovementThreshold)
+        {
+            if (toPosition != fromPosition)
+            {
+                // Debug.Log("Interpolation");
+                sphere.transform.position = Vector3.Lerp(fromPosition, toPosition, lerpAmount);            
+            }
+        }
+        // Extrapolation Position
         else
         {
-            sphere.transform.position = Vector3.Lerp(sphere.transform.position, lastServerPosition, interpolationRatio);
+            // Debug.Log("Extrapolation");
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
+            sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
         }
+
         // Interpolation Rotation
-        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, lastServerRotationY, interpolationRatio);
+        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.75f);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
     }
 #endregion
@@ -212,9 +215,9 @@ public class Player : MonoBehaviour
 
 #region PublicMethod
     // 내 플레이어와 다른 플레이어 객체 초기화
-    public void Initialize(bool _isMe, int _playerId, string _nickName)
+    public void Initialize(bool _isMe, int _playerId, string _nickName, Vector3 position, float rotation)
     {
-        IsMe = _isMe;
+        isMe = _isMe;
         this.playerId = _playerId;
         this.nickName = _nickName;
 
@@ -224,11 +227,23 @@ public class Player : MonoBehaviour
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
         nameObject.transform.position = GetNameUIPos();
 
+        sled.transform.position = position;
+        sphere.transform.position = position;
+        sled.transform.rotation = Quaternion.Euler(0, rotation, 0);
+
+        previousPosition = GetPosition();
+        previousTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+        toPosition = GetPosition();
+        toVelocity = GetVelocity();
+        toRotationY = GetRotationY();
+        toTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
         RankManager.instance.AddRankInfo(GetComponent<Player>());
         InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
 
-        if (IsMe)
-            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
+        if (isMe)
+            Invoke("SetCamera", 0.5f);
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
@@ -236,10 +251,13 @@ public class Player : MonoBehaviour
 
     public void SetServerData(Vector3 _position, Vector3 _velocity, float _rotationY, long _timeStamp)
     {
-        lastServerPosition = _position;
-        lastServerVelocity = _velocity;
-        lastServerRotationY = _rotationY;
-        lastServerTimeStamp = _timeStamp;
+        previousPosition = toPosition;
+        previousTimeStamp = toTimeStamp;
+
+        toPosition = _position;
+        toVelocity = _velocity;
+        toRotationY = _rotationY;
+        toTimeStamp = _timeStamp;
     }
 
     public void SetMoveVector(Vector2 vector)
@@ -260,9 +278,13 @@ public class Player : MonoBehaviour
     {
         return sphere.velocity;
     }
-    public float GetRotation()
+    public float GetRotationY()
     {
         return sled.transform.rotation.eulerAngles.y;
+    }
+    public SyncMessage GetSyncData()
+    {
+        return new SyncMessage(playerId, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
     public void SetDrift(bool isDrift)
