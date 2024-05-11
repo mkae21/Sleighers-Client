@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Net.Sockets;
 using System.Collections;
 using System.Threading.Tasks;
@@ -14,6 +15,16 @@ public class OutGameServerManager : MonoBehaviour
     private string serverIP = string.Empty;
     private int serverPort = 0;
     private SocketIOUnity socket;
+
+    [SerializeField]
+    private GameObject AuthPanel;
+    [SerializeField]
+    private GameObject LobbyPanel;
+    [SerializeField]
+    private GameObject TopBar;
+    [SerializeField]
+    private GameObject idInputField;
+
 #endregion
 
 #region PublicVariables
@@ -63,6 +74,7 @@ public class OutGameServerManager : MonoBehaviour
         {
             Debug.Log("Login success: " + res);
             //SceneManager.LoadScene("Topdown");
+            DefaltLoginSucc();
         });
 
         socket.On("loginFail", (res) =>
@@ -137,6 +149,21 @@ public class OutGameServerManager : MonoBehaviour
         Debug.Log("º¸³½´Ù."+sendPacket);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("loginSucc", jsonData);
+    }
+
+    public void DefaltLogin()
+    {
+        Packet sendPacket = new Packet();
+        sendPacket.email = "test";
+        string jsonData = JsonUtility.ToJson(sendPacket);
+        socket.Emit("loginSucc", jsonData);
+    }
+
+    public void DefaltLoginSucc()
+    {
+        AuthPanel.SetActive(false);
+        LobbyPanel.SetActive(true);
+        TopBar.SetActive(true);
     }
 #endregion
 }
