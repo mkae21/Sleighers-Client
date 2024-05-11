@@ -10,18 +10,18 @@ using UnityEngine.SceneManagement;
 
 public class OutGameServerManager : MonoBehaviour
 {
-    #region PrivateVariables
+#region PrivateVariables
     private string serverIP = string.Empty;
     private int serverPort = 0;
     private SocketIOUnity socket;
-    #endregion
+#endregion
 
-    #region PublicVariables
+#region PublicVariables
     public static OutGameServerManager instance = null;
-    #endregion
+#endregion
 
 
-    #region PrivateMethod
+#region PrivateMethod
     private void Awake()
     {
         if (instance != null)
@@ -32,11 +32,6 @@ public class OutGameServerManager : MonoBehaviour
     void Start()
     {
         Init();
-    }
-
-    void Update()
-    {
-
     }
 
     private void Init()
@@ -117,9 +112,9 @@ public class OutGameServerManager : MonoBehaviour
         socket.Connect();
 
     }
-    #endregion
+#endregion
 
-    #region PublicMethod
+#region PublicMethod
     public static OutGameServerManager Instance()
     {
         if (instance == null)
@@ -139,5 +134,5 @@ public class OutGameServerManager : MonoBehaviour
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("loginSucc", jsonData);
     }
-    #endregion
+#endregion
 }
