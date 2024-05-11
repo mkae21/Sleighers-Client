@@ -62,8 +62,7 @@ public class OutGameServerManager : MonoBehaviour
         socket.On("loginSucc", (res) =>
         {
             Debug.Log("Login success: " + res);
-            SceneManager.LoadScene("Topdown");
-            Debug.Log("야 비 당장 그쳐 뚝!");
+            //SceneManager.LoadScene("Topdown");
         });
 
         socket.On("loginFail", (res) =>
@@ -104,6 +103,11 @@ public class OutGameServerManager : MonoBehaviour
         });
 
         socket.On("moveInGameScene", (res) =>
+        {
+            Debug.Log(res);
+        });
+
+        socket.On("enterRoomSucc", (res) =>
         {
             Debug.Log(res);
         });
