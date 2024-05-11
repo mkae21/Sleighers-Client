@@ -110,7 +110,7 @@ public class WorldManager : MonoBehaviour
     // 서버로부터 받은 데이터 처리 핸들러
     private void OnReceive()
     {
-        if (messageQueue.Count > 0)
+        while (messageQueue.Count > 0)
         {
             byte[] data;
             lock (messageQueue)
