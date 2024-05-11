@@ -8,6 +8,7 @@ using System.IO;
 using UnityEditor.PackageManager;
 using SocketIOClient;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class OutGameServerManager : MonoBehaviour
 {
@@ -23,7 +24,7 @@ public class OutGameServerManager : MonoBehaviour
     [SerializeField]
     private GameObject TopBar;
     [SerializeField]
-    private GameObject idInputField;
+    private TMP_InputField idInputField;
 
 #endregion
 
@@ -102,6 +103,8 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log("inquiryPlayer: " + userInfo.name);
             Debug.Log("inquiryPlayer: " + userInfo.cart);
             Debug.Log("inquiryPlayer: " + userInfo.email);
+
+            DefaltLoginSucc();
         });
 
         socket.On("enterRoomFail", (res) =>
@@ -154,9 +157,9 @@ public class OutGameServerManager : MonoBehaviour
     public void DefaltLogin()
     {
         Packet sendPacket = new Packet();
-        sendPacket.email = "test";
+        sendPacket.email = idInputField.text;
         string jsonData = JsonUtility.ToJson(sendPacket);
-        socket.Emit("loginSucc", jsonData);
+        socket.Emit("login", jsonData);
     }
 
     public void DefaltLoginSucc()

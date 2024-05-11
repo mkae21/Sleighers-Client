@@ -11612,7 +11612,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &709169512
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15527,7 +15527,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 460.80005, y: -181.59601}
+  m_AnchoredPosition: {x: 460.80005, y: -190.19221}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &947368148
@@ -20531,7 +20531,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1511830733}
+      objectReference: {fileID: 1511830734}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -20570,7 +20570,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: 
+      value: DefaltLogin
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -20590,7 +20590,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: GoogleAuth, Assembly-CSharp
+      value: OutGameServerManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -23325,7 +23325,7 @@ MonoBehaviour:
   AuthPanel: {fileID: 1127217608}
   LobbyPanel: {fileID: 709169511}
   TopBar: {fileID: 34541510}
-  idInputField: {fileID: 0}
+  idInputField: {fileID: 1542977665}
 --- !u!4 &1511830735
 Transform:
   m_ObjectHideFlags: 0
