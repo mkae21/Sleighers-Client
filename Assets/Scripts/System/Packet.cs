@@ -14,3 +14,15 @@ public class UserInfo : Packet
     public int curCostume;
     public int curCart;
 }
+
+// 매치메이킹 요청 패킷
+public class IdPacket
+{
+    public string id;
+}
+
+public class MatchInfo : IdPacket
+{
+    public string name;
+    public int curCart;
+}
