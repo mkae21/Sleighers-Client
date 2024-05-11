@@ -9,13 +9,14 @@ public class LoginInfo
 
 public class UserInfo : LoginInfo
 {
+    public string id;
     public string name;
     public string cart;
     public int curCostume;
     public int curCart;
 }
 
-// ë§¤ì¹˜ë©”ì´í‚¹ ìš”ì²­ íŒ¨í‚·
+// ¸ÅÄ¡¸ŞÀÌÅ· ¿äÃ» ÆĞÅ¶
 public class Packet
 {
     public string id;

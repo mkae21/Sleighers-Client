@@ -48,29 +48,29 @@ public class OutGameServerManager : MonoBehaviour
 
     private void Init()
     {
-        // serverIP = "localhost"; // 濡쒖뺄 �뀒�뒪�듃 �슜
+        // serverIP = "localhost"; // 로컬 테스트 용
         serverIP = SecretLoader.outgameServer.ip;
         serverPort = SecretLoader.outgameServer.port;
         socket = new SocketIOUnity("http://" + serverIP +":"+serverPort);
 
         socket.OnConnected += (sender, e) =>
         {
-            Debug.LogFormat("[OutGameServerManager] �꽌踰� �젒�냽 �꽦怨� {0}:{1}", serverIP, serverPort);
+            Debug.LogFormat("[OutGameServerManager] 서버 접속 성공 {0}:{1}", serverIP, serverPort);
         };
 
-        // �뿰寃� �빐�젣 �씠踰ㅽ듃 �빖�뱾�윭
+        // 연결 해제 이벤트 핸들러
         socket.OnDisconnected += (sender, e) =>
         {
-            Debug.LogFormat("[OutGameServerManager] �꽌踰� �젒�냽 �빐�젣 {0}:{1}", serverIP, serverPort);
+            Debug.LogFormat("[OutGameServerManager] 서버 접속 해제 {0}:{1}", serverIP, serverPort);
         };
 
-        // �뿉�윭 �씠踰ㅽ듃 �빖�뱾�윭
+        // 에러 이벤트 핸들러
         socket.OnError += (sender, e) =>
         {
-            Debug.LogError("[OutGameServerManager] �뿉�윭 : " + e);
+            Debug.LogError("[OutGameServerManager] 에러 : " + e);
         };
 
-        // 濡쒓렇�씤 �쓳�떟 �씠踰ㅽ듃 �빖�뱾�윭
+        // 로그인 응답 이벤트 핸들러
         socket.On("loginSucc", (res) =>
         {
             Debug.Log("Login success: " + res);
@@ -83,7 +83,7 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log("Login fail: " + res);
         });
 
-        // �쉶�썝媛��엯 �쓳�떟 �씠踰ㅽ듃 �빖�뱾�윭
+        // 회원가입 응답 이벤트 핸들러
         socket.On("signupSucc", (res) =>
         {
             Debug.Log("Signup success: " + res);
@@ -99,7 +99,7 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log("inquiryPlayer: " + res);
             string jsonString = res.GetValue<string>();
             UserInfo userInfo = JsonUtility.FromJson<UserInfo>(jsonString);
-            UserData.instance.id = userInfo.email.Split('@')[0];    // �씠硫붿씪�뿉�꽌 �븘�씠�뵒 異붿텧
+            UserData.instance.id = userInfo.id;
             UserData.instance.nickName = userInfo.name;
             UserData.instance.cart = userInfo.cart;
             UserData.instance.email = userInfo.email;
@@ -107,8 +107,6 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log("inquiryPlayer: " + userInfo.name);
             Debug.Log("inquiryPlayer: " + userInfo.cart);
             Debug.Log("inquiryPlayer: " + userInfo.email);
-
-            DefaltLoginSucc();
         });
 
         socket.On("enterRoomFail", (res) =>
@@ -131,7 +129,7 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log(res);
         });
 
-        // �꽌踰� �뿰寃�
+        // 서버 오픈
         socket.Connect();
 
     }
@@ -142,7 +140,7 @@ public class OutGameServerManager : MonoBehaviour
     {
         if (instance == null)
         {
-            Debug.LogError("[OutGameServerManager] �씤�뒪�꽩�뒪媛� 議댁옱�븯吏� �븡�뒿�땲�떎.");
+            Debug.LogError("[OutGameServerManager] 인스턴스가 존재하지 않습니다.");
             return null;
         }
 
@@ -153,31 +151,28 @@ public class OutGameServerManager : MonoBehaviour
     {
         LoginInfo sendPacket = new LoginInfo();
         sendPacket.email = email;
-        Debug.Log("蹂대궦�떎."+sendPacket);
+        Debug.Log("보낸다."+sendPacket);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("loginSucc", jsonData);
     }
 
     public void DefaltLogin()
     {
-        Packet sendPacket = new Packet();
-        sendPacket.email = idInputField.text;
-        string jsonData = JsonUtility.ToJson(sendPacket);
-        socket.Emit("login", jsonData);
+        LoginSucc(idInputField.text);
     }
 
     public void DefaltLoginSucc()
     {
-        AuthPanel.SetActive(false);
-        LobbyPanel.SetActive(true);
-        TopBar.SetActive(true);
+        OutGameUI.instance.panels[0].SetActive(false);  // auth panel
+        OutGameUI.instance.panels[1].SetActive(true);   // lobby panel
+        OutGameUI.instance.topBar.SetActive(true);
     }
 
     public void MatchMaking()
     {
         Packet sendPacket = new Packet();
         sendPacket.id = UserData.instance.id;
-        Debug.Log("matchmaking id 蹂대궦�떎."+sendPacket.id);
+        Debug.Log("matchmaking id 보낸다."+sendPacket.id);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
     }
