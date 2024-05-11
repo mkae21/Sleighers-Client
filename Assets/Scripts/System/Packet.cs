@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Packet
+public class LoginInfo
 {
     public string email;
 }
 
-public class UserInfo : Packet
+public class UserInfo : LoginInfo
 {
     public string name;
     public string cart;
@@ -16,12 +16,12 @@ public class UserInfo : Packet
 }
 
 // 매치메이킹 요청 패킷
-public class IdPacket
+public class Packet
 {
     public string id;
 }
 
-public class MatchInfo : IdPacket
+public class MatchInfo : Packet
 {
     public string name;
     public int curCart;

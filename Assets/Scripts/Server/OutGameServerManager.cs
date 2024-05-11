@@ -87,10 +87,10 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log("inquiryPlayer: " + res);
             string jsonString = res.GetValue<string>();
             UserInfo userInfo = JsonUtility.FromJson<UserInfo>(jsonString);
-            User.instance.id = userInfo.email.Split('@')[0];    // 이메일에서 아이디 추출
-            User.instance.nickName = userInfo.name;
-            User.instance.cart = userInfo.cart;
-            User.instance.email = userInfo.email;
+            UserData.instance.id = userInfo.email.Split('@')[0];    // 이메일에서 아이디 추출
+            UserData.instance.nickName = userInfo.name;
+            UserData.instance.cart = userInfo.cart;
+            UserData.instance.email = userInfo.email;
             Debug.Log("inquiryPlayer: " + userInfo);
             Debug.Log("inquiryPlayer: " + userInfo.name);
             Debug.Log("inquiryPlayer: " + userInfo.cart);
@@ -132,7 +132,7 @@ public class OutGameServerManager : MonoBehaviour
 
     public void LoginSucc(string email)
     {
-        Packet sendPacket = new Packet();
+        LoginInfo sendPacket = new LoginInfo();
         sendPacket.email = email;
         Debug.Log("보낸다."+sendPacket);
         string jsonData = JsonUtility.ToJson(sendPacket);
@@ -141,8 +141,8 @@ public class OutGameServerManager : MonoBehaviour
 
     public void MatchMaking()
     {
-        IdPacket sendPacket = new IdPacket();
-        sendPacket.id = User.instance.id;
+        Packet sendPacket = new Packet();
+        sendPacket.id = UserData.instance.id;
         Debug.Log("matchmaking id 보낸다."+sendPacket.id);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
