@@ -65,8 +65,8 @@ public class WorldManager : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        // if (tick % 5 == 0)
-        //     OnSend(Protocol.Type.Sync);
+        if (tick % 5 == 0)
+            OnSend(Protocol.Type.Sync);
         tick++;
         OnReceive();
     }
@@ -160,7 +160,7 @@ public class WorldManager : MonoBehaviour
 
                 case Protocol.Type.Key:
                     KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                    ReceiveKeyEvent(keyMessage);
+                    // ReceiveKeyEvent(keyMessage);
                     break;
                 
                 case Protocol.Type.Sync:

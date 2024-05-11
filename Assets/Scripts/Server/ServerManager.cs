@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 
 /* ServeManager.cs
  * - 서버와의 통신을 관리

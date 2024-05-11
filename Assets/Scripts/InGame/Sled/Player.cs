@@ -14,10 +14,14 @@ public class Player : MonoBehaviour
     private bool isDrifting;
 
     // expolation, slerp
-    private Vector3 lastServerPosition;
-    private Vector3 lastServerVelocity;
-    private float lastServerRotationY;
-    private long lastServerTimeStamp;
+    private Vector3 previousPosition;
+    private Vector3 previousVelocity;
+    private float previousRotationY;
+    private long previousTimeStamp;
+    private Vector3 toPosition;
+    private Vector3 toVelocity;
+    private float toRotationY;
+    private long toTimeStamp;
     private float extrapolationLimit = 0.5f;
 
     // 최대속도 제한, 드리프트
@@ -72,6 +76,8 @@ public class Player : MonoBehaviour
             SetMoveVector(tmp);
         }
 
+        if (!isMe && WorldManager.instance.isGameStart)
+            Polation();
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -82,10 +88,8 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         RaycastHit hitData = AdJustBottom();
-        if (isMove)
+        if (isMove && isMe)
             ApplyPhysics(hitData);
-        if (!isMe && WorldManager.instance.isGameStart)
-            Polation();
     }
 
     private void GetVerticalSpeed()
@@ -182,23 +186,35 @@ public class Player : MonoBehaviour
     // 위치/회전 보간 및 외삽
     private void Polation()
     {
-        long currentTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        float timeSinceLastUpdate = (currentTime - lastServerTimeStamp) / 1000f;
-        float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
+        float timeSinceLastUpdate = (toTimeStamp - previousTimeStamp) / 1000f;
+        Vector3 fromPosition = sphere.transform.position;
+        if (timeSinceLastUpdate < 0.5f)
+        {
+            if (toPosition != fromPosition)
+                sphere.transform.position = Vector3.Lerp(fromPosition, toPosition, 0.5f);
+            
+            return;
+        }
 
-        // Extrapolation Position
-        if (timeSinceLastUpdate < extrapolationLimit)
-        {
-            Vector3 extrapolatedPosition = lastServerPosition + (lastServerVelocity * timeSinceLastUpdate);
-            sphere.transform.position = Vector3.Lerp(sphere.transform.position, extrapolatedPosition, interpolationRatio);
-        }
-        // Interpolation Position
-        else
-        {
-            sphere.transform.position = Vector3.Lerp(sphere.transform.position, lastServerPosition, interpolationRatio);
-        }
+        sphere.transform.position = Vector3.LerpUnclamped(fromPosition, toPosition, 0.75f);
+
+
+
+        // float interpolationRatio = Mathf.Clamp01(timeSinceLastUpdate / extrapolationLimit);
+
+        // // Extrapolation Position
+        // if (timeSinceLastUpdate < extrapolationLimit)
+        // {
+        //     Vector3 extrapolatedPosition = toPosition + (toVelocity * timeSinceLastUpdate);
+        //     sphere.transform.position = Vector3.Lerp(sphere.transform.position, extrapolatedPosition, interpolationRatio);
+        // }
+        // // Interpolation Position
+        // else
+        // {
+        //     sphere.transform.position = Vector3.Lerp(sphere.transform.position, toPosition, interpolationRatio);
+        // }
         // Interpolation Rotation
-        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, lastServerRotationY, interpolationRatio);
+        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.5f);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
     }
 #endregion
@@ -222,10 +238,15 @@ public class Player : MonoBehaviour
         sphere.transform.position = position;
         sled.transform.rotation = Quaternion.Euler(0, rotation, 0);
 
-        lastServerPosition = GetPosition();
-        lastServerVelocity = GetVelocity();
-        lastServerRotationY = GetRotationY();
-        lastServerTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        previousPosition = GetPosition();
+        previousVelocity = GetVelocity();
+        previousRotationY = GetRotationY();
+        previousTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+        toPosition = GetPosition();
+        toVelocity = GetVelocity();
+        toRotationY = GetRotationY();
+        toTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         RankManager.instance.AddRankInfo(GetComponent<Player>());
         InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
@@ -239,10 +260,15 @@ public class Player : MonoBehaviour
 
     public void SetServerData(Vector3 _position, Vector3 _velocity, float _rotationY, long _timeStamp)
     {
-        lastServerPosition = _position;
-        lastServerVelocity = _velocity;
-        lastServerRotationY = _rotationY;
-        lastServerTimeStamp = _timeStamp;
+        previousPosition = toPosition;
+        previousVelocity = toVelocity;
+        previousRotationY = toRotationY;
+        previousTimeStamp = toTimeStamp;
+
+        toPosition = _position;
+        toVelocity = _velocity;
+        toRotationY = _rotationY;
+        toTimeStamp = _timeStamp;
     }
 
     public void SetMoveVector(Vector2 vector)
