@@ -15,13 +15,13 @@ public class SpeedPostProcessingEffect : MonoBehaviour
     private void Start()
     {
         player = GetComponentInParent<Player>();
-        if (!player.IsMe)
+        if (!player.isMe)
             gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        if (postProcessVolume != null && player != null && player.IsMe)
+        if (postProcessVolume != null && player != null && player.isMe)
         {
             // float speed = player.isMove ? player.NormalizedForwardSpeed : 0.0f;
             float speed = player.NormalizedForwardSpeed;

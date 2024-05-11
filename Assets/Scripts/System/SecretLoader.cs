@@ -38,10 +38,6 @@ public class SecretLoader : MonoBehaviour
         ingameServer = LoadJson<ServerInfo>(ingamePath);
         outgameServer = LoadJson<ServerInfo>(outgamePath);
         googleAuth = LoadJson<GoogleInfo>(googlePath);
-
-        Debug.Log("Ingame Server IP: " + ingameServer.ip + " Port: " + ingameServer.port);
-        Debug.Log("Outgame Server IP: " + outgameServer.ip + " Port: " + outgameServer.port);
-        Debug.Log("Google Auth ID: " + googleAuth.id + " Secret: " + googleAuth.secret);
     }
     private T LoadJson<T>(string path)
     {

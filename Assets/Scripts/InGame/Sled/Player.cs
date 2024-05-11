@@ -27,12 +27,7 @@ public class Player : MonoBehaviour
     private float rotate;
 
     private float currentRotate;
-    [SerializeField] private bool isMe = false;
-    public bool IsMe
-    {
-        get { return isMe; }
-        set { isMe = value; }
-    }
+    public bool isMe { get; private set; } = false;
     [SerializeField] private bool isBraking = false;
     public bool IsBraking
     {
@@ -95,6 +90,8 @@ public class Player : MonoBehaviour
         RaycastHit hitData = AdJustBottom();
         if (isMove)
             ApplyPhysics(hitData);
+        if (!isMe)
+            Polation();
     }
 
     private void GetVerticalSpeed()
@@ -149,8 +146,6 @@ public class Player : MonoBehaviour
         sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
         isMove = false;
         isDrifting = false;
-        if (!IsMe)
-            Polation();
     }
     public void Steer(int direction, float amount)
     {
@@ -215,7 +210,7 @@ public class Player : MonoBehaviour
     // 내 플레이어와 다른 플레이어 객체 초기화
     public void Initialize(bool _isMe, int _playerId, string _nickName)
     {
-        IsMe = _isMe;
+        isMe = _isMe;
         this.playerId = _playerId;
         this.nickName = _nickName;
 
@@ -228,8 +223,16 @@ public class Player : MonoBehaviour
         RankManager.instance.AddRankInfo(GetComponent<Player>());
         InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
 
-        if (IsMe)
+        if (isMe)
+        {
+            Debug.Log(isMe);
+            Debug.Log(CinemachineCore.Instance.GetActiveBrain(0));
+            Debug.Log(CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera);
+            Debug.Log(sled.transform);
+            Debug.Log(sled.transform.position);
+            Debug.Log(CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow);
             CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
+        }
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
@@ -267,7 +270,7 @@ public class Player : MonoBehaviour
     }
     public SyncMessage GetSyncData()
     {
-        return new SyncMessage(playerId, GetPosition(), GetVelocity(), GetRotation(), 0);
+        return new SyncMessage(playerId, GetPosition(), GetVelocity(), GetRotation(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
     public void SetDrift(bool isDrift)

@@ -113,10 +113,10 @@ public class ServerManager : MonoBehaviour
         Client.Close();
     }
     // 서버로 데이터 전송
-    public async Task SendDataToInGame<T>(T msg)
+    public void SendDataToInGame<T>(T msg)
     {
         var byteArray = DataParser.DataToJsonData<T>(msg);
-        await Stream.WriteAsync(byteArray, 0, byteArray.Length);
+        Stream.WriteAsync(byteArray, 0, byteArray.Length);
     }
 #endregion
 }

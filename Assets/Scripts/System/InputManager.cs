@@ -34,7 +34,7 @@ public class InputManager : MonoBehaviour
             WorldManager.instance.OnSend(Protocol.Type.GameStart);
     }
 
-    private async void KeyInput()
+    private void KeyInput()
     {
         if (Input.GetKey(KeyCode.R))
             WorldManager.instance.OnSend(Protocol.Type.ResetServer);
@@ -43,7 +43,7 @@ public class InputManager : MonoBehaviour
         if  (Input.GetKey(KeyCode.G))
             WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
         
-        if (WorldManager.instance.IsRaceFinish)
+        if (WorldManager.instance.isRaceFinish)
             return;
         
         float h = Input.GetAxis(HORIZONTAL);
@@ -53,14 +53,14 @@ public class InputManager : MonoBehaviour
         if (h == 0 && v == 0)
             return;
         
-        int id = WorldManager.instance.MyPlayerId;
+        int id = WorldManager.instance.myPlayerId;
         Vector2 acceleration = new Vector2(h, v);
         acceleration = Vector3.Normalize(acceleration);
 
         WorldManager.instance.GetMyPlayer().SetDrift(drifting);
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
         KeyMessage msg = new KeyMessage(id, acceleration);
-        await ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
+        ServerManager.Instance().SendDataToInGame<KeyMessage>(msg);
     }
 #endregion
 
