@@ -128,7 +128,7 @@ public class WorldManager : MonoBehaviour
                 Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
                 return;
             }
-            if (msg.type != Protocol.Type.Key && msg.type != Protocol.Type.Sync)
+            if (msg.type != Protocol.Type.Sync)
             {
                 Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
                 LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
@@ -155,13 +155,7 @@ public class WorldManager : MonoBehaviour
                     break;
 
                 case Protocol.Type.GameEnd:
-                    KeyMessage endMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                    ReceiveGameEndEvent(endMessage);
-                    break;
-
-                case Protocol.Type.Key:
-                    KeyMessage keyMessage = DataParser.ReadJsonData<KeyMessage>(data);
-                    // ReceiveKeyEvent(keyMessage);
+                    ReceiveGameEndEvent(msg);
                     break;
                 
                 case Protocol.Type.Sync:
@@ -184,19 +178,6 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-
-    // 키 입력 이벤트 처리
-    private async void ReceiveKeyEvent(KeyMessage keyMessage)
-    {
-        await Task.Run(() =>
-        {
-            if (players == null || !isGameStart)
-                return;
-            int id = keyMessage.from;
-            Vector2 acceleration = keyMessage.acceleration;
-            players[id].SetMoveVector(acceleration);
-        });
-    }
     private async void ReceiveSyncEvent(SyncMessage msg)
     {
         await Task.Run(() =>
@@ -265,7 +246,7 @@ public class WorldManager : MonoBehaviour
         InGameUI.instance.SetGameEndCountDown(count);        
     }
     // 게임 종료 이벤트 처리
-    private void ReceiveGameEndEvent(KeyMessage msg)
+    private void ReceiveGameEndEvent(Message msg)
     {
         int userId = msg.from;
         Debug.LogFormat("플레이어 {0}가 승리했습니다.", userId);  
@@ -284,15 +265,6 @@ public class WorldManager : MonoBehaviour
 
 #region Send 프로토콜 처리
     // 동기화 이벤트를 서버에 알림
-    private async void SendKeyEvent(KeyMessage msg)
-    {
-        await Task.Run(() =>
-        {
-            if (players == null || !isGameStart)
-                return;
-            ServerManager.Instance().SendDataToInGame(msg);
-        });
-    }
     private void SendSyncEvent()
     {
         if (players == null || !isGameStart)
@@ -392,19 +364,15 @@ public class WorldManager : MonoBehaviour
         }
     }
     // 서버로 보내는 데이터 처리 핸들러
-    public void OnSend(Protocol.Type _type, Message msg = null)
+    public void OnSend(Protocol.Type _type)
     {
-        if (_type != Protocol.Type.Sync && _type != Protocol.Type.Key)
+        if (_type != Protocol.Type.Sync)
         {
             Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
             LogManager.instance.Log("[OnSend] 메세지 타입 : " + _type.ToString());
         }
         switch (_type)
         {
-            case Protocol.Type.Key:
-                KeyMessage keyMsg = msg as KeyMessage;
-                SendKeyEvent(keyMsg);
-                break;
             case Protocol.Type.Sync:
                 SendSyncEvent();
                 break;

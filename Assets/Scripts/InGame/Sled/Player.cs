@@ -13,19 +13,16 @@ public class Player : MonoBehaviour
 #region PrivateVariables
     private bool isDrifting;
 
-    // expolation, slerp
+    // Polation
     private float timeToReachTarget = 0.05f;
-    private float movementThreshold = 0.1f;
+    private float movementThreshold = 1f;
     private float squareMovementThreshold;
     private Vector3 previousPosition;
-    private Vector3 previousVelocity;
-    private float previousRotationY;
     private long previousTimeStamp;
     private Vector3 toPosition;
     private Vector3 toVelocity;
     private float toRotationY;
     private long toTimeStamp;
-    private float extrapolationLimit = 0.5f;
 
     // 최대속도 제한, 드리프트
     private float maxSpeed = 75f;
@@ -189,7 +186,7 @@ public class Player : MonoBehaviour
     private void Polation()
     {
         float latency = (toTimeStamp - previousTimeStamp) / 1000f;
-        float lerpAmount = latency / timeToReachTarget;
+        float lerpAmount = Mathf.Clamp01(latency / timeToReachTarget);
         Vector3 fromPosition = sphere.transform.position;
 
         // Interpolation Position
@@ -206,7 +203,7 @@ public class Player : MonoBehaviour
         {
             // Debug.Log("Extrapolation");
             Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
-            sphere.transform.position = Vector3.LerpUnclamped(fromPosition, extrapolatedPosition, lerpAmount);
+            sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
         }
 
         // Interpolation Rotation
@@ -235,8 +232,6 @@ public class Player : MonoBehaviour
         sled.transform.rotation = Quaternion.Euler(0, rotation, 0);
 
         previousPosition = GetPosition();
-        previousVelocity = GetVelocity();
-        previousRotationY = GetRotationY();
         previousTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         toPosition = GetPosition();
@@ -257,8 +252,6 @@ public class Player : MonoBehaviour
     public void SetServerData(Vector3 _position, Vector3 _velocity, float _rotationY, long _timeStamp)
     {
         previousPosition = toPosition;
-        previousVelocity = toVelocity;
-        previousRotationY = toRotationY;
         previousTimeStamp = toTimeStamp;
 
         toPosition = _position;

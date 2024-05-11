@@ -10,7 +10,6 @@ public class InputManager : MonoBehaviour
 #region PrivateVariables
     private const string HORIZONTAL = "Horizontal";
     private const string VERTICAL = "Vertical";
-    private const string BRAKE = "Jump";
 #endregion
 
 #region PublicVariables
@@ -54,14 +53,11 @@ public class InputManager : MonoBehaviour
         if (h == 0 && v == 0)
             return;
         
-        // int id = WorldManager.instance.myPlayerId;
         Vector2 acceleration = new Vector2(h, v);
         acceleration = Vector3.Normalize(acceleration);
 
         WorldManager.instance.GetMyPlayer().SetDrift(drifting);
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
-        // KeyMessage msg = new KeyMessage(id, acceleration);
-        // WorldManager.instance.OnSend(Protocol.Type.Key, msg);
     }
 #endregion
 
