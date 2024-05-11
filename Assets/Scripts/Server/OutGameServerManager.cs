@@ -18,12 +18,6 @@ public class OutGameServerManager : MonoBehaviour
     private SocketIOUnity socket;
 
     [SerializeField]
-    private GameObject AuthPanel;
-    [SerializeField]
-    private GameObject LobbyPanel;
-    [SerializeField]
-    private GameObject TopBar;
-    [SerializeField]
     private TMP_InputField idInputField;
 
 #endregion
@@ -75,7 +69,7 @@ public class OutGameServerManager : MonoBehaviour
         {
             Debug.Log("Login success: " + res);
             //SceneManager.LoadScene("Topdown");
-            DefaltLoginSucc();
+            DefaultLoginSucc();
         });
 
         socket.On("loginFail", (res) =>
@@ -156,16 +150,18 @@ public class OutGameServerManager : MonoBehaviour
         socket.Emit("loginSucc", jsonData);
     }
 
-    public void DefaltLogin()
+    public void DefaultLogin()
     {
         LoginSucc(idInputField.text);
     }
 
-    public void DefaltLoginSucc()
+    public void DefaultLoginSucc()
     {
+        Debug.Log("DefaultLoginSucc Start");
         OutGameUI.instance.panels[0].SetActive(false);  // auth panel
         OutGameUI.instance.panels[1].SetActive(true);   // lobby panel
         OutGameUI.instance.topBar.SetActive(true);
+        Debug.Log("DefaultLoginSucc");
     }
 
     public void MatchMaking()
