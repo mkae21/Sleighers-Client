@@ -1,0 +1,18 @@
+Introducing a tool for generating and working with the "Characters 7" Asset Pack. This toolkit allows you to easily interact with multiple character assests, conveniently customize and easily save your characters for future use.
+
+Opening the customization tool
+Click the “Tools” button on the main menu bar to open the “Character Customization” tool.
+
+Basic settings and features
+"Enable" button allows you to turn on and off any necessary parts of the character and, when turned off, removes a slot from the saved prefab.
+"Select" button allows you to select an Asset manually.
+"Left" and "Right" buttons allow you to select an Asset.
+"Prefab Folder" choose where the final character will be saved after clicking "Save Prefab".
+"Randomize" button allows you to generate random characters with random slots and assets.
+"Last" button allows you to display the last 2 generated characters. Warning! Pressing the "Randomize" button afterwards generates new characters, but does not return the characters that were there before pressing the "Last" button.
+"Save Prefab" button saves the generated character to the specified path. 
+
+If you liked this package, please leave a review! Creativity to you!
+If you have any questions, write to us!
+
+Email -  support@ithapp.com
