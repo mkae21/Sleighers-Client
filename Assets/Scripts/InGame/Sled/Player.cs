@@ -87,9 +87,9 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        RaycastHit hitData = AdJustBottom();
         if (isMove && isMe)
         {
-            RaycastHit hitData = AdJustBottom();
             ApplyPhysics(hitData);
         }
     }
