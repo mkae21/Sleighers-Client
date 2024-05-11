@@ -1,5 +1,7 @@
 using UnityEngine;
-
+/* LookCamera.cs
+ * - 닉네임 UI가 카메라를 바라보도록 설정
+ */
 public class LookCamera : MonoBehaviour
 {
 #region PrivateVariables

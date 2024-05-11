@@ -31,17 +31,12 @@ public class Player : MonoBehaviour
     private float rotate;
 
     private float currentRotate;
-    public bool isMe { get; private set; } = false;
-    [SerializeField] private bool isBraking = false;
-    public bool IsBraking
-    {
-        get { return isBraking; }
-        set { isBraking = value; }
-    }
     private string nickName = string.Empty;
 #endregion
 
 #region PublicVariables
+    public bool isMe { get; private set; } = false;
+    public bool isBraking { get; private set;} = false;
     public int playerId { get; private set; } = -1;
     public Rigidbody sphere;
     public Transform sledModel;
@@ -249,7 +244,7 @@ public class Player : MonoBehaviour
         this.moveVector = new Vector3(0, 0, 0);
     }
 
-    public void SetServerData(Vector3 _position, Vector3 _velocity, float _rotationY, long _timeStamp)
+    public void SetSyncData(Vector3 _position, Vector3 _velocity, float _rotationY, long _timeStamp)
     {
         previousPosition = toPosition;
         previousTimeStamp = toTimeStamp;

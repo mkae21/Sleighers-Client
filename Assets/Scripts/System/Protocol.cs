@@ -37,16 +37,6 @@ namespace Protocol
             this.from = _id;
         }
     }
-
-    public class KeyMessage : Message
-    {
-        public Vector2 acceleration;    // 가속도
-        public KeyMessage(int _id, Vector2 _a) : base(Type.Key, _id)
-        {
-            this.from = _id;
-            this.acceleration = _a;
-        }
-    }
     public class SyncMessage : Message
     {
         public Vector3 position;        // 위치

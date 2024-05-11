@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Net.Sockets;
 
-/* ServeManager.cs
- * - 서버와의 통신을 관리
+/* InGameServeManager.cs
+ * - 인게임 서버와의 통신을 관리
  */
-public class ServerManager : MonoBehaviour
+public partial class ServerManager : MonoBehaviour
 {
 #region PrivateVariables
     private TcpClient client;
