@@ -15,7 +15,7 @@ public class GoogleAuth : MonoBehaviour
 #endregion
 
 #region PrivateMethod
-    public async void _GoogleOAuth()
+    public async void GoogleOAuth()
     {
         var clientId = SecretLoader.googleAuth.id;
         var clientSecret = SecretLoader.googleAuth.secret;
