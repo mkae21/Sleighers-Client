@@ -10,18 +10,18 @@ using UnityEngine.SceneManagement;
 
 public class OutGameServerManager : MonoBehaviour
 {
-    #region PrivateVariables
+#region PrivateVariables
     private string serverIP = string.Empty;
     private int serverPort = 0;
     private SocketIOUnity socket;
-    #endregion
+#endregion
 
-    #region PublicVariables
+#region PublicVariables
     public static OutGameServerManager instance = null;
-    #endregion
+#endregion
 
 
-    #region PrivateMethod
+#region PrivateMethod
     private void Awake()
     {
         if (instance != null)
@@ -34,40 +34,36 @@ public class OutGameServerManager : MonoBehaviour
         Init();
     }
 
-    void Update()
-    {
-
-    }
-
     private void Init()
     {
-        // serverIP = "localhost"; // ë¡œì»¬ í…ŒìŠ¤íŠ¸ ìš©
+        // serverIP = "localhost"; // ·ÎÄÃ Å×½ºÆ® ¿ë
         serverIP = SecretLoader.outgameServer.ip;
         serverPort = SecretLoader.outgameServer.port;
         socket = new SocketIOUnity("http://" + serverIP +":"+serverPort);
 
         socket.OnConnected += (sender, e) =>
         {
-            Debug.LogFormat("[OutGameServerManager] ì„œë²„ ì ‘ì† ì„±ê³µ {0}:{1}", serverIP, serverPort);
+            Debug.LogFormat("[OutGameServerManager] ¼­¹ö Á¢¼Ó ¼º°ø {0}:{1}", serverIP, serverPort);
         };
 
-        // ì—°ê²° í•´ì œ ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬
+        // ¿¬°á ÇØÁ¦ ÀÌº¥Æ® ÇÚµé·¯
         socket.OnDisconnected += (sender, e) =>
         {
-            Debug.LogFormat("[OutGameServerManager] ì„œë²„ ì ‘ì† í•´ì œ {0}:{1}", serverIP, serverPort);
+            Debug.LogFormat("[OutGameServerManager] ¼­¹ö Á¢¼Ó ÇØÁ¦ {0}:{1}", serverIP, serverPort);
         };
 
-        // ë¡œê·¸ì¸ ì‘ë‹µ ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬
+        // ¿¡·¯ ÀÌº¥Æ® ÇÚµé·¯
         socket.OnError += (sender, e) =>
         {
-            Debug.LogError("[OutGameServerManager] ì—ëŸ¬ : " + e);
+            Debug.LogError("[OutGameServerManager] ¿¡·¯ : " + e);
         };
 
-        // ë¡œê·¸ì¸ ì‘ë‹µ ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬
+        // ·Î±×ÀÎ ÀÀ´ä ÀÌº¥Æ® ÇÚµé·¯
         socket.On("loginSucc", (res) =>
         {
             Debug.Log("Login success: " + res);
-            //SceneManager.LoadScene("Topdown");
+            SceneManager.LoadScene("Topdown");
+            Debug.Log("¾ß ºñ ´çÀå ±×ÃÄ ¶Ò!");
         });
 
         socket.On("loginFail", (res) =>
@@ -75,7 +71,7 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log("Login fail: " + res);
         });
 
-        // íšŒì›ê°€ì… ì‘ë‹µ ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬
+        // È¸¿ø°¡ÀÔ ÀÀ´ä ÀÌº¥Æ® ÇÚµé·¯
         socket.On("signupSucc", (res) =>
         {
             Debug.Log("Signup success: " + res);
@@ -90,7 +86,7 @@ public class OutGameServerManager : MonoBehaviour
         {
             Debug.Log("inquiryPlayer: " + res);
             string jsonString = res.GetValue<string>();
-            userInfo userInfo = JsonUtility.FromJson<userInfo>(jsonString);
+            UserInfo userInfo = JsonUtility.FromJson<UserInfo>(jsonString);
             Debug.Log("inquiryPlayer: " + userInfo);
             Debug.Log("inquiryPlayer: " + userInfo.name);
             Debug.Log("inquiryPlayer: " + userInfo.cart);
@@ -112,18 +108,18 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log(res);
         });
 
-        // ì„œë²„ ì—°ê²°
+        // ¼­¹ö ¿¬°á
         socket.Connect();
 
     }
-    #endregion
+#endregion
 
-    #region PublicMethod
+#region PublicMethod
     public static OutGameServerManager Instance()
     {
         if (instance == null)
         {
-            Debug.LogError("[OutGameServerManager] ì¸ìŠ¤í„´ìŠ¤ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
+            Debug.LogError("[OutGameServerManager] ÀÎ½ºÅÏ½º°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.");
             return null;
         }
 
@@ -132,11 +128,11 @@ public class OutGameServerManager : MonoBehaviour
 
     public void LoginSucc(string email)
     {
-        packet sendPacket = new packet();
+        Packet sendPacket = new Packet();
         sendPacket.email = email;
-        Debug.Log("ë³´ë‚¸ë‹¤."+sendPacket);
+        Debug.Log("º¸³½´Ù."+sendPacket);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("loginSucc", jsonData);
     }
-    #endregion
+#endregion
 }
