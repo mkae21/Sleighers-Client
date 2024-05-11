@@ -12,7 +12,8 @@ public class OutGameUI : MonoBehaviour
     [Space(10), Header("===== Setting =====")]
     public Toggle soundToggle;
     public Slider volumeSlider;
-
+    [Space(10), Header("===== Bar =====")]
+    public GameObject topBar;
     [Space(10), Header("===== Store =====")]
     public GameObject storePanel;
     public GameObject[] sledList;
