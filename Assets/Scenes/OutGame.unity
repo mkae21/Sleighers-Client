@@ -2428,7 +2428,7 @@ Transform:
   m_GameObject: {fileID: 169067629}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.041, y: 1.168, z: -9.345}
+  m_LocalPosition: {x: 0.041, y: -100, z: -9.345}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3278,7 +3278,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1891215497}
         m_TargetAssemblyTypeName: OutGameUI, Assembly-CSharp
         m_MethodName: ClosePanels
         m_Mode: 1
@@ -3306,6 +3306,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1113373758}
+        m_TargetAssemblyTypeName: OutGameServerManager, Assembly-CSharp
+        m_MethodName: MatchMaking
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3808,7 +3820,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 977507946}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -4145,7 +4157,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1891215497}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -10524,7 +10536,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1891215497}
         m_TargetAssemblyTypeName: OutGameUI, Assembly-CSharp
         m_MethodName: LoadInGame
         m_Mode: 1
@@ -17116,7 +17128,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1891215497}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -18624,7 +18636,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1891215497}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -31655,7 +31667,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1891215497}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -32284,24 +32296,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panels:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  soundToggle: {fileID: 0}
-  volumeSlider: {fileID: 0}
-  topBar: {fileID: 0}
-  storePanel: {fileID: 0}
+  - {fileID: 2072592679}
+  - {fileID: 1161987804}
+  - {fileID: 1025012366}
+  - {fileID: 172996338}
+  - {fileID: 406879826}
+  - {fileID: 1652357913}
+  - {fileID: 1898024901}
+  soundToggle: {fileID: 870550506}
+  volumeSlider: {fileID: 1109577905}
+  topBar: {fileID: 1180568477}
+  storePanel: {fileID: 1025012366}
   sledList:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 356004450}
+  - {fileID: 1062049625}
+  - {fileID: 472201711}
+  - {fileID: 1794392351}
   sledListCnt: 4
-  waitingRoomPanel: {fileID: 0}
+  waitingRoomPanel: {fileID: 1898024901}
   waitingRoomStartBtn: {fileID: 0}
 --- !u!4 &1891215498
 Transform:
@@ -35988,12 +36000,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1891215497}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1891215497}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
