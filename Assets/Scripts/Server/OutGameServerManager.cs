@@ -86,7 +86,7 @@ public class OutGameServerManager : MonoBehaviour
         {
             Debug.Log("inquiryPlayer: " + res);
             string jsonString = res.GetValue<string>();
-            userInfo userInfo = JsonUtility.FromJson<userInfo>(jsonString);
+            UserInfo userInfo = JsonUtility.FromJson<UserInfo>(jsonString);
             Debug.Log("inquiryPlayer: " + userInfo);
             Debug.Log("inquiryPlayer: " + userInfo.name);
             Debug.Log("inquiryPlayer: " + userInfo.cart);
@@ -128,7 +128,7 @@ public class OutGameServerManager : MonoBehaviour
 
     public void LoginSucc(string email)
     {
-        packet sendPacket = new packet();
+        Packet sendPacket = new Packet();
         sendPacket.email = email;
         Debug.Log("º¸³½´Ù."+sendPacket);
         string jsonData = JsonUtility.ToJson(sendPacket);
