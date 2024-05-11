@@ -90,7 +90,7 @@ public class Player : MonoBehaviour
         RaycastHit hitData = AdJustBottom();
         if (isMove)
             ApplyPhysics(hitData);
-        if (!isMe)
+        if (!isMe && WorldManager.instance.isGameStart)
             Polation();
     }
 
@@ -181,6 +181,10 @@ public class Player : MonoBehaviour
             sphere.velocity = sphere.velocity.normalized * maxSpeed;
         }
     }
+    private void SetCamera()
+    {
+        CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
+    }
     // 위치/회전 보간 및 외삽
     private void Polation()
     {
@@ -220,19 +224,16 @@ public class Player : MonoBehaviour
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
         nameObject.transform.position = GetNameUIPos();
 
+        lastServerPosition = GetPosition();
+        lastServerVelocity = GetVelocity();
+        lastServerRotationY = GetRotationY();
+        lastServerTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
         RankManager.instance.AddRankInfo(GetComponent<Player>());
         InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
 
         if (isMe)
-        {
-            Debug.Log(isMe);
-            Debug.Log(CinemachineCore.Instance.GetActiveBrain(0));
-            Debug.Log(CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera);
-            Debug.Log(sled.transform);
-            Debug.Log(sled.transform.position);
-            Debug.Log(CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow);
-            CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
-        }
+            Invoke("SetCamera", 0.5f);
 
         this.isMove = false;
         this.moveVector = new Vector3(0, 0, 0);
@@ -264,13 +265,13 @@ public class Player : MonoBehaviour
     {
         return sphere.velocity;
     }
-    public float GetRotation()
+    public float GetRotationY()
     {
         return sled.transform.rotation.eulerAngles.y;
     }
     public SyncMessage GetSyncData()
     {
-        return new SyncMessage(playerId, GetPosition(), GetVelocity(), GetRotation(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        return new SyncMessage(playerId, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
     public void SetDrift(bool isDrift)

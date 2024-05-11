@@ -271,34 +271,32 @@ public class WorldManager : MonoBehaviour
 
 #region Send 프로토콜 처리
     // 동기화 이벤트를 서버에 알림
-    private void SendSyncEvent()
+    private async Task SendSyncEvent()
     {
         if (players == null || !isGameStart)
             return;
         SyncMessage msg = GetMyPlayer().GetSyncData();
-        // Debug.LogFormat("{0} / {1} / {2} / {3}", msg.position, msg.velocity, msg.rotation, msg.timeStamp);
-        ServerManager.Instance().SendDataToInGame(msg);
+        await ServerManager.Instance().SendDataToInGame(msg);
     }
     // 게임 시작 이벤트를 서버에 알림
-    private void SendGameStartEvent()
+    private async Task SendGameStartEvent()
     {
         if (isGameStart)
             return;
-        isGameStart = true;
         Message msg = new Message(Protocol.Type.GameStart, myPlayerId);
-        ServerManager.Instance().SendDataToInGame(msg);
+        await ServerManager.Instance().SendDataToInGame(msg);
     }
     // 내 플레이어가 골인했음을 서버에 알림
-    private void SendPlayerGoalEvent()
+    private async Task SendPlayerGoalEvent()
     {
         Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId);
-        ServerManager.Instance().SendDataToInGame(msg);
+        await ServerManager.Instance().SendDataToInGame(msg);
     }
     // 임시 서버 리셋
-    private void SendResetServerEvent()
+    private async Task SendResetServerEvent()
     {
         Message msg = new Message(Protocol.Type.ResetServer, myPlayerId);
-        ServerManager.Instance().SendDataToInGame(msg);
+        await ServerManager.Instance().SendDataToInGame(msg);
     }
     private int ReadBytes(byte[] buffer, int offset, int count, int timeoutCounts)
     {
@@ -363,7 +361,7 @@ public class WorldManager : MonoBehaviour
         }
     }
     // 서버로 보내는 데이터 처리 핸들러
-    public void OnSend(Protocol.Type _type)
+    public async void OnSend(Protocol.Type _type)
     {
         Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
         if (_type != Protocol.Type.Sync)
@@ -371,19 +369,19 @@ public class WorldManager : MonoBehaviour
         switch (_type)
         {
             case Protocol.Type.Sync:
-                SendSyncEvent();
+                await SendSyncEvent();
                 break;
 
             case Protocol.Type.GameStart:
-                SendGameStartEvent();
+                await SendGameStartEvent();
                 break;
 
             case Protocol.Type.PlayerGoal:
-                SendPlayerGoalEvent();
+                await SendPlayerGoalEvent();
                 break;
 
             case Protocol.Type.ResetServer:
-                SendResetServerEvent();
+                await SendResetServerEvent();
                 break;
 
             default:
@@ -408,9 +406,9 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerId].GetVelocity();
     }
-    public float GetMyPlayerRotation()
+    public float GetMyPlayerRotationY()
     {
-        return players[myPlayerId].GetRotation();
+        return players[myPlayerId].GetRotationY();
     }
     public Player GetPlayerFromId(int _id)
     {
