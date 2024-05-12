@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class OutGameUI : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class OutGameUI : MonoBehaviour
     [Space(10), Header("===== Setting =====")]
     public Toggle soundToggle;
     public Slider volumeSlider;
+    public TMP_InputField settingNameField;
     [Space(10), Header("===== Bar =====")]
     public GameObject topBar;
     [Space(10), Header("===== Store =====")]

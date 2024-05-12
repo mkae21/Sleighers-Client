@@ -83,11 +83,21 @@ public class OutGameServerManager : MonoBehaviour
             UserData.instance.nickName = userInfo.name;
             UserData.instance.cart = userInfo.cart;
             UserData.instance.email = userInfo.email;
-            Debug.Log("inquiryPlayer: " + userInfo);
             Debug.Log("inquiryPlayer: " + userInfo.name);
             Debug.Log("inquiryPlayer: " + userInfo.cart);
             Debug.Log("inquiryPlayer: " + userInfo.email);
         });
+
+        socket.On("setNameSucc", (res) =>
+        {
+            Debug.Log(res);
+        });
+
+        socket.On("setNameFail", (res) =>
+        {
+            Debug.Log(res);
+        });
+
 
         socket.On("enterRoomFail", (res) =>
         {
@@ -139,5 +149,17 @@ public class OutGameServerManager : MonoBehaviour
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
     }
+
+    public void SetName()
+    {
+        SetNameInfo sendPacket = new SetNameInfo();
+        sendPacket.id = UserData.instance.id;
+        sendPacket.name = OutGameUI.instance.settingNameField.text;
+        OutGameUI.instance.settingNameField.text = "";
+        Debug.Log("setName 보낸다." + sendPacket);
+        string jsonData = JsonUtility.ToJson(sendPacket);
+        socket.Emit("setName", jsonData);
+    }
+
 #endregion
 }
