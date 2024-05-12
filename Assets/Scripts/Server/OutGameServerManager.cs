@@ -1,12 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
-using System.Net.Sockets;
-using System.Collections;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
-using System.IO;
-using UnityEditor.PackageManager;
-using SocketIOClient;
 using UnityEngine.SceneManagement;
 using TMPro;
 
@@ -42,29 +34,29 @@ public class OutGameServerManager : MonoBehaviour
 
     private void Init()
     {
-        // serverIP = "localhost"; // ë¡œì»¬ í…ŒìŠ¤íŠ¸ ìš©
+        // serverIP = "localhost"; // ë¡œì»¬ ?…Œ?Š¤?Š¸ ?š©
         serverIP = SecretLoader.outgameServer.ip;
         serverPort = SecretLoader.outgameServer.port;
         socket = new SocketIOUnity("http://" + serverIP +":"+serverPort);
 
         socket.OnConnected += (sender, e) =>
         {
-            Debug.LogFormat("[OutGameServerManager] ì„œë²„ ì ‘ì† ì„±ê³µ {0}:{1}", serverIP, serverPort);
+            Debug.LogFormat("[OutGameServerManager] ?„œë²? ? ‘?† ?„±ê³? {0}:{1}", serverIP, serverPort);
         };
 
-        // ì—°ê²° í•´ì œ ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬
+        // ?—°ê²? ?•´? œ ?´ë²¤íŠ¸ ?•¸?“¤?Ÿ¬
         socket.OnDisconnected += (sender, e) =>
         {
-            Debug.LogFormat("[OutGameServerManager] ì„œë²„ ì ‘ì† í•´ì œ {0}:{1}", serverIP, serverPort);
+            Debug.LogFormat("[OutGameServerManager] ?„œë²? ? ‘?† ?•´? œ {0}:{1}", serverIP, serverPort);
         };
 
-        // ì—ëŸ¬ ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬
+        // ?—?Ÿ¬ ?´ë²¤íŠ¸ ?•¸?“¤?Ÿ¬
         socket.OnError += (sender, e) =>
         {
-            Debug.LogError("[OutGameServerManager] ì—ëŸ¬ : " + e);
+            Debug.LogError("[OutGameServerManager] ?—?Ÿ¬ : " + e);
         };
 
-        // ë¡œê·¸ì¸ ì‘ë‹µ ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬
+        // ë¡œê·¸?¸ ?‘?‹µ ?´ë²¤íŠ¸ ?•¸?“¤?Ÿ¬
         socket.On("loginSucc", (res) =>
         {
             Debug.Log("Login success: " + res);
@@ -77,7 +69,7 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log("Login fail: " + res);
         });
 
-        // íšŒì›ê°€ì… ì‘ë‹µ ì´ë²¤íŠ¸ í•¸ë“¤ëŸ¬
+        // ?šŒ?›ê°??… ?‘?‹µ ?´ë²¤íŠ¸ ?•¸?“¤?Ÿ¬
         socket.On("signupSucc", (res) =>
         {
             Debug.Log("Signup success: " + res);
@@ -97,11 +89,21 @@ public class OutGameServerManager : MonoBehaviour
             UserData.instance.nickName = userInfo.name;
             UserData.instance.cart = userInfo.cart;
             UserData.instance.email = userInfo.email;
-            Debug.Log("inquiryPlayer: " + userInfo);
             Debug.Log("inquiryPlayer: " + userInfo.name);
             Debug.Log("inquiryPlayer: " + userInfo.cart);
             Debug.Log("inquiryPlayer: " + userInfo.email);
         });
+
+        socket.On("setNameSucc", (res) =>
+        {
+            Debug.Log(res);
+        });
+
+        socket.On("setNameFail", (res) =>
+        {
+            Debug.Log(res);
+        });
+
 
         socket.On("enterRoomFail", (res) =>
         {
@@ -123,7 +125,7 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log(res);
         });
 
-        // ì„œë²„ ì˜¤í”ˆ
+        // ?„œë²? ?˜¤?”ˆ
         socket.Connect();
 
     }
@@ -134,7 +136,7 @@ public class OutGameServerManager : MonoBehaviour
     {
         if (instance == null)
         {
-            Debug.LogError("[OutGameServerManager] ì¸ìŠ¤í„´ìŠ¤ê°€ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
+            Debug.LogError("[OutGameServerManager] ?¸?Š¤?„´?Š¤ê°? ì¡´ì¬?•˜ì§? ?•Š?Šµ?‹ˆ?‹¤.");
             return null;
         }
 
@@ -145,7 +147,7 @@ public class OutGameServerManager : MonoBehaviour
     {
         LoginInfo sendPacket = new LoginInfo();
         sendPacket.email = email;
-        Debug.Log("ë³´ë‚¸ë‹¤."+sendPacket);
+        Debug.Log("ë³´ë‚¸?‹¤."+sendPacket);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("loginSucc", jsonData);
     }
@@ -168,9 +170,21 @@ public class OutGameServerManager : MonoBehaviour
     {
         Packet sendPacket = new Packet();
         sendPacket.id = UserData.instance.id;
-        Debug.Log("matchmaking id ë³´ë‚¸ë‹¤."+sendPacket.id);
+        Debug.Log("matchmaking id ë³´ë‚¸?‹¤."+sendPacket.id);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
     }
+
+    public void SetName()
+    {
+        SetNameInfo sendPacket = new SetNameInfo();
+        sendPacket.id = UserData.instance.id;
+        sendPacket.name = OutGameUI.instance.settingNameField.text;
+        OutGameUI.instance.settingNameField.text = "";
+        Debug.Log("setName ë³´ë‚¸?‹¤." + sendPacket);
+        string jsonData = JsonUtility.ToJson(sendPacket);
+        socket.Emit("setName", jsonData);
+    }
+
 #endregion
 }

@@ -22,6 +22,11 @@ public class Packet
     public string id;
 }
 
+public class SetNameInfo : Packet
+{
+    public string name;
+}
+
 public class MatchInfo : Packet
 {
     public string name;
