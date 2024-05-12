@@ -1,11 +1,4 @@
 using UnityEngine;
-using System.Net.Sockets;
-using System.Collections;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
-using System.IO;
-using UnityEditor.PackageManager;
-using SocketIOClient;
 using UnityEngine.SceneManagement;
 
 public class OutGameServerManager : MonoBehaviour
@@ -63,7 +56,6 @@ public class OutGameServerManager : MonoBehaviour
         {
             Debug.Log("Login success: " + res);
             SceneManager.LoadScene("Topdown");
-            Debug.Log("야 비 당장 그쳐 뚝!");
         });
 
         socket.On("loginFail", (res) =>

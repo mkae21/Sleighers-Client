@@ -5,7 +5,6 @@ using UnityEngine.Events;
 using Protocol;
 using System.Threading.Tasks;
 using System;
-using System.Runtime.CompilerServices;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
@@ -189,7 +188,7 @@ public class WorldManager : MonoBehaviour
             Vector3 velocity = msg.velocity;
             float rotation = msg.rotation;
             long timeStamp = msg.timeStamp;
-            players[id].SetServerData(position, velocity, rotation, timeStamp);
+            players[id].SetSyncData(position, velocity, rotation, timeStamp);
         });
     }
     // 다른 플레이어 접속 이벤트 처리
