@@ -32,6 +32,8 @@ public class Player : MonoBehaviour
 
     private float currentRotate;
     private string nickName = string.Empty;
+
+    private Animator animator;
 #endregion
 
 #region PublicVariables
@@ -41,6 +43,7 @@ public class Player : MonoBehaviour
     public Rigidbody sphere;
     public Transform sledModel;
     public Transform sled;
+    public Transform playerModel;
 
     [Header("Parameters")]
     public float acceleration = 50f;
@@ -59,6 +62,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
+        animator = playerModel.GetComponent<Animator>();
     }
     private void Start()
     {
@@ -75,6 +79,7 @@ public class Player : MonoBehaviour
         GetVerticalSpeed();
         CuerrentValue();
         CheckVelocity();
+        SetAnimation();
     }
 
     private void FixedUpdate()
@@ -146,6 +151,7 @@ public class Player : MonoBehaviour
     private void SledPosition()
     {
         sled.transform.position = sphere.transform.position - new Vector3(0, 1.2f, 0);
+        playerModel.transform.position = sphere.transform.position - new Vector3(0, 0.5f, 0);
     }
     private RaycastHit AdJustBottom()
     {
@@ -154,6 +160,9 @@ public class Player : MonoBehaviour
         Physics.Raycast(sled.position + (sled.up * .5f), Vector3.down, out hitNear, 2.0f);
         sledModel.up = Vector3.Lerp(sledModel.up, hitNear.normal, Time.deltaTime * 8.0f);
         sledModel.Rotate(0, sled.eulerAngles.y, 0);
+        
+        playerModel.up = Vector3.Lerp(playerModel.up, hitNear.normal, Time.deltaTime * 8.0f);
+        playerModel.Rotate(0, sled.eulerAngles.y, 0);
 
         return hitNear;
     }
@@ -204,6 +213,17 @@ public class Player : MonoBehaviour
         // Interpolation Rotation
         float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.75f);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
+    }
+    private void SetAnimation()
+    {
+        if(WorldManager.instance.isGameStart)
+        {
+            animator.SetBool("isMove",true);
+        }
+        else
+        {
+            animator.SetBool("isMove",false);
+        }
     }
 #endregion
 
