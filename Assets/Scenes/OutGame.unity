@@ -18276,7 +18276,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -18302,7 +18302,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1113373758}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -18341,7 +18341,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: GoogleOAuth
+      value: DefaultLogin
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -18361,7 +18361,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: GoogleAuth, Assembly-CSharp
+      value: OutGameServerManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -18381,7 +18381,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -32322,6 +32322,7 @@ MonoBehaviour:
   - {fileID: 1898024901}
   soundToggle: {fileID: 870550506}
   volumeSlider: {fileID: 1109577905}
+  idField: {fileID: 729808195}
   settingNameField: {fileID: 1543634049}
   topBar: {fileID: 1180568477}
   storePanel: {fileID: 1025012366}
