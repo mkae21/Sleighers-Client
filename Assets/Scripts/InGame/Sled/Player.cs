@@ -40,6 +40,7 @@ public class Player : MonoBehaviour
     public bool isMe { get; private set; } = false;
     public bool isBraking { get; private set;} = false;
     public int playerId { get; private set; } = -1;
+    public Vector3 respawnPosition = Vector3.zero;
     public Rigidbody sphere;
     public Transform sledModel;
     public Transform sled;
@@ -332,6 +333,14 @@ public class Player : MonoBehaviour
     public float NormalizedForwardSpeed
     {
         get => (Mathf.Abs(ForwardSpeed) > 0.1f) ? Mathf.Abs(ForwardSpeed) * 5 / maxSpeed : 0.0f;
+    }
+    public void Respawn()
+    {
+        sphere.velocity = Vector3.zero;
+        sphere.angularVelocity = Vector3.zero;
+        sphere.transform.position = respawnPosition;
+        sphere.transform.rotation = Quaternion.identity;
+        // TODO: 서버로 리스폰 패킷 전송
     }
 #endregion
 }
