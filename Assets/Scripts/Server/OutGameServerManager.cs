@@ -120,10 +120,6 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log(res);
         });
 
-        socket.On("enterRoomSucc", (res) =>
-        {
-            Debug.Log(res);
-        });
 
         // ?„œë²? ?˜¤?”ˆ
         socket.Connect();
