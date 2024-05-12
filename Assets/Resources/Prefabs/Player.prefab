@@ -165,6 +165,7 @@ MonoBehaviour:
   sledModel: {fileID: 9148137571823036153}
   sled: {fileID: 2172718939356495318}
   playerModel: {fileID: 7876792525106887487}
+  animator: {fileID: 4300886813352878405}
   acceleration: 100
   steering: 20
   gravity: 33
@@ -385,6 +386,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Basic_Character
       objectReference: {fileID: 0}
+    - target: {fileID: 5535401800020567768, guid: e9819275c8d49ee459bde6b77b4649d5,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6040122126249981372, guid: e9819275c8d49ee459bde6b77b4649d5,
         type: 3}
       propertyPath: m_LocalRotation.w
@@ -510,6 +516,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e9819275c8d49ee459bde6b77b4649d5, type: 3}
+--- !u!95 &4300886813352878405 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 1259405786501948952, guid: e9819275c8d49ee459bde6b77b4649d5,
+    type: 3}
+  m_PrefabInstance: {fileID: 3086548109175179101}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7876792525106887487 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5159544313112755298, guid: e9819275c8d49ee459bde6b77b4649d5,

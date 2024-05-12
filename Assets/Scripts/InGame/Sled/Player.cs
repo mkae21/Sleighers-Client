@@ -33,7 +33,6 @@ public class Player : MonoBehaviour
     private float currentRotate;
     private string nickName = string.Empty;
 
-    private Animator animator;
 #endregion
 
 #region PublicVariables
@@ -44,6 +43,7 @@ public class Player : MonoBehaviour
     public Transform sledModel;
     public Transform sled;
     public Transform playerModel;
+    public Animator animator;
 
     [Header("Parameters")]
     public float acceleration = 50f;
@@ -79,7 +79,6 @@ public class Player : MonoBehaviour
         GetVerticalSpeed();
         CuerrentValue();
         CheckVelocity();
-        SetAnimation();
     }
 
     private void FixedUpdate()
@@ -143,6 +142,7 @@ public class Player : MonoBehaviour
         sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
         isMove = false;
         isDrifting = false;
+        animator.SetBool("isMove", false);
     }
     public void Steer(int direction, float amount)
     {
@@ -186,12 +186,32 @@ public class Player : MonoBehaviour
     {
         CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
     }
+
+    private bool IsMoving(Vector3 fromPosition, Vector3 toPosition)
+    {   
+        //일정 거리 이상 움직였는지 여부를 판단한다.
+        float movementThreshold = 0.1f; //움직임 여부를 판단하는 임계값
+        return Vector3.Distance(fromPosition, toPosition) > movementThreshold;
+    }
+
     // ExtraPolation, InterPolation
     private void Polation()
     {
         float latency = (toTimeStamp - previousTimeStamp) / 1000f;
         float lerpAmount = Mathf.Clamp01(latency / timeToReachTarget);
         Vector3 fromPosition = sphere.transform.position;
+
+        //플레이어가 움직였는지 확인
+        isMove = IsMoving(fromPosition, toPosition);
+
+        if(isMove)
+        {     
+            animator.SetBool("isMove", true);
+        }
+        else
+        {
+            animator.SetBool("isMove", false);
+        }
 
         // Interpolation Position
         if ((toPosition - previousPosition).sqrMagnitude < squareMovementThreshold)
@@ -208,22 +228,11 @@ public class Player : MonoBehaviour
             // Debug.Log("Extrapolation");
             Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
             sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
-        }
-
+        }  
+          
         // Interpolation Rotation
         float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.75f);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
-    }
-    private void SetAnimation()
-    {
-        if(WorldManager.instance.isGameStart)
-        {
-            animator.SetBool("isMove",true);
-        }
-        else
-        {
-            animator.SetBool("isMove",false);
-        }
     }
 #endregion
 
@@ -282,7 +291,10 @@ public class Player : MonoBehaviour
         if (vector == Vector2.zero)
             isMove = false;
         else
+        {
             isMove = true;
+            animator.SetBool("isMove",true);
+        }
     }
 
     public Vector3 GetPosition()
