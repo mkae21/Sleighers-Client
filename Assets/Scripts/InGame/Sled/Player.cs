@@ -32,6 +32,7 @@ public class Player : MonoBehaviour
 
     private float currentRotate;
     private string nickName = string.Empty;
+    private Animator animator;
 
 #endregion
 
@@ -43,7 +44,6 @@ public class Player : MonoBehaviour
     public Transform sledModel;
     public Transform sled;
     public Transform playerModel;
-    public Animator animator;
 
     [Header("Parameters")]
     public float acceleration = 50f;
