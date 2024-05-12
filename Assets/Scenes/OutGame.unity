@@ -26719,7 +26719,7 @@ MonoBehaviour:
   m_CaretWidth: 1
   m_ReadOnly: 0
   m_RichText: 1
-  m_GlobalFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_GlobalFontAsset: {fileID: 11400000, guid: 94dde5f9d6cb96641b07278bcec486b7, type: 2}
   m_OnFocusSelectAll: 1
   m_ResetOnDeActivation: 1
   m_RestoreOriginalTextOnEscape: 1
@@ -32310,6 +32310,7 @@ MonoBehaviour:
   - {fileID: 1898024901}
   soundToggle: {fileID: 870550506}
   volumeSlider: {fileID: 1109577905}
+  settingNameField: {fileID: 1543634049}
   topBar: {fileID: 1180568477}
   storePanel: {fileID: 1025012366}
   sledList:
