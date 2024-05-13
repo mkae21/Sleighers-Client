@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -32312,6 +32312,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a97ae29f176c2d84eab3f88383802db0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  matchMakingBtnText: {fileID: 0}
+  loadingObject: {fileID: 0}
   panels:
   - {fileID: 2072592679}
   - {fileID: 1161987804}
@@ -32331,8 +32333,7 @@ MonoBehaviour:
   - {fileID: 472201711}
   - {fileID: 1794392351}
   sledListCnt: 4
-  waitingRoomPanel: {fileID: 1898024901}
-  waitingRoomStartBtn: {fileID: 0}
+  matchingListPanel: {fileID: 0}
 --- !u!4 &1891215498
 Transform:
   m_ObjectHideFlags: 0
