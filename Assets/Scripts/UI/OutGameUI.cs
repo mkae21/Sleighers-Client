@@ -12,9 +12,14 @@ public class OutGameUI : MonoBehaviour
     public GameObject loadingObject;
     [Space(10), Header("===== Panels =====")]
     public GameObject[] panels;
+    [Space(10), Header("===== Button =====")]
+    public Button loginBtn;
     [Space(10), Header("===== Setting =====")]
     public Toggle soundToggle;
     public Slider volumeSlider;
+    public TMP_Text setNameText;
+    [Space(10), Header("===== TextField =====")]
+    public TMP_InputField idField;
     public TMP_InputField settingNameField;
     [Space(10), Header("===== Bar =====")]
     public GameObject topBar;
@@ -31,6 +36,7 @@ public class OutGameUI : MonoBehaviour
     private void Start()
     {
         instance = this;
+        loginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
     }
 #endregion
 
@@ -47,6 +53,14 @@ public class OutGameUI : MonoBehaviour
             AudioListener.volume = 0;
             soundToggle.isOn = false;
         }
+    }
+
+
+    public void SuccLoginPanel()
+    {
+        panels[0].SetActive(false);  // auth panel
+        panels[1].SetActive(true);   // lobby panel
+        topBar.SetActive(true);
     }
 
     public void VolumeSlider()
