@@ -47,9 +47,6 @@ public class InputManager : MonoBehaviour
         float h = Input.GetAxis(HORIZONTAL);
         float v = Input.GetAxis(VERTICAL);
         bool drifting = Input.GetKey(KeyCode.LeftShift);
-
-        if (h == 0 && v == 0)
-            return;
         
         Vector2 acceleration = new Vector2(h, v);
         acceleration = Vector3.Normalize(acceleration);
