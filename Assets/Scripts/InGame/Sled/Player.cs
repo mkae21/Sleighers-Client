@@ -56,6 +56,7 @@ public class Player : MonoBehaviour
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
     public MiniMapComponent miniMapComponent;
+    public int myRank = 1;
 #endregion
 
 
@@ -75,6 +76,7 @@ public class Player : MonoBehaviour
         {
             Polation();
         }
+
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -136,6 +138,7 @@ public class Player : MonoBehaviour
         {
             sphere.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
             sled.eulerAngles = Vector3.Lerp(sled.eulerAngles, new Vector3(0, sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
+            VelocityCompensate(myRank);
         }
         else
             sphere.AddForce(sledModel.forward * sphere.velocity.magnitude, ForceMode.Acceleration);
@@ -323,6 +326,24 @@ public class Player : MonoBehaviour
     {   
         // km/h로 변환
         return sphere.velocity.magnitude * 3.6f;
+    }
+    public void VelocityCompensate(int _myRank)
+    {
+        switch (_myRank)
+        {
+            case 2:
+                sphere.AddForce(sledModel.forward * 10f,ForceMode.Acceleration);
+                Debug.Log("2등 보정중");
+                break;
+            case 3:
+                sphere.AddForce(sledModel.forward * 20f,ForceMode.Acceleration);
+                Debug.Log("3등 보정중");
+                break;
+            case 4:
+                sphere.AddForce(sledModel.forward * 30f,ForceMode.Acceleration);
+                Debug.Log("4등 보정중");
+                break;
+        }
     }
 
     // 앞으로 나아가는 차량 속도의 양
