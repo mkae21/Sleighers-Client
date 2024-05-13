@@ -23,7 +23,6 @@ namespace Protocol
         GameEndCountDown,       // 1등 도착 후 카운트 다운 시작
         GameEnd,                // 게임 종료
         Sync = 30,              // 게임 싱크
-        Respawn,                // 리스폰
         ResetServer = 100,      // 서버 리셋
         Receiver = 255          // 수신 전용
     }
