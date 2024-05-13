@@ -34,12 +34,14 @@ public class GameManager : MonoBehaviour
     public static event Action Garage = delegate { };       // Garage 상태에서 실행되는 함수들
     public static event Action Record = delegate { };       // Record 상태에서 실행되는 함수들
     public static event Action Friend = delegate { };       // Friend 상태에서 실행되는 함수들
+    public static event Action MatchMaking = delegate { };  // MatchMaking 상태에서 실행되는 함수들
+    public static event Action MatchReady = delegate { };   // MatchReady 상태에서 실행되는 함수들
     public static event Action MatchResult = delegate { };  // MatchResult 상태에서 실행되는 함수들
     public static event Action Ready = delegate { };        // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { };       // InGame 상태에서 실행되는 함수들
     public static event Action End = delegate { };          // End 상태에서 실행되는 함수들
     public static event Action Result = delegate { };       // Result 상태에서 실행되는 함수들
-    public enum GameState { Login, Lobby, Garage, Record, Friend, MatchResult, Ready, InGame, End, Result };
+    public enum GameState { Login, Lobby, Garage, Record, Friend, MatchMaking, MatchReady, MatchResult, Ready, InGame, End, Result };
     public SoundManager soundManager = new SoundManager();
 #endregion
 
@@ -125,6 +127,12 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Friend:
                 Friend();
+                break;
+            case GameState.MatchMaking:
+                MatchMaking();
+                break;
+            case GameState.MatchReady:
+                MatchReady();
                 break;
             case GameState.MatchResult:
                 MatchResult();

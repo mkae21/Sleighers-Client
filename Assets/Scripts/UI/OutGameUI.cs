@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,9 +13,15 @@ public class OutGameUI : MonoBehaviour
     public GameObject loadingObject;
     [Space(10), Header("===== Panels =====")]
     public GameObject[] panels;
+    [Space(10), Header("===== Button =====")]
+    public Button loginBtn;
+    public Button matchMakingBtn;
     [Space(10), Header("===== Setting =====")]
     public Toggle soundToggle;
     public Slider volumeSlider;
+    public TMP_Text setNameText;
+    [Space(10), Header("===== TextField =====")]
+    public TMP_InputField idField;
     public TMP_InputField settingNameField;
     [Space(10), Header("===== Bar =====")]
     public GameObject topBar;
@@ -31,6 +38,8 @@ public class OutGameUI : MonoBehaviour
     private void Start()
     {
         instance = this;
+        loginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
+        matchMakingBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.MatchMaking));
     }
 #endregion
 
@@ -49,6 +58,20 @@ public class OutGameUI : MonoBehaviour
         }
     }
 
+
+    public void SuccLoginPanel()
+    {
+        panels[0].SetActive(false);  // auth panel
+        panels[1].SetActive(true);   // lobby panel
+        topBar.SetActive(true);
+    }
+
+    public void MatchMakingUI()
+    {
+        matchMakingBtnText.text = "매칭 중";
+        loadingObject.SetActive(true);
+        panels[6].SetActive(true);
+    }
     public void VolumeSlider()
     {
         AudioListener.volume = volumeSlider.value;
