@@ -214,10 +214,10 @@ public class WorldManager : MonoBehaviour
         Transform sp = startingPoints[totalPlayerCount].transform;
 
         GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
         miniMapController.SetTarget(miniMapTarget);
-        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
 
         for (int i = 0; i < totalPlayerCount; i++)
