@@ -90,7 +90,6 @@ public class Player : MonoBehaviour
         if (isMove && isMe)
         {
             ApplyPhysics(hitData);
-            VelocityCompensate(myRank);
         }
     }
 
@@ -139,6 +138,7 @@ public class Player : MonoBehaviour
         {
             sphere.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
             sled.eulerAngles = Vector3.Lerp(sled.eulerAngles, new Vector3(0, sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
+            VelocityCompensate(myRank);
         }
         else
             sphere.AddForce(sledModel.forward * sphere.velocity.magnitude, ForceMode.Acceleration);
@@ -332,7 +332,7 @@ public class Player : MonoBehaviour
         switch (_myRank)
         {
             case 2:
-                sphere.AddForce(sledModel.forward * 1000f,ForceMode.Acceleration);
+                sphere.AddForce(sledModel.forward * 10f,ForceMode.Acceleration);
                 Debug.Log("2등 보정중");
                 break;
             case 3:
