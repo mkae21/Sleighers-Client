@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
 
     // Polation
     private float timeToReachTarget = 0.5f;
-    private float movementThreshold = 3f;
+    private float movementThreshold = 1f;
     private float squareMovementThreshold;
     private Vector3 previousPosition;
     private long previousTimeStamp;
