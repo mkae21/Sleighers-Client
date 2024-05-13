@@ -68,7 +68,7 @@ public class OutGameUI : MonoBehaviour
 
     public void MatchMakingUI()
     {
-        matchMakingBtnText.text = "¸ÅÄª Áß";
+        matchMakingBtnText.text = "ë§¤ì¹­ ì¤‘";
         loadingObject.SetActive(true);
     }
     public void VolumeSlider()
