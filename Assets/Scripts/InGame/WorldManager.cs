@@ -162,6 +162,10 @@ public class WorldManager : MonoBehaviour
                     ReceiveSyncEvent(syncMessage);
                     break;
 
+                case Protocol.Type.Respawn:
+                    ReceiveRespawnEvent(msg);
+                    break;
+
                 case Protocol.Type.PlayerReconnect:
                     ReceivePlayerReconnectEvent(msg);
                     break;
@@ -177,6 +181,7 @@ public class WorldManager : MonoBehaviour
         }
     }
 
+    // 동기화 이벤트 처리
     private async void ReceiveSyncEvent(SyncMessage msg)
     {
         await Task.Run(() =>
@@ -190,6 +195,14 @@ public class WorldManager : MonoBehaviour
             long timeStamp = msg.timeStamp;
             players[id].SetSyncData(position, velocity, rotation, timeStamp);
         });
+    }
+    // 리스폰 이벤트 처리
+    private void ReceiveRespawnEvent(Message msg)
+    {
+        if (players == null || !isGameStart)
+            return;
+        int id = msg.from;
+        GetPlayerFromId(id).Respawn();
     }
     // 다른 플레이어 접속 이벤트 처리
     private void ReceivePlayerReconnectEvent(Message msg)
@@ -270,6 +283,17 @@ public class WorldManager : MonoBehaviour
             return;
         SyncMessage msg = GetMyPlayer().GetSyncData();
         ServerManager.Instance().SendDataToInGame(msg);
+    }
+    // 리스폰 이벤트를 서버에 알림
+    private async void SendRespawnEvent()
+    {
+        await Task.Run(() =>
+        {
+            if (players == null || !isGameStart)
+                return;
+            Message msg = new Message(Protocol.Type.Respawn, myPlayerId);
+            ServerManager.Instance().SendDataToInGame(msg);
+        });
     }
     // 게임 시작 이벤트를 서버에 알림
     private async void SendGameStartEvent()
@@ -374,6 +398,10 @@ public class WorldManager : MonoBehaviour
         {
             case Protocol.Type.Sync:
                 SendSyncEvent();
+                break;
+
+            case Protocol.Type.Respawn:
+                SendRespawnEvent();
                 break;
 
             case Protocol.Type.GameStart:
