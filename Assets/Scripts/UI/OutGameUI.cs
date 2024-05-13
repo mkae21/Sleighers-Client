@@ -1,13 +1,15 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using TMPro;
 
 public class OutGameUI : MonoBehaviour
 {
 #region PublicVariables
     public static OutGameUI instance;
     
+    public TMP_Text matchMakingBtnText;
+    public GameObject loadingObject;
     [Space(10), Header("===== Panels =====")]
     public GameObject[] panels;
     [Space(10), Header("===== Setting =====")]
@@ -21,10 +23,8 @@ public class OutGameUI : MonoBehaviour
     public GameObject[] sledList;
     public int sledListCnt;
     
-    [Space(10), Header("===== Waiting Room =====")]
-    public GameObject waitingRoomPanel;
-    public Button waitingRoomStartBtn;
-
+    [Space(10), Header("===== Matching Room =====")]
+    public GameObject matchingListPanel;
 #endregion
 
 #region PrivateMethod
