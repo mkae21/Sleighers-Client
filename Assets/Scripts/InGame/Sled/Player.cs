@@ -75,6 +75,7 @@ public class Player : MonoBehaviour
         {
             Polation();
         }
+
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -88,6 +89,7 @@ public class Player : MonoBehaviour
         if (isMove && isMe)
         {
             ApplyPhysics(hitData);
+            VelocityCompensate();
         }
     }
 
@@ -323,6 +325,36 @@ public class Player : MonoBehaviour
     {   
         // km/h로 변환
         return sphere.velocity.magnitude * 3.6f;
+    }
+    public void VelocityCompensate()
+    {
+        var rank = RankManager.instance.GetRanking();
+        for(int i = 0 ; i < rank.Count ;i++)
+        {
+            if(rank[i].id == playerId)
+            {
+                int myRank = i + 1;
+                switch (myRank)
+                {
+                    case 2:
+                        sphere.AddForce(sledModel.forward * 0.08f,ForceMode.Impulse);
+                        Debug.Log("2등 보정중");
+                        break;
+                    case 3:
+                        sphere.AddForce(sledModel.forward * 0.16f,ForceMode.Impulse);
+                        Debug.Log("3등 보정중");
+                        break;
+                    case 4:
+                        sphere.AddForce(sledModel.forward * 0.26f,ForceMode.Impulse);
+                        Debug.Log("4등 보정중");
+                        break;
+                    case 5:
+                        sphere.AddForce(sledModel.forward * 0.36f,ForceMode.Impulse);
+                        Debug.Log("5등 보정중");
+                        break;
+                }
+            }
+        }
     }
 
     // 앞으로 나아가는 차량 속도의 양
