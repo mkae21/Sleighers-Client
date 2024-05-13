@@ -34,13 +34,17 @@ public class MiniMapComponent : MonoBehaviour {
 	MiniMapEntity mme;
 	MapObject mmo;
 
-	void OnEnable(){
+	public void Init(GameObject obj){
 		miniMapController = GameObject.Find ("CanvasMiniMap").GetComponent<MiniMapController> ();
 		mme = new MiniMapEntity ();
 		if (gameObject.GetComponent<Player>().isMe)
+		{
 			mme.icon = Resources.Load<Sprite>("Sprites/MyIndicator");
+		}
 		else
+		{
 			mme.icon = Resources.Load<Sprite>("Sprites/OtherIndicator");
+		}
 		mme.rotation = initialIconRotation;
 		mme.size = size;
 		mme.upAxis = upAxis;
@@ -48,7 +52,7 @@ public class MiniMapComponent : MonoBehaviour {
 		mme.clampInBorder = clampIconInBorder;
 		mme.clampDist = clampDistance;
 		
-		mmo = miniMapController.RegisterMapObject(GameObject.Find("Sled"), mme);
+		mmo = miniMapController.RegisterMapObject(obj, mme);
 	}
 
 	void OnDisable(){
