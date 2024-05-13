@@ -332,15 +332,15 @@ public class Player : MonoBehaviour
         switch (_myRank)
         {
             case 2:
-                sphere.AddForce(sledModel.forward * 1000f,ForceMode.Impulse);
+                sphere.AddForce(sledModel.forward * 10f,ForceMode.Acceleration);
                 Debug.Log("2등 보정중");
                 break;
             case 3:
-                sphere.AddForce(sledModel.forward * 20f,ForceMode.Impulse);
+                sphere.AddForce(sledModel.forward * 20f,ForceMode.Acceleration);
                 Debug.Log("3등 보정중");
                 break;
             case 4:
-                sphere.AddForce(sledModel.forward * 30f,ForceMode.Impulse);
+                sphere.AddForce(sledModel.forward * 30f,ForceMode.Acceleration);
                 Debug.Log("4등 보정중");
                 break;
         }
