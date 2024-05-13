@@ -24,6 +24,7 @@ public class OutGameServerManager : MonoBehaviour
     void Start()
     {
         Init();
+        GameManager.MatchMaking += MatchMaking;
     }
 
     private void Init()
@@ -54,7 +55,6 @@ public class OutGameServerManager : MonoBehaviour
         socket.On("loginSucc", (res) =>
         {
             Debug.Log("Login success: " + res);
-            SceneManager.LoadScene("Topdown");
         });
 
         socket.On("loginFail", (res) =>
@@ -147,8 +147,7 @@ public class OutGameServerManager : MonoBehaviour
         Debug.Log("matchmaking id 보낸다."+sendPacket.id);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
-        OutGameUI.instance.matchMakingBtnText.text = "매칭 중";
-        OutGameUI.instance.loadingObject.SetActive(true);
+        OutGameUI.instance.MatchMakingUI();
     }
 
     public void SetName()
