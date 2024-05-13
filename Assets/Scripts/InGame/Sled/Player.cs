@@ -249,7 +249,7 @@ public class Player : MonoBehaviour
         this.playerId = _playerId;
         this.nickName = _nickName;
 
-        miniMapComponent.enabled = true;
+        miniMapComponent.Init(sled.gameObject);
 
         nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, sledModel);
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
