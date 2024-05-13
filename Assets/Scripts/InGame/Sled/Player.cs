@@ -340,7 +340,6 @@ public class Player : MonoBehaviour
         sphere.angularVelocity = Vector3.zero;
         sphere.transform.position = respawnPosition;
         sphere.transform.rotation = Quaternion.identity;
-        // TODO: 서버로 리스폰 패킷 전송
     }
 #endregion
 }
