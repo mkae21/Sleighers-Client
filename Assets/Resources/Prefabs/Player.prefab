@@ -161,11 +161,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf119559e933854dbc4256168dde221, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  respawnPosition: {x: 0, y: 0, z: 0}
   sphere: {fileID: 8835457807169266014}
   sledModel: {fileID: 9148137571823036153}
   sled: {fileID: 2172718939356495318}
   playerModel: {fileID: 7876792525106887487}
-  animator: {fileID: 4300886813352878405}
   acceleration: 100
   steering: 20
   gravity: 33
@@ -175,6 +175,7 @@ MonoBehaviour:
   nameObject: {fileID: 6711063065380186699, guid: 288abb305934d2b4cba29bea79a9c247,
     type: 3}
   miniMapComponent: {fileID: 138193475721386800}
+  myRank: 1
 --- !u!114 &138193475721386800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,7 +183,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6599233335221535074}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dbf9db670c1df4bb2843b82560ce5409, type: 3}
   m_Name: 
@@ -516,12 +517,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e9819275c8d49ee459bde6b77b4649d5, type: 3}
---- !u!95 &4300886813352878405 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 1259405786501948952, guid: e9819275c8d49ee459bde6b77b4649d5,
-    type: 3}
-  m_PrefabInstance: {fileID: 3086548109175179101}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7876792525106887487 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5159544313112755298, guid: e9819275c8d49ee459bde6b77b4649d5,
