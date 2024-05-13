@@ -56,6 +56,7 @@ public class Player : MonoBehaviour
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
     public MiniMapComponent miniMapComponent;
+    public int myRank = 1;
 #endregion
 
 
@@ -89,7 +90,7 @@ public class Player : MonoBehaviour
         if (isMove && isMe)
         {
             ApplyPhysics(hitData);
-            VelocityCompensate();
+            VelocityCompensate(myRank);
         }
     }
 
@@ -326,34 +327,22 @@ public class Player : MonoBehaviour
         // km/h로 변환
         return sphere.velocity.magnitude * 3.6f;
     }
-    public void VelocityCompensate()
+    public void VelocityCompensate(int _myRank)
     {
-        var rank = RankManager.instance.GetRanking();
-        for(int i = 0 ; i < rank.Count ;i++)
+        switch (_myRank)
         {
-            if(rank[i].id == playerId)
-            {
-                int myRank = i + 1;
-                switch (myRank)
-                {
-                    case 2:
-                        sphere.AddForce(sledModel.forward * 0.08f,ForceMode.Impulse);
-                        Debug.Log("2등 보정중");
-                        break;
-                    case 3:
-                        sphere.AddForce(sledModel.forward * 0.16f,ForceMode.Impulse);
-                        Debug.Log("3등 보정중");
-                        break;
-                    case 4:
-                        sphere.AddForce(sledModel.forward * 0.26f,ForceMode.Impulse);
-                        Debug.Log("4등 보정중");
-                        break;
-                    case 5:
-                        sphere.AddForce(sledModel.forward * 0.36f,ForceMode.Impulse);
-                        Debug.Log("5등 보정중");
-                        break;
-                }
-            }
+            case 2:
+                sphere.AddForce(sledModel.forward * 10f,ForceMode.Impulse);
+                Debug.Log("2등 보정중");
+                break;
+            case 3:
+                sphere.AddForce(sledModel.forward * 20f,ForceMode.Impulse);
+                Debug.Log("3등 보정중");
+                break;
+            case 4:
+                sphere.AddForce(sledModel.forward * 30f,ForceMode.Impulse);
+                Debug.Log("4등 보정중");
+                break;
         }
     }
 
