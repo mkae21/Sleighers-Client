@@ -1,6 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using Protocol;
 using UnityEngine;
+using UnityEngine.Events;
 
 /* GameManager.cs
  * - 게임 전체적인 상태를 관리
@@ -27,7 +30,7 @@ public class GameManager : MonoBehaviour
  * Ready - 게임 시작 전 준비 (이때부터 인게임 씬)
  * InGame - 게임 중
  * End - 게임 종료 (피니시 라인 통과 시)
- * Result - 게임 결과
+ * Result - 게임 결과창
  */
     public static event Action Login = delegate { };        // Login 상태에서 실행되는 함수들
     public static event Action Lobby = delegate { };        // Lobby 상태에서 실행되는 함수들
@@ -40,7 +43,9 @@ public class GameManager : MonoBehaviour
     public static event Action Ready = delegate { };        // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { };       // InGame 상태에서 실행되는 함수들
     public static event Action End = delegate { };          // End 상태에서 실행되는 함수들
-    public static event Action Result = delegate { };       // Result 상태에서 실행되는 함수들
+    // InGame 상태에서 실행되는 함수들
+    public static UnityAction<List<PlayerResult>> Result;   // 게임이 끝나고 결과창을 띄울 때 실행되는 함수
+
     public enum GameState { Login, Lobby, Garage, Record, Friend, MatchMaking, MatchReady, MatchResult, Ready, InGame, End, Result };
     public SoundManager soundManager = new SoundManager();
 #endregion
@@ -107,7 +112,7 @@ public class GameManager : MonoBehaviour
         return instance;
     }
 
-    public void ChangeState(GameState state, Action<bool> func = null)
+    public void ChangeState(GameState state, Message msg = null)
     {
         gameState = state;
 
@@ -150,7 +155,8 @@ public class GameManager : MonoBehaviour
                 soundManager.StopAll();
                 break;
             case GameState.Result:
-                Result();
+                GameResultMessage gameResult = (GameResultMessage)msg;
+                Result?.Invoke(gameResult.resultList);
                 break;
             default:
                 Debug.Log("[GameManager] 알 수 없는 상태입니다.");

@@ -121,6 +121,10 @@ public class RankManager : MonoBehaviour
                 checkpoint = item.Value.checkpoint
             };
             ranking.Add(rankSort);
+            if (rankSort.id == WorldManager.instance.myPlayerId)
+            {
+                WorldManager.instance.GetMyPlayer().myRank = ranking.Count;
+            }
         }
 
         return ranking;

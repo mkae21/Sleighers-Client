@@ -154,7 +154,8 @@ public class WorldManager : MonoBehaviour
                     break;
 
                 case Protocol.Type.GameEnd:
-                    ReceiveGameEndEvent(msg);
+                    GameResultMessage gameResultMessage = DataParser.ReadJsonData<GameResultMessage>(data);
+                    ReceiveGameEndEvent(gameResultMessage);
                     break;
                 
                 case Protocol.Type.Sync:
@@ -213,10 +214,10 @@ public class WorldManager : MonoBehaviour
         Transform sp = startingPoints[totalPlayerCount].transform;
 
         GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
         miniMapController.SetTarget(miniMapTarget);
-        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
 
         for (int i = 0; i < totalPlayerCount; i++)
@@ -247,11 +248,9 @@ public class WorldManager : MonoBehaviour
         InGameUI.instance.SetGameEndCountDown(count);        
     }
     // 게임 종료 이벤트 처리
-    private void ReceiveGameEndEvent(Message msg)
+    private void ReceiveGameEndEvent(GameResultMessage msg)
     {
-        int userId = msg.from;
-        Debug.LogFormat("플레이어 {0}가 승리했습니다.", userId);  
-        GameManager.Instance().ChangeState(GameManager.GameState.End);
+        GameManager.Instance().ChangeState(GameManager.GameState.End, msg);
     }
     // 다른 플레이어 접속 끊김 이벤트 처리
     private void ReceivePlayerDisconnectEvent(Message msg)
