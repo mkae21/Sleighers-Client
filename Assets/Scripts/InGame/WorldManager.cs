@@ -200,8 +200,8 @@ public class WorldManager : MonoBehaviour
         int newId = msg.from;
         Transform sp = startingPoints[sessionInfo.totalPlayerCount];
         GameObject newInstance = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-        newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId, sp.position, sp.rotation.eulerAngles.y);
         players.Add(newId, newInstance.GetComponent<Player>());
+        newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId, sp.position, sp.rotation.eulerAngles.y);
         sessionInfo.totalPlayerCount++;
     }
     // 게임 씬 로드 이벤트 처리
@@ -225,8 +225,8 @@ public class WorldManager : MonoBehaviour
             int otherPlayerId = userList[i];
             Transform _sp = startingPoints[i].transform;
             GameObject otherPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
             players.Add(otherPlayerId, otherPlayer.GetComponent<Player>());
+            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
         }
     }
     // 게임 시작 카운트 다운 이벤트 처리
