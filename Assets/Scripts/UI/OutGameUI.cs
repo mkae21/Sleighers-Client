@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,6 +15,7 @@ public class OutGameUI : MonoBehaviour
     public GameObject[] panels;
     [Space(10), Header("===== Button =====")]
     public Button loginBtn;
+    public Button matchMakingBtn;
     [Space(10), Header("===== Setting =====")]
     public Toggle soundToggle;
     public Slider volumeSlider;
@@ -37,6 +39,7 @@ public class OutGameUI : MonoBehaviour
     {
         instance = this;
         loginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
+        matchMakingBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.MatchMaking));
     }
 #endregion
 
@@ -63,6 +66,11 @@ public class OutGameUI : MonoBehaviour
         topBar.SetActive(true);
     }
 
+    public void MatchMakingUI()
+    {
+        matchMakingBtnText.text = "¸ÅÄª Áß";
+        loadingObject.SetActive(true);
+    }
     public void VolumeSlider()
     {
         AudioListener.volume = volumeSlider.value;
