@@ -70,6 +70,7 @@ public class OutGameUI : MonoBehaviour
     {
         matchMakingBtnText.text = "매칭 중";
         loadingObject.SetActive(true);
+        panels[6].SetActive(true);
     }
     public void VolumeSlider()
     {
