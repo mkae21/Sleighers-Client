@@ -39,6 +39,7 @@ public class Finish : MonoBehaviour
             // 첫번째 체크포인트만 통과해야 함.
             if (_checkpoint == checkpoints.First())
             {
+                _player.respawnPosition = _checkpoint.transform.position;
                 checkpointInfo.SetLastCheckpoint(_checkpoint);
                 checkpointInfo.SetNextCheckpoint(GetNextCheckpoint(_checkpoint));
                 RankManager.instance.SetPlayerCheckpointCount(_player);
@@ -52,6 +53,7 @@ public class Finish : MonoBehaviour
             if (_checkpoint == checkpoints.Last())
                 checkpointInfo.canPassFinish = true;
 
+            _player.respawnPosition = _checkpoint.transform.position;
             checkpointInfo.SetLastCheckpoint(_checkpoint);
             checkpointInfo.SetNextCheckpoint(GetNextCheckpoint(_checkpoint));
             RankManager.instance.SetPlayerCheckpointCount(_player);
