@@ -74,4 +74,25 @@ namespace Protocol
             this.count = _count;
         }
     }
+    public struct PlayerResult
+    {
+        public int rank;
+        public string nickname;
+        public float time;
+        public PlayerResult(string _nickname, int _rank, float _time)
+        {
+            this.rank = _rank;
+            this.nickname = _nickname;
+            this.time = _time;
+        }
+    }
+    public class GameResultMessage : Message
+    {
+        public List<PlayerResult> resultList;
+        public GameResultMessage(int _id, List<PlayerResult> _resultList) : base(Type.Receiver, _id)
+        {
+            this.from = _id;
+            this.resultList = new List<PlayerResult>(_resultList);
+        }
+    }
 }
