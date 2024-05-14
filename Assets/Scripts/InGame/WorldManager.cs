@@ -89,7 +89,7 @@ public class WorldManager : MonoBehaviour
     private void OnLapComplete(Player _player, RankInfo _lapInfo)
     {
         // 플레이어가 레이스를 완료했나 확인
-        if (_player.isMe && _lapInfo.lap == rankManager.Laps)
+        if (_player.isMe && _lapInfo.lap == rankManager.laps)
         {
             // 아직 완료하지 못했다면 레이스를 완료
             if (!isRaceFinish)

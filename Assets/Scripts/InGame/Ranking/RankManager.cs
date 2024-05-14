@@ -5,36 +5,26 @@ using System.Linq;
 
 public struct RankInfo
 {
+    public string nickname; // 플레이어 닉네임
     public int lap;         // 완료된 랩 수
     public int checkpoint;  // 완료된 체크포인트 수
 }
-public struct RankSort // 랭킹 정렬을 위한 임시 구조체. 추후 코드 리팩토링 필요
-{
-    public int id;          // 플레이어 ID
-    public int lap;         // 완료된 랩 수
-    public int checkpoint;  // 완료된 체크포인트 수
-}
+
 public class RankManager : MonoBehaviour
 {
 #region PrivateVariables
-    [Tooltip("레이스를 완료하기 위해 통과해야 하는 랩 수")]
-    [SerializeField] private int laps;
-    public int Laps
-    { 
-        get { return this.laps; }
-        set { this.laps = value; }
-    }
     private Finish finish;
 
-    // 모든 차량의 랭킹에 관련된 정보를 포함하는 딕셔너리
-    private Dictionary<Player, RankInfo> rankInfoDictionary = new Dictionary<Player, RankInfo>();
+    // 모든 플레이어의의 랭킹에 관련된 정보를 포함하는 딕셔너리
+    private Dictionary<string, RankInfo> rankInfoDictionary;
 #endregion
 
 #region PublicVariables
+    public int previousRank = 1;    // 갱신된 랭킹에 비해 나의 이전 랭킹
     // 차량이 한 바퀴를 완료하면 액션이 호출
     public UnityAction<Player, RankInfo> OnLapComplete { get; set; }
     public static RankManager instance;
-
+    public int laps { get; set; } = 1;
 #endregion
 
 #region PrivateMethod
@@ -42,6 +32,7 @@ public class RankManager : MonoBehaviour
     {
         instance = this;
         finish = FindObjectOfType<Finish>();
+        rankInfoDictionary = new Dictionary<string, RankInfo>();
 
         if (finish != null)
             finish.OnPlayerEnter += OnPlayerEnterFinish;
@@ -53,90 +44,84 @@ public class RankManager : MonoBehaviour
     {   
         if (_player == null)
             return;
+        string nickname = _player.nickName;
         // 딕셔너리 항목이 없는 경우 새 사전 항목 만들기
-        if (!rankInfoDictionary.ContainsKey(_player))
-            rankInfoDictionary.Add(_player, new RankInfo());
+        if (!rankInfoDictionary.ContainsKey(nickname))
+            rankInfoDictionary.Add(nickname, new RankInfo());
 
         // 완료한 랩 수 증가 및 업데이트
-        RankInfo rankInfo = rankInfoDictionary[_player];
+        RankInfo rankInfo = rankInfoDictionary[nickname];
 
         rankInfo.lap = Mathf.Clamp(rankInfo.lap + 1, 0, laps);
 
-        rankInfoDictionary[_player] = rankInfo;
+        rankInfoDictionary[nickname] = rankInfo;
 
         OnLapComplete?.Invoke(_player, rankInfo);
-        InGameUI.instance.UpdateRankUI(GetRanking());
+        List<RankInfo> ranking = GetRanking();
+        InGameUI.instance.UpdateRankUI(ranking);
     }
     
 #endregion
 
 #region PublicMethod
-    public void AddRankInfo(Player _player)
+    // 플레이어의 랭킹 정보를 가져오거나 추가
+    public RankInfo AddOrGetRankInfo(Player _player)
     {
-        if (!rankInfoDictionary.ContainsKey(_player))
+        string nickname = _player.nickName;
+        if (!rankInfoDictionary.ContainsKey(nickname))
         {
-            RankInfo lapInfo = new RankInfo()
+            RankInfo newRankInfo = new RankInfo()
             {
+                nickname = _player.nickName,
                 lap = 0,
                 checkpoint = 0
             };
-            rankInfoDictionary.Add(_player, lapInfo);
-            InGameUI.instance.AddRankUI(_player.playerId);
+            rankInfoDictionary.Add(nickname, newRankInfo);
+            InGameUI.instance.CreateRankUI(_player.nickName);
+            return newRankInfo;
         }
+        return rankInfoDictionary[nickname];
     }
     public void DeleteRankInfo(Player _player)
     {
-        if (rankInfoDictionary.ContainsKey(_player))
+        string nickname = _player.nickName;
+        if (rankInfoDictionary.ContainsKey(nickname))
         {
-            rankInfoDictionary.Remove(_player);
-            InGameUI.instance.DeleteRankUI(_player.playerId);
+            rankInfoDictionary.Remove(nickname);
+            InGameUI.instance.DeleteRankUI(nickname);
         }
     }
-    // 주어진 차량의 랩 정보를 가져오기.
-    public RankInfo GetLapInfo(Player _player)
-    {
-        RankInfo labInfo = new RankInfo()
-        {
-            lap = 0,
-            checkpoint = 0
-        };
-        if (_player != null && rankInfoDictionary.ContainsKey(_player))
-            labInfo = rankInfoDictionary[_player];
-
-        return labInfo;
-    }
-    public List<RankSort> GetRanking()
-    {   
-        List<RankSort> ranking = new List<RankSort>();
-        var sortedRanking = from pair in rankInfoDictionary 
+    public List<RankInfo> GetRanking()
+    {       
+        List<RankInfo> sortedRanking = new List<RankInfo>();
+        var sortedRankDictionary = from pair in rankInfoDictionary 
                         orderby pair.Value.lap descending, pair.Value.checkpoint descending 
                         select pair;
 
-        foreach (var item in sortedRanking)
+        foreach (var item in sortedRankDictionary)
         {
-            RankSort rankSort = new RankSort()
+            RankInfo rankInfo = new RankInfo();
+            rankInfo.nickname = item.Value.nickname;
+            rankInfo.lap = item.Value.lap;
+            rankInfo.checkpoint = item.Value.checkpoint;
+            sortedRanking.Add(rankInfo);
+            if (item.Key == WorldManager.instance.GetMyPlayer().nickName)
             {
-                id = item.Key.playerId,
-                lap = item.Value.lap,
-                checkpoint = item.Value.checkpoint
-            };
-            ranking.Add(rankSort);
-            if (rankSort.id == WorldManager.instance.myPlayerId)
-            {
-                WorldManager.instance.GetMyPlayer().myRank = ranking.Count;
+                WorldManager.instance.GetMyPlayer().myRank = sortedRanking.Count;
             }
         }
 
-        return ranking;
+        return sortedRanking;
     }
 
     public void SetPlayerCheckpointCount(Player _player)
     {
-        if (rankInfoDictionary.ContainsKey(_player))
+        string nickname = _player.nickName;
+        if (rankInfoDictionary.ContainsKey(nickname))
         {
-            RankInfo lapInfo = rankInfoDictionary[_player];
+            RankInfo lapInfo = rankInfoDictionary[nickname];
             lapInfo.checkpoint++;
-            rankInfoDictionary[_player] = lapInfo;
+            rankInfoDictionary[nickname] = lapInfo;
         }
     }
 #endregion
