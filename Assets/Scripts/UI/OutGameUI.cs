@@ -9,8 +9,6 @@ public class OutGameUI : MonoBehaviour
 #region PublicVariables
     public static OutGameUI instance;
     
-    public TMP_Text matchMakingBtnText;
-    public GameObject loadingObject;
     [Space(10), Header("===== Panels =====")]
     public GameObject[] panels;
     [Space(10), Header("===== Button =====")]
@@ -26,12 +24,11 @@ public class OutGameUI : MonoBehaviour
     [Space(10), Header("===== Bar =====")]
     public GameObject topBar;
     [Space(10), Header("===== Store =====")]
-    public GameObject storePanel;
     public GameObject[] sledList;
     public int sledListCnt;
-    
-    [Space(10), Header("===== Matching Room =====")]
-    public GameObject matchingListPanel;
+    [Space(10), Header("===== MatchMaking =====")]
+    public TMP_Text matchMakingBtnText;
+    public GameObject loadingObject;
 #endregion
 
 #region PrivateMethod

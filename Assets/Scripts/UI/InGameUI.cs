@@ -14,11 +14,12 @@ public class InGameUI : MonoBehaviour
 #region PublicVariables
     public static InGameUI instance;
 
+    [Space(10), Header("타이머 관련")]
     public TextMeshProUGUI text_timer;
     public TextMeshProUGUI text_countDown;
     public TextMeshProUGUI text_gameEndCountDown;
+    [Space(10), Header("속도계")]
     public TextMeshProUGUI text_speedLabel;
-    
     [Space(10), Header("랭킹 관련"), Tooltip("1/2 LAP")] 
     public TextMeshProUGUI text_lab;
     [Tooltip("1/5 (등수)")]
@@ -69,7 +70,7 @@ public class InGameUI : MonoBehaviour
         GameManager.Result += GameResultUI;
     }
 
-    // Go! 텍스트 숨기기
+    // 텍스트 숨기기
     private void HideCountDown()
     {
         if(text_countDown.text == "GO!")
