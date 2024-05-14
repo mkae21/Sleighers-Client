@@ -14,8 +14,8 @@ public class Player : MonoBehaviour
     private bool isDrifting;
 
     // Polation
-    private float timeToReachTarget = 0.05f;
-    private float movementThreshold = 1f;
+    private float timeToReachTarget = 0.5f;
+    private float movementThreshold = 4f;
     private float squareMovementThreshold;
     private Vector3 previousPosition;
     private long previousTimeStamp;
@@ -136,9 +136,9 @@ public class Player : MonoBehaviour
 
         if (hitNear.collider != null)// If the sled is on the ground
         {
-            sphere.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
+            float weight = (myRank - 1) * 10f; // 등수에 따른 속도 가중치
+            sphere.AddForce(sledModel.forward * (currentSpeed + weight), ForceMode.Acceleration);
             sled.eulerAngles = Vector3.Lerp(sled.eulerAngles, new Vector3(0, sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
-            VelocityCompensate(myRank);
         }
         else
             sphere.AddForce(sledModel.forward * sphere.velocity.magnitude, ForceMode.Acceleration);
@@ -233,7 +233,7 @@ public class Player : MonoBehaviour
             Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
             sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
         }  
-          
+        
         // Interpolation Rotation
         float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.75f);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
@@ -327,25 +327,6 @@ public class Player : MonoBehaviour
         // km/h로 변환
         return sphere.velocity.magnitude * 3.6f;
     }
-    public void VelocityCompensate(int _myRank)
-    {
-        switch (_myRank)
-        {
-            case 2:
-                sphere.AddForce(sledModel.forward * 10f,ForceMode.Acceleration);
-                Debug.Log("2등 보정중");
-                break;
-            case 3:
-                sphere.AddForce(sledModel.forward * 20f,ForceMode.Acceleration);
-                Debug.Log("3등 보정중");
-                break;
-            case 4:
-                sphere.AddForce(sledModel.forward * 30f,ForceMode.Acceleration);
-                Debug.Log("4등 보정중");
-                break;
-        }
-    }
-
     // 앞으로 나아가는 차량 속도의 양
     public float ForwardSpeed => Vector3.Dot(sphere.velocity, transform.forward);
 
