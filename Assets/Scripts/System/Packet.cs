@@ -39,6 +39,13 @@ public class SetNameInfo : Packet
 
 public class MatchInfo : Packet
 {
-    public string name;
-    public int curCart;
+    public int name;
+    public int? curCart;
+}
+
+
+public class RoomData
+{
+    public int roomID;
+    public List<MatchInfo> playerList;
 }

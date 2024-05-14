@@ -18,6 +18,12 @@ public class OutGameUI : MonoBehaviour
     public Toggle soundToggle;
     public Slider volumeSlider;
     public TMP_Text setNameText;
+    [Space(10), Header("===== Matching Room =====")]
+    public GameObject loadingObject;
+    public TMP_Text matchMakingBtnText;
+    public GameObject PlayerMatchList;
+    public GameObject PlayerMatchListPrefabs;
+
     [Space(10), Header("===== TextField =====")]
     public TMP_InputField idField;
     public TMP_InputField settingNameField;
@@ -26,15 +32,18 @@ public class OutGameUI : MonoBehaviour
     [Space(10), Header("===== Store =====")]
     public GameObject[] sledList;
     public int sledListCnt;
-    [Space(10), Header("===== MatchMaking =====")]
-    public TMP_Text matchMakingBtnText;
-    public GameObject loadingObject;
 #endregion
 
 #region PrivateMethod
+    private void Awake()
+    {
+        if (instance != null)
+            Destroy(instance);
+        instance = this;
+    }
+
     private void Start()
     {
-        instance = this;
         loginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
         matchMakingBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.MatchMaking));
     }
@@ -65,6 +74,35 @@ public class OutGameUI : MonoBehaviour
     {
         matchMakingBtnText.text = "매칭중";
         loadingObject.SetActive(true);
+    }
+    public void ReturnMatchMakingUI()
+    {
+        matchMakingBtnText.text = "매치메이킹";
+        loadingObject.SetActive(false);
+    }
+
+    public void DrawMatchPlayer(int name)
+    {
+        GameObject playerObject = Instantiate(PlayerMatchListPrefabs, PlayerMatchList.transform);
+        playerObject.GetComponentInChildren<TMP_Text>().text = name.ToString();
+    }
+
+    public void DrawMatchPlayer(string name)
+    {
+        GameObject playerObject = Instantiate(PlayerMatchListPrefabs, PlayerMatchList.transform);
+        playerObject.GetComponentInChildren<TMP_Text>().text = name;
+    }
+
+    public void DestroyMatchPlayer()
+    {
+        foreach(Transform child in PlayerMatchList.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    public void PopupMatchMakingPanel()
+    {
         panels[6].SetActive(true);
     }
     public void VolumeSlider()

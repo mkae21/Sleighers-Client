@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -24,20 +26,28 @@ public class OutGameServerManager : MonoBehaviour
 
 #region PublicVariables
     public static OutGameServerManager instance = null;
+    public RoomData roomData;
+
 #endregion
 
-#region PrivateMethod
+    #region PrivateMethod
     private void Awake()
     {
         if (instance != null)
             Destroy(instance);
         instance = this;
+        DontDestroyOnLoad(this.gameObject);
     }
 
     void Start()
     {
         Init();
         GameManager.MatchMaking += MatchMaking;
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.MatchMaking -= MatchMaking;
     }
 
     private void Init()
@@ -103,14 +113,13 @@ public class OutGameServerManager : MonoBehaviour
 
         socket.On("setNameSucc", (res) =>
         {
-            Debug.Log(res);
+
         });
 
         socket.On("setNameFail", (res) =>
         {
-            Debug.Log(res);
-        });
 
+        });
 
         socket.On("enterRoomFail", (res) =>
         {
@@ -119,12 +128,40 @@ public class OutGameServerManager : MonoBehaviour
 
         socket.On("enterRoomSucc", (res) =>
         {
-            Debug.Log("endterRoomSucc:" + res);
+            UnityThread.executeInLateUpdate(() =>
+            {
+                Debug.Log("endterRoomSucc:" + res);
+                roomData = ParseData(res.GetValue<string>());
+
+                // 자신의 MatchInfo를 첫 번째 요소로 정렬
+                roomData.playerList.Sort((a, b) =>
+                {
+                    if (a.id == UserData.instance.id)
+                        return -1;
+                    else if (b.id == UserData.instance.id)
+                        return 1;
+                    else
+                        return 0;
+                });
+                Debug.Log(roomData.playerList[0].id);
+                OutGameUI.instance.PopupMatchMakingPanel();
+
+                // 파싱된 데이터 출력
+                foreach (MatchInfo player in roomData.playerList)
+                {
+                    OutGameUI.instance.DrawMatchPlayer(player.name);
+                }
+                OutGameUI.instance.ReturnMatchMakingUI();
+            });
         });
 
-        socket.On("moveInGameScene", (res) =>
+        socket.On("loadGameScene", (res) =>
         {
             Debug.Log(res);
+            UnityThread.executeInLateUpdate(() =>
+            {
+                OutGameUI.instance.LoadInGame();
+            });
         });
 
 
@@ -144,6 +181,12 @@ public class OutGameServerManager : MonoBehaviour
         }
 
         return instance;
+    }
+
+    public RoomData ParseData(string jsonData)
+    {
+        RoomData roomData = JsonConvert.DeserializeObject<RoomData>(jsonData);
+        return roomData;
     }
 
     public void LoginSucc(string email)

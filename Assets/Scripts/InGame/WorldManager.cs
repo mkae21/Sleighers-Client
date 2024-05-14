@@ -36,6 +36,7 @@ public class WorldManager : MonoBehaviour
     public MiniMapController miniMapController;
     // 레이스가 종료되면 호출되는 액션
     public UnityAction OnRaceFinished { get; set; }
+    
 
 #endregion
 
@@ -136,7 +137,8 @@ public class WorldManager : MonoBehaviour
             {
                 case Protocol.Type.LoadGameScene:
                     LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
-                    ReceiveLoadGameSceneEvent(loadMessage);
+                    //ReceiveLoadGameSceneEvent(loadMessage);
+                    LoadGameScene(OutGameServerManager.instance.roomData.playerList);
                     break;
 
                 case Protocol.Type.GameStartCountDown:
@@ -204,6 +206,31 @@ public class WorldManager : MonoBehaviour
         newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId, sp.position, sp.rotation.eulerAngles.y);
         sessionInfo.totalPlayerCount++;
     }
+
+    private void LoadGameScene(List<MatchInfo> playerList)
+    {
+        myPlayerId = playerList[0].name;
+        int totalPlayerCount = playerList.Count -1;
+        sessionInfo.totalPlayerCount = playerList.Count;
+        Transform sp = startingPoints[totalPlayerCount].transform;
+
+        GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
+        myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
+        Transform miniMapTarget = myPlayer.transform.Find("Sled");
+        miniMapController.SetTarget(miniMapTarget);
+        Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
+
+        for (int i = 0; i < totalPlayerCount; i++)
+        {
+            int otherPlayerId = playerList[i+1].name;
+            Transform _sp = startingPoints[i].transform;
+            GameObject otherPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+            players.Add(otherPlayerId, otherPlayer.GetComponent<Player>());
+            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
+        }
+    }
+
     // 게임 씬 로드 이벤트 처리
     private void ReceiveLoadGameSceneEvent(LoadGameSceneMessage msg)
     {

@@ -70,7 +70,7 @@ public partial class ServerManager : MonoBehaviour
     }
     private void Init()
     {
-        // serverIP = "localhost"; // 로컬 테스트 용
+        //serverIP = "localhost"; // 로컬 테스트 용
         serverIP = SecretLoader.ingameServer.ip;
         serverPort = SecretLoader.ingameServer.port;
 
