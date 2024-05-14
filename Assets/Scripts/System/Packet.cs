@@ -7,6 +7,11 @@ public class LoginInfo
     public string email;
 }
 
+public class DefaultLoginInfo : LoginInfo
+{
+    public string password;
+}
+
 public class UserInfo : LoginInfo
 {
     public string id;
@@ -14,6 +19,11 @@ public class UserInfo : LoginInfo
     public string cart;
     public int curCostume;
     public int curCart;
+}
+
+public class SignupInfo : DefaultLoginInfo
+{
+    public string name;
 }
 
 // 매치메이킹 요청 패킷

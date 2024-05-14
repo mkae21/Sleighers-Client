@@ -57,8 +57,6 @@ public class OutGameUI : MonoBehaviour
             soundToggle.isOn = false;
         }
     }
-
-
     public void SuccLoginPanel()
     {
         panels[0].SetActive(false);  // auth panel
@@ -68,7 +66,7 @@ public class OutGameUI : MonoBehaviour
 
     public void MatchMakingUI()
     {
-        matchMakingBtnText.text = "매칭 중";
+        matchMakingBtnText.text = "매칭 �?";
         loadingObject.SetActive(true);
         panels[6].SetActive(true);
     }

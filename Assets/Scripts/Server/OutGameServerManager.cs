@@ -11,6 +11,14 @@ public class OutGameServerManager : MonoBehaviour
 
     [SerializeField]
     private TMP_InputField idInputField;
+    [SerializeField]
+    private TMP_InputField pwInputField;
+    [SerializeField]
+    private TMP_InputField idSignUpField;
+    [SerializeField]
+    private TMP_InputField pwSignUpField;
+    [SerializeField]
+    private TMP_InputField nameSignUpField;
 
 #endregion
 
@@ -60,7 +68,6 @@ public class OutGameServerManager : MonoBehaviour
         socket.On("loginSucc", (res) =>
         {
             Debug.Log("Login success: " + res);
-            //SceneManager.LoadScene("Topdown");
             DefaultLoginSucc();
         });
 
@@ -150,16 +157,29 @@ public class OutGameServerManager : MonoBehaviour
 
     public void DefaultLogin()
     {
-        LoginSucc(idInputField.text);
+        DefaultLoginInfo sendPacket = new DefaultLoginInfo();
+        sendPacket.email = idInputField.text;
+        sendPacket.password = pwInputField.text;
+        string jsonData = JsonUtility.ToJson(sendPacket);
+        socket.Emit("login", jsonData);
     }
 
     public void DefaultLoginSucc()
     {
-        Debug.Log("DefaultLoginSucc Start");
-        OutGameUI.instance.panels[0].SetActive(false);  // auth panel
-        OutGameUI.instance.panels[1].SetActive(true);   // lobby panel
-        OutGameUI.instance.topBar.SetActive(true);
-        Debug.Log("DefaultLoginSucc");
+        UnityThread.executeInLateUpdate (() =>
+        {
+            OutGameUI.instance.SuccLoginPanel();
+        });
+    }
+
+    public void Signup()
+    {
+        SignupInfo sendPacket = new SignupInfo();
+        sendPacket.email = idSignUpField.text;
+        sendPacket.password = pwSignUpField.text;
+        sendPacket.name = nameSignUpField.text;
+        string jsonData = JsonUtility.ToJson(sendPacket);
+        socket.Emit("signup", jsonData);
     }
 
     public void MatchMaking()
