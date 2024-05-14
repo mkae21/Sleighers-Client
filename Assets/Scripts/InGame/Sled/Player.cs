@@ -14,8 +14,8 @@ public class Player : MonoBehaviour
     private bool isDrifting;
 
     // Polation
-    private float timeToReachTarget = 0.05f;
-    private float movementThreshold = 1f;
+    private float timeToReachTarget = 0.5f;
+    private float movementThreshold = 4f;
     private float squareMovementThreshold;
     private Vector3 previousPosition;
     private long previousTimeStamp;
@@ -56,6 +56,7 @@ public class Player : MonoBehaviour
     [field: SerializeField] public bool isMove { get; private set; }
     public GameObject nameObject;
     public MiniMapComponent miniMapComponent;
+    public int myRank = 1;
 #endregion
 
 
@@ -75,6 +76,7 @@ public class Player : MonoBehaviour
         {
             Polation();
         }
+
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -134,7 +136,8 @@ public class Player : MonoBehaviour
 
         if (hitNear.collider != null)// If the sled is on the ground
         {
-            sphere.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
+            float weight = (myRank - 1) * 10f; // 등수에 따른 속도 가중치
+            sphere.AddForce(sledModel.forward * (currentSpeed + weight), ForceMode.Acceleration);
             sled.eulerAngles = Vector3.Lerp(sled.eulerAngles, new Vector3(0, sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
         }
         else
@@ -230,7 +233,7 @@ public class Player : MonoBehaviour
             Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
             sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
         }  
-          
+        
         // Interpolation Rotation
         float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.75f);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
@@ -246,7 +249,7 @@ public class Player : MonoBehaviour
         this.playerId = _playerId;
         this.nickName = _nickName;
 
-        miniMapComponent.enabled = true;
+        miniMapComponent.Init(sled.gameObject);
 
         nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, sledModel);
         nameObject.GetComponent<TMP_Text>().text = this.nickName;
@@ -324,7 +327,6 @@ public class Player : MonoBehaviour
         // km/h로 변환
         return sphere.velocity.magnitude * 3.6f;
     }
-
     // 앞으로 나아가는 차량 속도의 양
     public float ForwardSpeed => Vector3.Dot(sphere.velocity, transform.forward);
 
@@ -340,7 +342,6 @@ public class Player : MonoBehaviour
         sphere.angularVelocity = Vector3.zero;
         sphere.transform.position = respawnPosition;
         sphere.transform.rotation = Quaternion.identity;
-        // TODO: 서버로 리스폰 패킷 전송
     }
 #endregion
 }

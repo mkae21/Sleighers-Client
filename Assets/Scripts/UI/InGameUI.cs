@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using Protocol;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+/* InGameUI.cs
+ * - 인게임 UI 관리
+ * - 타이머, 속도계, 랭킹, 결과창 등을 관리
+ */
 public class InGameUI : MonoBehaviour
 {
 #region PublicVariables
@@ -24,6 +28,11 @@ public class InGameUI : MonoBehaviour
     public RankManager rankManager;
     [Tooltip("랭킹 요소 프리팹")]
     public GameObject rankingElem;
+
+    [Space(10), Header("결과창 관련")]
+    public GameObject resultPanel;      // 결과창 패널
+    public GameObject resultElem;       // 결과창 요소 프리팹
+    public Transform resultElemHolder;  // 결과창 요소를 가지고 있는 부모
 #endregion
 
 #region PrivateVariables
@@ -36,6 +45,10 @@ public class InGameUI : MonoBehaviour
     private float blinkDuration = 0.1f; // 블링크 지속 시간 (초)
     private Color originalColor = Color.white; // 원래 색상
     private Color blinkColor = Color.black; // 블링크 색상
+    // ResultElem 텍스트 인덱스
+    private const int rankIndex = 0;
+    private const int nicknameIndex = 2;
+    private const int timeIndex = 3;
 #endregion
 
 #region PrivateMethod
@@ -53,6 +66,7 @@ public class InGameUI : MonoBehaviour
             Debug.Log("[InGameUI] LapManager가 없습니다.");
         UpdateLapText(1);
         text_ranks = new Dictionary<int, TextMeshProUGUI>();
+        GameManager.Result += GameResultUI;
     }
 
     // Go! 텍스트 숨기기
@@ -207,6 +221,18 @@ public class InGameUI : MonoBehaviour
     {
         SceneManager.LoadScene("OutGame");
     }
+    public void GameResultUI(List<PlayerResult> _playerResults)
+    {
+        resultPanel.SetActive(true);
 
+        for (int i = 0; i < _playerResults.Count; i++)
+        {
+            GameObject resultElemObj = Instantiate(resultElem, resultElemHolder);
+            resultElemObj.transform.SetSiblingIndex(i);
+            resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].rank.ToString();
+            resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].nickname;
+            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].time.ToString("F2");
+        }
+    }
 #endregion
 }

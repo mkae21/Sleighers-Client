@@ -64,7 +64,7 @@ public class WorldManager : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (tick % 2 == 0)
+        if (tick % 4 == 0)
             OnSend(Protocol.Type.Sync);
         tick++;
         OnReceive();
@@ -154,7 +154,8 @@ public class WorldManager : MonoBehaviour
                     break;
 
                 case Protocol.Type.GameEnd:
-                    ReceiveGameEndEvent(msg);
+                    GameResultMessage gameResultMessage = DataParser.ReadJsonData<GameResultMessage>(data);
+                    ReceiveGameEndEvent(gameResultMessage);
                     break;
                 
                 case Protocol.Type.Sync:
@@ -177,6 +178,7 @@ public class WorldManager : MonoBehaviour
         }
     }
 
+    // 동기화 이벤트 처리
     private async void ReceiveSyncEvent(SyncMessage msg)
     {
         await Task.Run(() =>
@@ -191,14 +193,15 @@ public class WorldManager : MonoBehaviour
             players[id].SetSyncData(position, velocity, rotation, timeStamp);
         });
     }
+
     // 다른 플레이어 접속 이벤트 처리
     private void ReceivePlayerReconnectEvent(Message msg)
     {
         int newId = msg.from;
         Transform sp = startingPoints[sessionInfo.totalPlayerCount];
         GameObject newInstance = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-        newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId, sp.position, sp.rotation.eulerAngles.y);
         players.Add(newId, newInstance.GetComponent<Player>());
+        newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId, sp.position, sp.rotation.eulerAngles.y);
         sessionInfo.totalPlayerCount++;
     }
     // 게임 씬 로드 이벤트 처리
@@ -211,10 +214,10 @@ public class WorldManager : MonoBehaviour
         Transform sp = startingPoints[totalPlayerCount].transform;
 
         GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
         miniMapController.SetTarget(miniMapTarget);
-        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
 
         for (int i = 0; i < totalPlayerCount; i++)
@@ -222,8 +225,8 @@ public class WorldManager : MonoBehaviour
             int otherPlayerId = userList[i];
             Transform _sp = startingPoints[i].transform;
             GameObject otherPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
             players.Add(otherPlayerId, otherPlayer.GetComponent<Player>());
+            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
         }
     }
     // 게임 시작 카운트 다운 이벤트 처리
@@ -245,11 +248,9 @@ public class WorldManager : MonoBehaviour
         InGameUI.instance.SetGameEndCountDown(count);        
     }
     // 게임 종료 이벤트 처리
-    private void ReceiveGameEndEvent(Message msg)
+    private void ReceiveGameEndEvent(GameResultMessage msg)
     {
-        int userId = msg.from;
-        Debug.LogFormat("플레이어 {0}가 승리했습니다.", userId);  
-        GameManager.Instance().ChangeState(GameManager.GameState.End);
+        GameManager.Instance().ChangeState(GameManager.GameState.End, msg);
     }
     // 다른 플레이어 접속 끊김 이벤트 처리
     private void ReceivePlayerDisconnectEvent(Message msg)
@@ -271,6 +272,7 @@ public class WorldManager : MonoBehaviour
         SyncMessage msg = GetMyPlayer().GetSyncData();
         ServerManager.Instance().SendDataToInGame(msg);
     }
+
     // 게임 시작 이벤트를 서버에 알림
     private async void SendGameStartEvent()
     {

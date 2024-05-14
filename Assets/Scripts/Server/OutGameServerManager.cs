@@ -18,7 +18,6 @@ public class OutGameServerManager : MonoBehaviour
     public static OutGameServerManager instance = null;
 #endregion
 
-
 #region PrivateMethod
     private void Awake()
     {
@@ -30,6 +29,7 @@ public class OutGameServerManager : MonoBehaviour
     void Start()
     {
         Init();
+        GameManager.MatchMaking += MatchMaking;
     }
 
     private void Init()
@@ -107,12 +107,12 @@ public class OutGameServerManager : MonoBehaviour
 
         socket.On("enterRoomFail", (res) =>
         {
-            Debug.Log(res);
+            Debug.Log("enterRoomFail: " + res);
         });
 
         socket.On("enterRoomSucc", (res) =>
         {
-            Debug.Log(res);
+            Debug.Log("endterRoomSucc:" + res);
         });
 
         socket.On("moveInGameScene", (res) =>
@@ -169,6 +169,7 @@ public class OutGameServerManager : MonoBehaviour
         Debug.Log("matchmaking id ë³´ë‚¸?‹¤."+sendPacket.id);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
+        OutGameUI.instance.MatchMakingUI();
     }
 
     public void SetName()
