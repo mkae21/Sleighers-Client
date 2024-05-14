@@ -43,7 +43,8 @@ public class Finish : MonoBehaviour
                 checkpointInfo.SetLastCheckpoint(_checkpoint);
                 checkpointInfo.SetNextCheckpoint(GetNextCheckpoint(_checkpoint));
                 RankManager.instance.SetPlayerCheckpointCount(_player);
-                InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
+                List<RankInfo> ranking = RankManager.instance.GetRanking();
+                InGameUI.instance.UpdateRankUI(ranking);
             }
         }
         // 그렇지 않으면 통과한 체크포인트가 통과해야 하는 다음 체크포인트인 경우, 그 다음 체크포인트를 잠금 해제합니다.
@@ -57,7 +58,8 @@ public class Finish : MonoBehaviour
             checkpointInfo.SetLastCheckpoint(_checkpoint);
             checkpointInfo.SetNextCheckpoint(GetNextCheckpoint(_checkpoint));
             RankManager.instance.SetPlayerCheckpointCount(_player);
-            InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
+            List<RankInfo> ranking = RankManager.instance.GetRanking();
+            InGameUI.instance.UpdateRankUI(ranking);
         } 
     }
     // 주어진 체크포인트의 다음 체크포인트를 반환
