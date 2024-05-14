@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class OutGameServerManager : MonoBehaviour
 {
@@ -7,6 +8,18 @@ public class OutGameServerManager : MonoBehaviour
     private string serverIP = string.Empty;
     private int serverPort = 0;
     private SocketIOUnity socket;
+
+    [SerializeField]
+    private TMP_InputField idInputField;
+    [SerializeField]
+    private TMP_InputField pwInputField;
+    [SerializeField]
+    private TMP_InputField idSignUpField;
+    [SerializeField]
+    private TMP_InputField pwSignUpField;
+    [SerializeField]
+    private TMP_InputField nameSignUpField;
+
 #endregion
 
 #region PublicVariables
@@ -55,6 +68,7 @@ public class OutGameServerManager : MonoBehaviour
         socket.On("loginSucc", (res) =>
         {
             Debug.Log("Login success: " + res);
+            DefaultLoginSucc();
         });
 
         socket.On("loginFail", (res) =>
@@ -78,7 +92,7 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log("inquiryPlayer: " + res);
             string jsonString = res.GetValue<string>();
             UserInfo userInfo = JsonUtility.FromJson<UserInfo>(jsonString);
-            UserData.instance.id = userInfo.email.Split('@')[0];    // 이메일에서 아이디 추출
+            UserData.instance.id = userInfo.id;
             UserData.instance.nickName = userInfo.name;
             UserData.instance.cart = userInfo.cart;
             UserData.instance.email = userInfo.email;
@@ -113,6 +127,7 @@ public class OutGameServerManager : MonoBehaviour
             Debug.Log(res);
         });
 
+
         // 서버 연결
         socket.Connect();
 
@@ -135,16 +150,43 @@ public class OutGameServerManager : MonoBehaviour
     {
         LoginInfo sendPacket = new LoginInfo();
         sendPacket.email = email;
-        Debug.Log("보낸다."+sendPacket);
+        Debug.Log("보낸다 : "+sendPacket);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("loginSucc", jsonData);
+    }
+
+    public void DefaultLogin()
+    {
+        DefaultLoginInfo sendPacket = new DefaultLoginInfo();
+        sendPacket.email = idInputField.text;
+        sendPacket.password = pwInputField.text;
+        string jsonData = JsonUtility.ToJson(sendPacket);
+        socket.Emit("login", jsonData);
+    }
+
+    public void DefaultLoginSucc()
+    {
+        UnityThread.executeInLateUpdate (() =>
+        {
+            OutGameUI.instance.SuccLoginPanel();
+        });
+    }
+
+    public void Signup()
+    {
+        SignupInfo sendPacket = new SignupInfo();
+        sendPacket.email = idSignUpField.text;
+        sendPacket.password = pwSignUpField.text;
+        sendPacket.name = nameSignUpField.text;
+        string jsonData = JsonUtility.ToJson(sendPacket);
+        socket.Emit("signup", jsonData);
     }
 
     public void MatchMaking()
     {
         Packet sendPacket = new Packet();
         sendPacket.id = UserData.instance.id;
-        Debug.Log("matchmaking id 보낸다."+sendPacket.id);
+        Debug.Log("matchmaking id 보낸다 : "+sendPacket.id);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
         OutGameUI.instance.MatchMakingUI();
@@ -156,7 +198,7 @@ public class OutGameServerManager : MonoBehaviour
         sendPacket.id = UserData.instance.id;
         sendPacket.name = OutGameUI.instance.settingNameField.text;
         OutGameUI.instance.settingNameField.text = "";
-        Debug.Log("setName 보낸다." + sendPacket);
+        Debug.Log("setName 보낸다 : " + sendPacket);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("setName", jsonData);
     }

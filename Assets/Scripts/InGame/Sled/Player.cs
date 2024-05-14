@@ -41,7 +41,8 @@ public class Player : MonoBehaviour
     public bool isBraking { get; private set;} = false;
     public int playerId { get; private set; } = -1;
     public string nickName {get; private set;} = string.Empty;
-    public Vector3 respawnPosition = Vector3.zero;
+    public Transform curCheckpoint;
+    public Transform nextCheckpoint;
     public Rigidbody sphere;
     public Transform sledModel;
     public Transform sled;
@@ -260,6 +261,9 @@ public class Player : MonoBehaviour
         sphere.transform.position = position;
         sled.transform.rotation = Quaternion.Euler(0, rotation, 0);
 
+        curCheckpoint = this.transform;
+        nextCheckpoint = this.transform;
+
         previousPosition = GetPosition();
         previousTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
@@ -342,8 +346,14 @@ public class Player : MonoBehaviour
     {
         sphere.velocity = Vector3.zero;
         sphere.angularVelocity = Vector3.zero;
-        sphere.transform.position = respawnPosition;
-        sphere.transform.rotation = Quaternion.identity;
+        sphere.transform.position = curCheckpoint.position;
+
+        // 바라볼 방향 구하기
+        Vector3 direction = nextCheckpoint.localPosition - curCheckpoint.localPosition;
+        Quaternion rot = Quaternion.LookRotation(direction.normalized);
+        rot.x = 0;
+        rot.z = 0;
+        sled.transform.rotation = rot;
     }
 #endregion
 }
