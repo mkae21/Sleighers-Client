@@ -14,11 +14,12 @@ public class InGameUI : MonoBehaviour
 #region PublicVariables
     public static InGameUI instance;
 
+    [Space(10), Header("타이머 관련")]
     public TextMeshProUGUI text_timer;
     public TextMeshProUGUI text_countDown;
     public TextMeshProUGUI text_gameEndCountDown;
+    [Space(10), Header("속도계")]
     public TextMeshProUGUI text_speedLabel;
-    
     [Space(10), Header("랭킹 관련"), Tooltip("1/2 LAP")] 
     public TextMeshProUGUI text_lab;
     [Tooltip("1/5 (등수)")]
@@ -26,8 +27,6 @@ public class InGameUI : MonoBehaviour
     [Tooltip("랭킹 프리팹을 가지고 있는 부모")]
     public Transform rankHolder;
     public RankManager rankManager;
-    [Tooltip("랭킹 요소 프리팹")]
-    public GameObject rankingElem;
 
     [Space(10), Header("결과창 관련")]
     public GameObject resultPanel;      // 결과창 패널
@@ -36,15 +35,17 @@ public class InGameUI : MonoBehaviour
 #endregion
 
 #region PrivateVariables
+    private GameObject rankingElem;     // 랭킹 프리팹
     private float countDownDuration = 3.0f;
     private float speed = 0.0f;
     private float timer = 0.0f;
-    private Dictionary<int, TextMeshProUGUI> text_ranks;
+    private Dictionary<string, TextMeshProUGUI> text_ranks; // <닉네임, 랭킹 텍스트>
 
     // Blink 코루틴 변수
     private float blinkDuration = 0.1f; // 블링크 지속 시간 (초)
     private Color originalColor = Color.white; // 원래 색상
-    private Color blinkColor = Color.black; // 블링크 색상
+    private Color blinkColor = Color.grey; // 블링크 색상
+    private const float highlightScale = 1.5f; // 블링크 크기
     // ResultElem 텍스트 인덱스
     private const int rankIndex = 0;
     private const int nicknameIndex = 2;
@@ -65,11 +66,12 @@ public class InGameUI : MonoBehaviour
         else
             Debug.Log("[InGameUI] LapManager가 없습니다.");
         UpdateLapText(1);
-        text_ranks = new Dictionary<int, TextMeshProUGUI>();
+        text_ranks = new Dictionary<string, TextMeshProUGUI>();
         GameManager.Result += GameResultUI;
+        rankingElem = Resources.Load<GameObject>("UI/RankingElem");
     }
 
-    // Go! 텍스트 숨기기
+    // 텍스트 숨기기
     private void HideCountDown()
     {
         if(text_countDown.text == "GO!")
@@ -84,33 +86,31 @@ public class InGameUI : MonoBehaviour
         if (WorldManager.instance.GetMyPlayer() != _player)
             return;      
         // Lap 텍스트 업데이트
-        int lapsCompleted = rankManager.GetLapInfo(_player).lap;
-        int currentLap = Mathf.Min(lapsCompleted + 1, rankManager.Laps);
+        int lapsCompleted = rankManager.AddOrGetRankInfo(_player).lap;
+        int currentLap = Mathf.Min(lapsCompleted + 1, rankManager.laps);
         UpdateLapText(currentLap);
     }
 
     private void UpdateLapText(int _currentLap)
     {
         if (rankManager != null)
-            text_lab.text = $"<size=160>{_currentLap}</size=160>/{rankManager.Laps} LAP";
+            text_lab.text = $"<size=160>{_currentLap}</size=160>/{rankManager.laps} LAP";
     }
     // 랭킹 UI 깜박임 효과
-    private IEnumerator BlinkCoroutine(Image _target)
+    private IEnumerator RankEffectCoroutine(Image _target)
     {
         // 점차 어두워짐
         for (float t = 0; t <= blinkDuration; t += Time.deltaTime)
         {
-            Color color = Color.Lerp(originalColor, blinkColor, t / blinkDuration);
-            color.a = 80/255f;
-            _target.color = color;
+            _target.color = Color.Lerp(originalColor, blinkColor, t / blinkDuration);
+            _target.transform.localScale = Vector3.one * Mathf.Lerp(1.0f, highlightScale, t / blinkDuration);
             yield return null;
         }
         // 점차 밝아짐
         for (float t = 0; t <= blinkDuration; t += Time.deltaTime)
         {
-            Color color = Color.Lerp(blinkColor, originalColor, t / blinkDuration);
-            color.a = 80/255f;
-            _target.color = color;
+            _target.color = Color.Lerp(blinkColor, originalColor, t / blinkDuration);
+            _target.transform.localScale = Vector3.one * Mathf.Lerp(highlightScale, 1.0f, t / blinkDuration);
             yield return null;
         }
     }
@@ -118,34 +118,42 @@ public class InGameUI : MonoBehaviour
 #endregion
 
 #region PublicMethod
-    public void AddRankUI(int _id)
+    public void CreateRankUI(string _nickname)
     {
         GameObject rankElem = Instantiate(rankingElem, rankHolder);
         TextMeshProUGUI text_rankElem = rankElem.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-        text_rankElem.text = $"Player{_id} 0LAP 0CP";
-        text_ranks.Add(_id, text_rankElem);
+        text_rankElem.text = $"Player {_nickname}";
+        text_ranks.Add(_nickname, text_rankElem);
     }
-    public void DeleteRankUI(int _id)
+    public void UpdateRankUI(List<RankInfo> _ranking)
     {
-        Destroy(text_ranks[_id].transform.parent.gameObject);
-        text_ranks.Remove(_id);
-    }
-    public void UpdateRankUI(List<RankSort> _ranking)
-    {
-        for (int i = 0; i < _ranking.Count; i++)
+        string myNickname = WorldManager.instance.GetMyPlayer().nickName;
+        int totalPlayer = _ranking.Count;
+        for (int i = 0; i < totalPlayer; i++)
         {
-            int id = _ranking[i].id;
+            string nickname = _ranking[i].nickname;
             int lap = _ranking[i].lap;
             int checkpoint = _ranking[i].checkpoint;
+            text_ranks[nickname].text = $"{i + 1}. {nickname} - {checkpoint}";
+            text_ranks[nickname].transform.parent.SetSiblingIndex(i);
 
-            if (id == WorldManager.instance.myPlayerId)
+            // 내 등수 업데이트
+            if (nickname == myNickname)
             {
-                text_rank.text = $"<size=160>{i + 1}</size>/{_ranking.Count}";
-                StartCoroutine(BlinkCoroutine(text_ranks[id].transform.parent.GetComponent<Image>()));
+                // 내 등수가 이전 등수보다 높으면 깜박임 효과
+                if (i + 1 < RankManager.instance.previousRank)
+                {
+                    StartCoroutine(RankEffectCoroutine(text_ranks[nickname].transform.parent.GetComponent<Image>()));
+                }
+                text_rank.text = $"<size=160>{i + 1}</size>/{totalPlayer}";
+                RankManager.instance.previousRank = i + 1;
             }
-            text_ranks[id].text = $"{i + 1}. Player{id} {lap}LAP {checkpoint}CP";
-            text_ranks[id].transform.parent.SetSiblingIndex(i);
         }
+    }
+    public void DeleteRankUI(string _nickname)
+    {
+        Destroy(text_ranks[_nickname].transform.parent.gameObject);
+        text_ranks.Remove(_nickname);
     }
     public void UpdateTimer()
     {

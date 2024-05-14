@@ -3,6 +3,7 @@ using TMPro;
 using Cinemachine;
 using System;
 using Protocol;
+using System.Collections.Generic;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
@@ -31,7 +32,6 @@ public class Player : MonoBehaviour
     private float rotate;
 
     private float currentRotate;
-    private string nickName = string.Empty;
     private Animator animator;
 
 #endregion
@@ -40,6 +40,7 @@ public class Player : MonoBehaviour
     public bool isMe { get; private set; } = false;
     public bool isBraking { get; private set;} = false;
     public int playerId { get; private set; } = -1;
+    public string nickName {get; private set;} = string.Empty;
     public Vector3 respawnPosition = Vector3.zero;
     public Rigidbody sphere;
     public Transform sledModel;
@@ -267,8 +268,9 @@ public class Player : MonoBehaviour
         toRotationY = GetRotationY();
         toTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        RankManager.instance.AddRankInfo(GetComponent<Player>());
-        InGameUI.instance.UpdateRankUI(RankManager.instance.GetRanking());
+        RankManager.instance.AddOrGetRankInfo(GetComponent<Player>());
+        List<RankInfo> ranking = RankManager.instance.GetRanking();
+        InGameUI.instance.UpdateRankUI(ranking);
 
         if (isMe)
             Invoke("SetCamera", 0.5f);
