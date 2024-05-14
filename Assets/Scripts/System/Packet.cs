@@ -26,7 +26,7 @@ public class SignupInfo : DefaultLoginInfo
     public string name;
 }
 
-// ¸ÅÄ¡¸ŞÀÌÅ· ¿äÃ» ÆĞÅ¶
+// ë§¤ì¹˜ë©”ì´í‚¹ ìš”ì²­ íŒ¨í‚·
 public class Packet
 {
     public string id;

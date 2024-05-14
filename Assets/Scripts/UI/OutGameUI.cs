@@ -63,7 +63,7 @@ public class OutGameUI : MonoBehaviour
 
     public void MatchMakingUI()
     {
-        matchMakingBtnText.text = "매칭 �?";
+        matchMakingBtnText.text = "매칭중";
         loadingObject.SetActive(true);
         panels[6].SetActive(true);
     }
