@@ -201,7 +201,11 @@ public class WorldManager : MonoBehaviour
             Vector3 velocity = msg.velocity;
             float rotation = msg.rotation;
             long timeStamp = msg.timeStamp;
-            players[id].SetSyncData(position, velocity, rotation, timeStamp);
+
+            Player player = GetPlayerFromId(id);
+            if (player == null)
+                return;
+            player.SetSyncData(position, velocity, rotation, timeStamp);
         });
     }
 
@@ -417,21 +421,12 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerId].gameObject.transform.Find("Sled").gameObject;
     }
-    public Vector3 GetMyPlayerPosition()
-    {
-        return players[myPlayerId].GetPosition();
-    }
-    public Vector3 GetMyPlayerVelocity()
-    {
-        return players[myPlayerId].GetVelocity();
-    }
-    public float GetMyPlayerRotationY()
-    {
-        return players[myPlayerId].GetRotationY();
-    }
     public Player GetPlayerFromId(int _id)
     {
-        return players[_id];
+        if (players.ContainsKey(_id))
+            return players[_id];
+        else
+            return null;
     }
 #endregion
 }
