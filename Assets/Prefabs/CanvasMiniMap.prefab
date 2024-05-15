@@ -451,7 +451,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -521,7 +521,7 @@ MonoBehaviour:
   miniMapOpacity: 1
   miniMapScale: {x: 1, y: 1, z: 1}
   cameraOffset: {x: 0, y: 120, z: 0}
-  camSize: 70
+  camSize: 50
   camFarClip: 1000
   rotationOfCam: {x: 90, y: 0, z: 0}
   rotateWithTarget: 1
@@ -593,7 +593,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 70
+  orthographic size: 50
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
