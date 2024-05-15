@@ -30,11 +30,13 @@ namespace Protocol
     public class Message
     {
         public Type type;
-        public int from;
-        public Message(Type _type, int _id)
+        public string from;
+        public int roomID;
+        public Message(Type _type, string _id, int _roomID)
         {
             this.type = _type;
             this.from = _id;
+            this.roomID = _roomID;
         }
     }
     public class SyncMessage : Message
@@ -43,9 +45,10 @@ namespace Protocol
         public Vector3 velocity;        // 속도
         public float rotation;          // 회전 (y축)
         public long timeStamp;          // 타임스탬프
-        public SyncMessage(int _id, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Sync, _id)
+        public SyncMessage(string _id, int _roomID, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Sync, _id, _roomID)
         {
             this.from = _id;
+            this.roomID = _roomID ;
             this.position = _p;
             this.velocity = _v;
             this.rotation = _rY;
@@ -57,9 +60,10 @@ namespace Protocol
     {
         public int count;
         public List<int> list;
-        public LoadGameSceneMessage(int _id, int _count, List<int> _userList) : base(Type.Receiver, _id)
+        public LoadGameSceneMessage(string _id, int _roomID, int _count, List<int> _userList) : base(Type.Receiver, _id, _roomID)
         {
             this.from = _id;
+            this.roomID = _roomID ;
             this.count = _count;
             this.list = new List<int>(_userList);
         }
@@ -68,9 +72,10 @@ namespace Protocol
     public class GameCountDownMessage : Message
     {
         public int count;
-        public GameCountDownMessage(int _id, int _count) : base(Type.Receiver, _id)
+        public GameCountDownMessage(string _id, int _roomID, int _count) : base(Type.Receiver, _id, _roomID)
         {
             this.from = _id;
+            this.roomID = _roomID;
             this.count = _count;
         }
     }
@@ -89,9 +94,10 @@ namespace Protocol
     public class GameResultMessage : Message
     {
         public List<PlayerResult> resultList;
-        public GameResultMessage(int _id, List<PlayerResult> _resultList) : base(Type.Receiver, _id)
+        public GameResultMessage(string _id, int _roomID, List<PlayerResult> _resultList) : base(Type.Receiver, _id, _roomID)
         {
             this.from = _id;
+            this.roomID= _roomID;
             this.resultList = new List<PlayerResult>(_resultList);
         }
     }

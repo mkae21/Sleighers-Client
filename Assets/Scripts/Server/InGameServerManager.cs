@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Net.Sockets;
+using Protocol;
 using System;
 
 /* InGameServeManager.cs
@@ -88,6 +89,8 @@ public partial class ServerManager : MonoBehaviour
             LogManager.instance.Log("[ServerManager] 인게임 서버 접속 성공 " + serverIP + ":" + serverPort.ToString());
             Stream = Client.GetStream();
             IsConnect = true;
+            Message msg = new Message(Protocol.Type.Login, UserData.instance.id, OutGameServerManager.instance.roomData.roomID);
+            SendDataToInGame(msg);
         }
         catch (Exception e)
         {

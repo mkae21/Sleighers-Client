@@ -20,7 +20,7 @@ public class WorldManager : MonoBehaviour
     private RankManager rankManager;
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
-    private Dictionary<int, Player> players;
+    private Dictionary<string, Player> players;
     private Transform[] startingPoints;
     private Queue<byte[]> messageQueue = new Queue<byte[]>();
     private int tick = 0;
@@ -28,7 +28,7 @@ public class WorldManager : MonoBehaviour
 
 #region PublicVariables
     static public WorldManager instance;
-    public int myPlayerId { get; private set; } = -1;
+    public string myPlayerId { get; private set; } = string.Empty;
     public bool isGameStart { get; private set; } = false;
     public bool isRaceFinish { get; private set; } = false;
     public GameObject playerPool;
@@ -53,7 +53,7 @@ public class WorldManager : MonoBehaviour
     {
         instance = this;
         rankManager = GetComponent<RankManager>();
-        players = new Dictionary<int, Player>();
+        players = new Dictionary<string, Player>();
         rankManager.OnLapComplete += OnLapComplete;
         OnRaceFinished += FinishRace;
     }
@@ -177,7 +177,7 @@ public class WorldManager : MonoBehaviour
                     break;
 
                 case Protocol.Type.PlayerReconnect:
-                    ReceivePlayerReconnectEvent(msg);
+                    //ReceivePlayerReconnectEvent(msg);
                     break;
 
                 case Protocol.Type.PlayerDisconnect:
@@ -198,7 +198,7 @@ public class WorldManager : MonoBehaviour
         {
             if (players == null || !isGameStart)
                 return;
-            int id = msg.from;
+            string id = msg.from;
             Vector3 position = msg.position;
             Vector3 velocity = msg.velocity;
             float rotation = msg.rotation;
@@ -212,65 +212,65 @@ public class WorldManager : MonoBehaviour
     }
 
     // 다른 플레이어 접속 이벤트 처리
-    private void ReceivePlayerReconnectEvent(Message msg)
-    {
-        int newId = msg.from;
-        Transform sp = startingPoints[sessionInfo.totalPlayerCount];
-        GameObject newInstance = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-        players.Add(newId, newInstance.GetComponent<Player>());
-        newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId, sp.position, sp.rotation.eulerAngles.y);
-        sessionInfo.totalPlayerCount++;
-    }
+    //private void ReceivePlayerReconnectEvent(Message msg)
+    //{
+    //    int newId = msg.from;
+    //    Transform sp = startingPoints[sessionInfo.totalPlayerCount];
+    //    GameObject newInstance = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+    //    players.Add(newId, newInstance.GetComponent<Player>());
+    //    newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId, sp.position, sp.rotation.eulerAngles.y);
+    //    sessionInfo.totalPlayerCount++;
+    //}
 
     private void LoadGameScene(List<MatchInfo> playerList)
     {
-        myPlayerId = playerList[0].name;
+        myPlayerId = playerList[0].id;
         int totalPlayerCount = playerList.Count -1;
         sessionInfo.totalPlayerCount = playerList.Count;
         Transform sp = startingPoints[totalPlayerCount].transform;
 
         GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
         players.Add(myPlayerId, myPlayer.GetComponent<Player>());
-        myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
+        myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, playerList[0].name, sp.position, sp.rotation.eulerAngles.y);
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
         miniMapController.SetTarget(miniMapTarget);
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
 
         for (int i = 0; i < totalPlayerCount; i++)
         {
-            int otherPlayerId = playerList[i+1].name;
+            string otherPlayerId = playerList[i+1].id;
             Transform _sp = startingPoints[i].transform;
             GameObject otherPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
             players.Add(otherPlayerId, otherPlayer.GetComponent<Player>());
-            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
+            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, playerList[i+1].name, _sp.position, _sp.rotation.eulerAngles.y);
         }
     }
 
     // 게임 씬 로드 이벤트 처리
-    private void ReceiveLoadGameSceneEvent(LoadGameSceneMessage msg)
-    {
-        myPlayerId = msg.from;
-        int totalPlayerCount = msg.count;
-        sessionInfo.totalPlayerCount = totalPlayerCount + 1;
-        List<int> userList = msg.list;
-        Transform sp = startingPoints[totalPlayerCount].transform;
+    //private void ReceiveLoadGameSceneEvent(LoadGameSceneMessage msg)
+    //{
+    //    myPlayerId = msg.from;
+    //    int totalPlayerCount = msg.count;
+    //    sessionInfo.totalPlayerCount = totalPlayerCount + 1;
+    //    List<int> userList = msg.list;
+    //    Transform sp = startingPoints[totalPlayerCount].transform;
 
-        GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
-        myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
-        Transform miniMapTarget = myPlayer.transform.Find("Sled");
-        miniMapController.SetTarget(miniMapTarget);
-        Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
+    //    GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+    //    players.Add(myPlayerId, myPlayer.GetComponent<Player>());
+    //    myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
+    //    Transform miniMapTarget = myPlayer.transform.Find("Sled");
+    //    miniMapController.SetTarget(miniMapTarget);
+    //    Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
 
-        for (int i = 0; i < totalPlayerCount; i++)
-        {
-            int otherPlayerId = userList[i];
-            Transform _sp = startingPoints[i].transform;
-            GameObject otherPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-            players.Add(otherPlayerId, otherPlayer.GetComponent<Player>());
-            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
-        }
-    }
+    //    for (int i = 0; i < totalPlayerCount; i++)
+    //    {
+    //        int otherPlayerId = userList[i];
+    //        Transform _sp = startingPoints[i].transform;
+    //        GameObject otherPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+    //        players.Add(otherPlayerId, otherPlayer.GetComponent<Player>());
+    //        otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
+    //    }
+    //}
     // 게임 시작 카운트 다운 이벤트 처리
     private void ReceiveGameStartCountDownEvent(GameCountDownMessage msg)
     {
@@ -297,7 +297,7 @@ public class WorldManager : MonoBehaviour
     // 다른 플레이어 접속 끊김 이벤트 처리
     private void ReceivePlayerDisconnectEvent(Message msg)
     {
-        int userId = msg.from;
+        string userId = msg.from;
         Destroy(players[userId].gameObject);
         RankManager.instance.DeleteRankInfo(players[userId]);
         players.Remove(userId);
@@ -322,7 +322,7 @@ public class WorldManager : MonoBehaviour
         {
             if (isGameStart)
                 return;
-            Message msg = new Message(Protocol.Type.GameStart, myPlayerId);
+            Message msg = new Message(Protocol.Type.GameStart, myPlayerId, OutGameServerManager.instance.roomData.roomID);
             ServerManager.Instance().SendDataToInGame(msg);
         });
     }
@@ -331,7 +331,7 @@ public class WorldManager : MonoBehaviour
     {
         await Task.Run(() =>
         {
-            Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId);
+            Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId, OutGameServerManager.instance.roomData.roomID);
             ServerManager.Instance().SendDataToInGame(msg);
         });
     }
@@ -340,7 +340,7 @@ public class WorldManager : MonoBehaviour
     {
         await Task.Run(() =>
         {
-            Message msg = new Message(Protocol.Type.ResetServer, myPlayerId);
+            Message msg = new Message(Protocol.Type.ResetServer, myPlayerId, OutGameServerManager.instance.roomData.roomID);
             ServerManager.Instance().SendDataToInGame(msg);
         });
     }
@@ -448,7 +448,7 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerId].gameObject.transform.Find("Sled").gameObject;
     }
-    public Player GetPlayerFromId(int _id)
+    public Player GetPlayerFromId(string _id)
     {
         if (players.ContainsKey(_id))
             return players[_id];

@@ -40,7 +40,7 @@ public class Player : MonoBehaviour
 #region PublicVariables
     public bool isMe { get; private set; } = false;
     public bool isBraking { get; private set;} = false;
-    public int playerId { get; private set; } = -1;
+    public string playerId { get; private set; } = string.Empty;
     public string nickName {get; private set;} = string.Empty;
     public Transform curCheckpoint;
     public Transform nextCheckpoint;
@@ -262,7 +262,7 @@ public class Player : MonoBehaviour
 
 #region PublicMethod
     // 내 플레이어와 다른 플레이어 객체 초기화
-    public void Initialize(bool _isMe, int _playerId, string _nickName, Vector3 position, float rotation)
+    public void Initialize(bool _isMe, string _playerId, string _nickName, Vector3 position, float rotation)
     {
         isMe = _isMe;
         this.playerId = _playerId;
@@ -348,7 +348,7 @@ public class Player : MonoBehaviour
     }
     public SyncMessage GetSyncData()
     {
-        return new SyncMessage(playerId, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        return new SyncMessage(playerId, OutGameServerManager.instance.roomData.roomID, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
     public void SetDrift(bool isDrift)

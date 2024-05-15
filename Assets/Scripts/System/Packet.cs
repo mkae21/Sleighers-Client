@@ -39,7 +39,7 @@ public class SetNameInfo : Packet
 
 public class MatchInfo : Packet
 {
-    public int name;
+    public string name;
     public int? curCart;
 }
 
