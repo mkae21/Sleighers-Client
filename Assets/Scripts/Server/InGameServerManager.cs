@@ -77,8 +77,8 @@ public partial class ServerManager : MonoBehaviour
     }
     public void ConnectInGame()
     {
-        serverIP = "localhost"; // 로컬 테스트 용
-        // serverIP = SecretLoader.ingameServer.ip;
+        // serverIP = "localhost"; // 로컬 테스트 용
+        serverIP = SecretLoader.ingameServer.ip;
         serverPort = SecretLoader.ingameServer.port;
 
         try
