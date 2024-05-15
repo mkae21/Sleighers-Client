@@ -34,7 +34,7 @@ public class WorldManager : MonoBehaviour
     public GameObject playerPool;
     public Transform startingPointHolder;
     public MiniMapController miniMapController;
-    public GameObject mainPostProcess;
+
     // 레이스가 종료되면 호출되는 액션
     public UnityAction OnRaceFinished { get; set; }
 
