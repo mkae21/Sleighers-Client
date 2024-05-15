@@ -14,8 +14,8 @@ public class Player : MonoBehaviour
 {
 #region PrivateVariables
     private bool isDrifting;
-
     // Polation
+    private bool onRamp = false;
     private float timeToReachTarget = 0.5f;
     private float movementThreshold = 4f;
     private float squareMovementThreshold;
@@ -52,7 +52,7 @@ public class Player : MonoBehaviour
     [Header("Parameters")]
     public float acceleration = 50f;
     public float steering = 40f;
-    public float gravity = 10f;
+    public float gravity = 1f;
     public float amount;
 
     [field: SerializeField] public Vector3 moveVector { get; private set; }
@@ -142,11 +142,25 @@ public class Player : MonoBehaviour
             float weight = (myRank - 1) * 10f; // 등수에 따른 속도 가중치
             sphere.AddForce(sledModel.forward * (currentSpeed + weight), ForceMode.Acceleration);
             sled.eulerAngles = Vector3.Lerp(sled.eulerAngles, new Vector3(0, sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
+            
+            if(hitNear.collider.gameObject.tag == "Ramp")
+            {
+                onRamp = true;
+                sphere.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
+            }
         }
-        else
-            sphere.AddForce(sledModel.forward * sphere.velocity.magnitude, ForceMode.Acceleration);
+        else{// If the sled is in the air
+            if(onRamp)
+            {
+                // Ramp를 벗어날 때의 방향과 속도를 기반으로 힘을 가함
+                Vector3 launchDirection = sledModel.forward * 5f + sledModel.up * 5f;
+                sphere.AddForce(launchDirection.normalized * sphere.velocity.magnitude * 10f, ForceMode.Impulse);
+                onRamp = false;
+            }
+        }
+        
+        sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration);//중력 작용
 
-        sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration); //Apply gravity
         isMove = false;
         isDrifting = false;
         animator.SetBool("isMove", false);
@@ -164,13 +178,13 @@ public class Player : MonoBehaviour
     {
         RaycastHit hitNear;
 
-        Physics.Raycast(sled.position + (sled.up * .5f), Vector3.down, out hitNear, 2.0f);
+        Physics.Raycast(sled.position + (sled.up * .5f) + (sled.forward * 0.5f), Vector3.down, out hitNear, 2.0f);
         sledModel.up = Vector3.Lerp(sledModel.up, hitNear.normal, Time.deltaTime * 8.0f);
         sledModel.Rotate(0, sled.eulerAngles.y, 0);
         
         playerModel.up = Vector3.Lerp(playerModel.up, hitNear.normal, Time.deltaTime * 8.0f);
         playerModel.Rotate(0, sled.eulerAngles.y, 0);
-
+        
         return hitNear;
     }
     private void OnTriggerEnter(Collider other)
@@ -184,6 +198,8 @@ public class Player : MonoBehaviour
 
     private void CheckVelocity()
     {
+        float maxWeight = (myRank - 1) * 10f;
+        maxSpeed = 75f + maxWeight;//등수에 따른 최대 속도 증가
         if (sphere.velocity.magnitude > maxSpeed)
         {
             sphere.velocity = sphere.velocity.normalized * maxSpeed;

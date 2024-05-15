@@ -48,23 +48,21 @@ public class OutGameUI : MonoBehaviour
     {
         loginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
         matchMakingBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.MatchMaking));
+
+        soundToggle.onValueChanged.AddListener((value) => SoundOnOff());
+        volumeSlider.onValueChanged.AddListener((value) => VolumeSlider()); 
+        volumeSlider.value = 0.5f;
+        
+        Button[] buttons = Resources.FindObjectsOfTypeAll<Button>();
+        foreach(Button button in buttons)
+        {
+            button.onClick.AddListener(()=> GameManager.Instance().soundManager.Play("Effect/Click", SoundType.EFFECT));
+        }
+
     }
 #endregion
 
 #region PublicMethod
-    public void ToggleSound()
-    {
-        if(soundToggle.isOn)
-        {
-            AudioListener.volume = 1;
-            soundToggle.isOn = true;
-        }
-        else
-        {
-            AudioListener.volume = 0;
-            soundToggle.isOn = false;
-        }
-    }
     public void SuccLoginPanel()
     {
         panels[0].SetActive(false);  // auth panel
@@ -107,10 +105,6 @@ public class OutGameUI : MonoBehaviour
     {
         panels[6].SetActive(true);
     }
-    public void VolumeSlider()
-    {
-        AudioListener.volume = volumeSlider.value;
-    }
     public void RealExitGame()
     {
         Debug.Log("Exit Game");
@@ -131,6 +125,29 @@ public class OutGameUI : MonoBehaviour
     {
         GameManager.Instance().ChangeState(GameManager.GameState.Ready);
         SceneManager.LoadScene("InGame");
+    }
+    public void SoundOnOff()
+    {
+        if(soundToggle.isOn && volumeSlider.value > 0)
+        {
+            AudioListener.volume = 1;
+        }
+        else
+        {
+            AudioListener.volume = 0;
+        }
+    }
+    
+    public void VolumeSlider()
+    {
+        if(soundToggle.isOn)
+        {
+            AudioListener.volume = volumeSlider.value;
+        }
+        else
+        {
+            AudioListener.volume = 0;
+        }
     }
     public void ToggleMainPostProcessing()
     {

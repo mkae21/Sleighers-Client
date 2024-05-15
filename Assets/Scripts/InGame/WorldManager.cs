@@ -46,11 +46,8 @@ public class WorldManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
-        ServerManager.Instance().IsConnect = false;
-        if (ServerManager.Instance().Stream != null)
-            ServerManager.Instance().CloseStream();
-        if (ServerManager.Instance().Client != null)
-            ServerManager.Instance().CloseTcpClient();
+        if (ServerManager.Instance().Stream != null && ServerManager.Instance().Client != null)
+            ServerManager.Instance().DisconnectInGame();
     }
     private void Awake()
     {
@@ -63,6 +60,19 @@ public class WorldManager : MonoBehaviour
     private void Start()
     {
         InitializeGame();
+        // 서버에 접속이 되지 않으면 오프라인 테스트 진행
+        if (!ServerManager.Instance().IsConnect)
+        {
+            Debug.LogWarning("[WorldManager] 서버에 접속되지 않았습니다. 오프라인 테스트 진행");
+            GameObject testPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+            players.Add(myPlayerId, testPlayer.GetComponent<Player>());
+            Transform sp = startingPoints[0];
+            testPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "TestPlayer", sp.position, sp.rotation.eulerAngles.y);
+            Transform miniMapTarget = testPlayer.transform.Find("Sled");
+            miniMapController.SetTarget(miniMapTarget);
+            GameManager.Instance().ChangeState(GameManager.GameState.InGame);
+            Debug.Log("[WorldManager] 테스트 플레이어 생성 완료");
+        }
     }
     private void FixedUpdate()
     {
@@ -193,7 +203,11 @@ public class WorldManager : MonoBehaviour
             Vector3 velocity = msg.velocity;
             float rotation = msg.rotation;
             long timeStamp = msg.timeStamp;
-            players[id].SetSyncData(position, velocity, rotation, timeStamp);
+
+            Player player = GetPlayerFromId(id);
+            if (player == null)
+                return;
+            player.SetSyncData(position, velocity, rotation, timeStamp);
         });
     }
 
@@ -389,12 +403,14 @@ public class WorldManager : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogErrorFormat("[Polling] 데이터 수신 중 에러 발생 : {0}", ex.Message);
+            Debug.LogWarningFormat("[Polling] 데이터 수신 중 에러 발생 : {0}", ex.Message);
         }
     }
     // 서버로 보내는 데이터 처리 핸들러
     public void OnSend(Protocol.Type _type)
     {
+        if (!ServerManager.Instance().IsConnect)
+            return;
         if (_type != Protocol.Type.Sync)
         {
             Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
@@ -432,21 +448,12 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerId].gameObject.transform.Find("Sled").gameObject;
     }
-    public Vector3 GetMyPlayerPosition()
-    {
-        return players[myPlayerId].GetPosition();
-    }
-    public Vector3 GetMyPlayerVelocity()
-    {
-        return players[myPlayerId].GetVelocity();
-    }
-    public float GetMyPlayerRotationY()
-    {
-        return players[myPlayerId].GetRotationY();
-    }
     public Player GetPlayerFromId(int _id)
     {
-        return players[_id];
+        if (players.ContainsKey(_id))
+            return players[_id];
+        else
+            return null;
     }
 #endregion
 }
