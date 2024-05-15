@@ -55,7 +55,7 @@ public partial class ServerManager : MonoBehaviour
         if (instance != null)
             Destroy(this.gameObject);
         instance = this;
-        DontDestroyOnLoad(this.gameObject);
+        //DontDestroyOnLoad(this.gameObject);
         ConnectInGame();
     }
     private void FixedUpdate()
@@ -89,7 +89,7 @@ public partial class ServerManager : MonoBehaviour
             LogManager.instance.Log("[ServerManager] 인게임 서버 접속 성공 " + serverIP + ":" + serverPort.ToString());
             Stream = Client.GetStream();
             IsConnect = true;
-            Message msg = new Message(Protocol.Type.Login, UserData.instance.id, OutGameServerManager.instance.roomData.roomID);
+            Message msg = new Message(Protocol.Type.Login, OutGameServerManager.instance.roomData.roomID, UserData.instance.id);
             SendDataToInGame(msg);
         }
         catch (Exception e)

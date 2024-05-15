@@ -134,15 +134,15 @@ public class OutGameServerManager : MonoBehaviour
                 roomData = ParseData(res.GetValue<string>());
 
                 // 자신의 MatchInfo를 첫 번째 요소로 정렬
-                roomData.playerList.Sort((a, b) =>
-                {
-                    if (a.id == UserData.instance.id)
-                        return -1;
-                    else if (b.id == UserData.instance.id)
-                        return 1;
-                    else
-                        return 0;
-                });
+                //roomData.playerList.Sort((a, b) =>
+                //{
+                //    if (a.id == UserData.instance.id)
+                //        return -1;
+                //    else if (b.id == UserData.instance.id)
+                //        return 1;
+                //    else
+                //        return 0;
+                //});
                 Debug.Log(roomData.playerList[0].id);
                 OutGameUI.instance.PopupMatchMakingPanel();
 

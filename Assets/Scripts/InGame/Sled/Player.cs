@@ -348,7 +348,7 @@ public class Player : MonoBehaviour
     }
     public SyncMessage GetSyncData()
     {
-        return new SyncMessage(playerId, OutGameServerManager.instance.roomData.roomID, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        return new SyncMessage(OutGameServerManager.instance.roomData.roomID, playerId, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
     public void SetDrift(bool isDrift)
