@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
     {
         if (instance == null)
         {
-            Debug.LogError("GameManager 인스턴스가 존재하지 않습니다.");
+            Debug.LogWarning("GameManager 인스턴스가 존재하지 않습니다.");
             return null;
         }
         return instance;

@@ -74,7 +74,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2712054036512009712}
   serializedVersion: 4
-  m_Mass: 200
+  m_Mass: 100
   m_Drag: 1
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -161,14 +161,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf119559e933854dbc4256168dde221, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  respawnPosition: {x: 0, y: 0, z: 0}
+  curCheckpoint: {fileID: 0}
+  nextCheckpoint: {fileID: 0}
   sphere: {fileID: 8835457807169266014}
   sledModel: {fileID: 9148137571823036153}
   sled: {fileID: 2172718939356495318}
   playerModel: {fileID: 7876792525106887487}
   acceleration: 100
   steering: 20
-  gravity: 33
+  gravity: 3
   amount: 0
   <moveVector>k__BackingField: {x: 0, y: 0, z: 0}
   <isMove>k__BackingField: 0
