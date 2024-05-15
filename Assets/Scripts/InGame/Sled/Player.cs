@@ -198,6 +198,8 @@ public class Player : MonoBehaviour
 
     private void CheckVelocity()
     {
+        float maxWeight = (myRank - 1) * 10f;
+        maxSpeed = 75f + maxWeight;//등수에 따른 최대 속도 증가
         if (sphere.velocity.magnitude > maxSpeed)
         {
             sphere.velocity = sphere.velocity.normalized * maxSpeed;
@@ -369,7 +371,6 @@ public class Player : MonoBehaviour
         {
             float speed = Mathf.Abs(ForwardSpeed * 3.6f);
             float normalizedSpeed = (speed > 30f) ? Mathf.Clamp01(speed / (maxSpeed * 3.6f)) : 0.0f;
-            Debug.Log($"{ForwardSpeed} / {speed} / {normalizedSpeed}");
             return normalizedSpeed * 2;
         }
     }
