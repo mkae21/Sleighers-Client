@@ -369,7 +369,6 @@ public class Player : MonoBehaviour
         {
             float speed = Mathf.Abs(ForwardSpeed * 3.6f);
             float normalizedSpeed = (speed > 30f) ? Mathf.Clamp01(speed / (maxSpeed * 3.6f)) : 0.0f;
-            Debug.Log($"{ForwardSpeed} / {speed} / {normalizedSpeed}");
             return normalizedSpeed * 2;
         }
     }
