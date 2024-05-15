@@ -334,13 +334,19 @@ public class Player : MonoBehaviour
         return sphere.velocity.magnitude * 3.6f;
     }
     // 앞으로 나아가는 차량 속도의 양
-    public float ForwardSpeed => Vector3.Dot(sphere.velocity, transform.forward);
+    public float ForwardSpeed => Vector3.Dot(sphere.velocity, sled.forward);
 
     // 차량의 최대 속도에 상대적인 전진 속도를 반환 
     // 반환되는 값은 [-1, 1] 범위
     public float NormalizedForwardSpeed
     {
-        get => (Mathf.Abs(ForwardSpeed) > 0.1f) ? Mathf.Abs(ForwardSpeed) * 5 / maxSpeed : 0.0f;
+        get
+        {
+            float speed = Mathf.Abs(ForwardSpeed * 3.6f);
+            float normalizedSpeed = (speed > 30f) ? Mathf.Clamp01(speed / (maxSpeed * 3.6f)) : 0.0f;
+            Debug.Log($"{ForwardSpeed} / {speed} / {normalizedSpeed}");
+            return normalizedSpeed * 2;
+        }
     }
     public void Respawn()
     {
