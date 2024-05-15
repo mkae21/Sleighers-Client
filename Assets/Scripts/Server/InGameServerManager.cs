@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Net.Sockets;
+using System;
 
 /* InGameServeManager.cs
  * - 인게임 서버와의 통신을 관리
@@ -47,9 +48,6 @@ public partial class ServerManager : MonoBehaviour
 
 #endregion
 
-#region PublicVariables
-#endregion
-
 #region PrivateMethod
     private void Awake()
     {
@@ -57,37 +55,12 @@ public partial class ServerManager : MonoBehaviour
             Destroy(this.gameObject);
         instance = this;
         DontDestroyOnLoad(this.gameObject);
-    }
-    private void Start()
-    {
-        LogManager.instance.Log("[ServerManager] Start()");
-        Init();
+        ConnectInGame();
     }
     private void FixedUpdate()
     {
-        if (Stream.DataAvailable && IsConnect)
+        if (IsConnect && Stream.DataAvailable)
             WorldManager.instance.Polling();
-    }
-    private void Init()
-    {
-        // serverIP = "localhost"; // 로컬 테스트 용
-        serverIP = SecretLoader.ingameServer.ip;
-        serverPort = SecretLoader.ingameServer.port;
-
-        Client = new TcpClient(serverIP, serverPort);
-        if (Client.Connected)
-        {
-            Debug.LogFormat("[ServerManager] 서버 접속 성공 {0}:{1}", serverIP, serverPort);
-            LogManager.instance.Log("[ServerManager] 서버 접속 성공 " + serverIP + ":" + serverPort.ToString());
-            Stream = Client.GetStream();
-            IsConnect = true;
-        }
-        else
-        {
-            Debug.LogError("[ServerManager] 서버 접속 실패");
-            LogManager.instance.Log("[ServerManager] 서버 접속 실패 " + serverIP + ":" + serverPort.ToString());
-            IsConnect = false;
-        }
     }
 #endregion
 
@@ -102,14 +75,39 @@ public partial class ServerManager : MonoBehaviour
 
         return instance;
     }
-    
-    public void CloseStream()
+    public void ConnectInGame()
     {
-        Stream.Close();
+        // serverIP = "localhost"; // 로컬 테스트 용
+        serverIP = SecretLoader.ingameServer.ip;
+        serverPort = SecretLoader.ingameServer.port;
+
+        try
+        {
+            Client = new TcpClient(serverIP, serverPort);
+            Debug.LogFormat("[ServerManager] 인게임 서버 접속 성공 {0}:{1}", serverIP, serverPort);
+            LogManager.instance.Log("[ServerManager] 인게임 서버 접속 성공 " + serverIP + ":" + serverPort.ToString());
+            Stream = Client.GetStream();
+            IsConnect = true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning("[ServerManager] 인게임 서버 접속 실패: " + e.Message);
+            LogManager.instance.Log("[ServerManager] 인게임 서버 접속 실패 " + serverIP + ":" + serverPort.ToString());
+            IsConnect = false;
+            return;
+        }
     }
-    public void CloseTcpClient()
+    public void DisconnectInGame()
     {
-        Client.Close();
+        if (IsConnect)
+        {
+            Stream.Close();
+            Client.Close();
+            IsConnect = false;
+            Debug.LogFormat("[ServerManager] 인게임 서버 접속 해제 {0}:{1}", serverIP, serverPort);
+        }
+        else
+            Debug.LogFormat("[ServerManager] 인게임 서버에 접속중이지 않습니다. {0}:{1}", serverIP, serverPort);
     }
     // 서버로 데이터 전송
     public void SendDataToInGame<T>(T msg)
