@@ -119,6 +119,7 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case GameState.Login:
+                soundManager.Play("BGM/Lobby", SoundType.BGM);
                 Login();
                 break;
             case GameState.Lobby:
@@ -143,11 +144,12 @@ public class GameManager : MonoBehaviour
                 MatchResult();
                 break;
             case GameState.Ready:
+                soundManager.Stop("BGM/Lobby", SoundType.BGM);
                 soundManager.Play("BGM/Wind", SoundType.WIND);
+                soundManager.Play("BGM/InGame", SoundType.BGM);
                 StartCoroutine(ReadyUpdateCoroutine);
                 break;
             case GameState.InGame:
-                soundManager.Play("BGM/InGame", SoundType.BGM);
                 StartCoroutine(InGameUpdateCoroutine);
                 break;
             case GameState.End:
