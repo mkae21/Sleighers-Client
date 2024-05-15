@@ -23,6 +23,8 @@ public class OutGameUI : MonoBehaviour
     public TMP_Text matchMakingBtnText;
     public GameObject PlayerMatchList;
     public GameObject PlayerMatchListPrefabs;
+    public bool speedPostProcessing = true;
+    public bool mainPostProcessing = true;
 
     [Space(10), Header("===== TextField =====")]
     public TMP_InputField idField;
@@ -129,6 +131,15 @@ public class OutGameUI : MonoBehaviour
     {
         GameManager.Instance().ChangeState(GameManager.GameState.Ready);
         SceneManager.LoadScene("InGame");
+    }
+    public void ToggleMainPostProcessing()
+    {
+        mainPostProcessing = !mainPostProcessing;
+    }
+
+    public void ToggleSpeedProcessing()
+    {  
+        speedPostProcessing = !speedPostProcessing;
     }
 #endregion
 }

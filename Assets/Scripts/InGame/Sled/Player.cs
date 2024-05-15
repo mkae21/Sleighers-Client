@@ -4,6 +4,7 @@ using Cinemachine;
 using System;
 using Protocol;
 using System.Collections.Generic;
+using UnityEngine.Rendering.PostProcessing;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
@@ -272,6 +273,16 @@ public class Player : MonoBehaviour
         toRotationY = GetRotationY();
         toTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
+        if(isMe && OutGameUI.instance.mainPostProcessing == false)
+        {
+            GameObject.FindWithTag("MainPostProcessing").SetActive(false);
+        }
+
+        if(isMe && OutGameUI.instance.speedPostProcessing == false)
+        {
+            gameObject.GetComponentInChildren<PostProcessVolume>().enabled = false;
+        }
+            
         RankManager.instance.AddOrGetRankInfo(GetComponent<Player>());
         List<RankInfo> ranking = RankManager.instance.GetRanking();
         InGameUI.instance.UpdateRankUI(ranking);
