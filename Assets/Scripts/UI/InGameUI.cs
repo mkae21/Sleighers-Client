@@ -18,14 +18,15 @@ public class InGameUI : MonoBehaviour
     public TextMeshProUGUI text_timer;
     public TextMeshProUGUI text_countDown;
     public TextMeshProUGUI text_gameEndCountDown;
+
     [Space(10), Header("속도계")]
     public TextMeshProUGUI text_speedLabel;
+
     [Space(10), Header("랭킹 관련"), Tooltip("1/2 LAP")] 
     public TextMeshProUGUI text_lab;
     [Tooltip("1/5 (등수)")]
     public TextMeshProUGUI text_rank;
-    [Tooltip("랭킹 프리팹을 가지고 있는 부모")]
-    public Transform rankHolder;
+    public Transform rankHolder;        // 랭킹 요소를 가지고 있는 부모
     public RankManager rankManager;
 
     [Space(10), Header("결과창 관련")]
@@ -35,17 +36,18 @@ public class InGameUI : MonoBehaviour
 #endregion
 
 #region PrivateVariables
-    private GameObject rankingElem;     // 랭킹 프리팹
+    // 랭킹 관련
+    private GameObject rankElementPrefab;     // 랭킹 프리팹
+    private Dictionary<string, GameObject> rankElements; // <닉네임, RankElement>
     private float countDownDuration = 3.0f;
     private float speed = 0.0f;
     private float timer = 0.0f;
-    private Dictionary<string, TextMeshProUGUI> text_ranks; // <닉네임, 랭킹 텍스트>
 
     // Blink 코루틴 변수
-    private float blinkDuration = 0.1f; // 블링크 지속 시간 (초)
-    private Color originalColor = Color.white; // 원래 색상
-    private Color blinkColor = Color.grey; // 블링크 색상
-    private const float highlightScale = 1.5f; // 블링크 크기
+    private float blinkDuration = 0.1f;         // 블링크 지속 시간 (초)
+    private Color originalColor = Color.white;  // 원래 색상
+    private Color blinkColor = Color.grey;      // 블링크 색상
+    private const float highlightScale = 1.5f;  // 블링크 크기
     // ResultElem 텍스트 인덱스
     private const int rankIndex = 0;
     private const int nicknameIndex = 2;
@@ -66,9 +68,9 @@ public class InGameUI : MonoBehaviour
         else
             Debug.Log("[InGameUI] LapManager가 없습니다.");
         UpdateLapText(1);
-        text_ranks = new Dictionary<string, TextMeshProUGUI>();
+        rankElements = new Dictionary<string, GameObject>();
         GameManager.Result += GameResultUI;
-        rankingElem = Resources.Load<GameObject>("UI/RankingElem");
+        rankElementPrefab = Resources.Load<GameObject>("UI/RankElement");
     }
 
     // 텍스트 숨기기
@@ -120,10 +122,15 @@ public class InGameUI : MonoBehaviour
 #region PublicMethod
     public void CreateRankUI(string _nickname)
     {
-        GameObject rankElem = Instantiate(rankingElem, rankHolder);
-        TextMeshProUGUI text_rankElem = rankElem.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
-        text_rankElem.text = $"Player {_nickname}";
-        text_ranks.Add(_nickname, text_rankElem);
+        GameObject rankElem = Instantiate(rankElementPrefab, rankHolder);
+        RankElement rankElement = rankElem.GetComponent<RankElement>();
+        rankElement.SetRankElement(0, _nickname);
+        rankElements.Add(_nickname, rankElem);
+
+        // 내 랭킹 요소면 투명도와 글자 색 조절
+        string myNickname = WorldManager.instance.GetMyPlayer().nickName;
+        if (_nickname == myNickname)
+            rankElement.SetMyRankElement();
     }
     public void UpdateRankUI(List<RankInfo> _ranking)
     {
@@ -134,8 +141,8 @@ public class InGameUI : MonoBehaviour
             string nickname = _ranking[i].nickname;
             int lap = _ranking[i].lap;
             int checkpoint = _ranking[i].checkpoint;
-            text_ranks[nickname].text = $"{i + 1}. {nickname} - {checkpoint}";
-            text_ranks[nickname].transform.parent.SetSiblingIndex(i);
+            rankElements[nickname].GetComponent<RankElement>().SetRankElement(i + 1, nickname + "-" + checkpoint);
+            rankElements[nickname].transform.SetSiblingIndex(i);
 
             // 내 등수 업데이트
             if (nickname == myNickname)
@@ -143,7 +150,7 @@ public class InGameUI : MonoBehaviour
                 // 내 등수가 이전 등수보다 높으면 깜박임 효과
                 if (i + 1 < RankManager.instance.previousRank)
                 {
-                    StartCoroutine(RankEffectCoroutine(text_ranks[nickname].transform.parent.GetComponent<Image>()));
+                    StartCoroutine(RankEffectCoroutine(rankElements[nickname].transform.GetComponent<Image>()));
                 }
                 text_rank.text = $"<size=160>{i + 1}</size>/{totalPlayer}";
                 RankManager.instance.previousRank = i + 1;
@@ -152,8 +159,8 @@ public class InGameUI : MonoBehaviour
     }
     public void DeleteRankUI(string _nickname)
     {
-        Destroy(text_ranks[_nickname].transform.parent.gameObject);
-        text_ranks.Remove(_nickname);
+        Destroy(rankElements[_nickname].transform.parent.gameObject);
+        rankElements.Remove(_nickname);
     }
     public void UpdateTimer()
     {
