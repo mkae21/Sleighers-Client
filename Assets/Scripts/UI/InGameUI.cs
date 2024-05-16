@@ -246,7 +246,7 @@ public class InGameUI : MonoBehaviour
             resultElemObj.transform.SetSiblingIndex(i);
             resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].rank.ToString();
             resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].nickname;
-            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].time.ToString("F2");
+            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].goalTime.ToString("F2");
         }
     }
 #endregion
