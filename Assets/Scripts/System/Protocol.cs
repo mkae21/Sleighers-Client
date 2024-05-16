@@ -30,10 +30,12 @@ namespace Protocol
     public class Message
     {
         public Type type;
-        public int from;
-        public Message(Type _type, int _id)
+        public int roomID;
+        public string from;
+        public Message(Type _type, int _roomID, string _id)
         {
             this.type = _type;
+            this.roomID = _roomID;
             this.from = _id;
         }
     }
@@ -43,8 +45,9 @@ namespace Protocol
         public Vector3 velocity;        // 속도
         public float rotation;          // 회전 (y축)
         public long timeStamp;          // 타임스탬프
-        public SyncMessage(int _id, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Sync, _id)
+        public SyncMessage(int _roomID, string _id, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Sync, _roomID, _id)
         {
+            this.roomID = _roomID;
             this.from = _id;
             this.position = _p;
             this.velocity = _v;
@@ -57,8 +60,9 @@ namespace Protocol
     {
         public int count;
         public List<int> list;
-        public LoadGameSceneMessage(int _id, int _count, List<int> _userList) : base(Type.Receiver, _id)
+        public LoadGameSceneMessage(int _roomID, string _id, int _count, List<int> _userList) : base(Type.Receiver, _roomID, _id)
         {
+            this.roomID = _roomID ;
             this.from = _id;
             this.count = _count;
             this.list = new List<int>(_userList);
@@ -68,8 +72,9 @@ namespace Protocol
     public class GameCountDownMessage : Message
     {
         public int count;
-        public GameCountDownMessage(int _id, int _count) : base(Type.Receiver, _id)
+        public GameCountDownMessage(int _roomID, string _id, int _count) : base(Type.Receiver, _roomID, _id)
         {
+            this.roomID = _roomID;
             this.from = _id;
             this.count = _count;
         }
@@ -78,21 +83,25 @@ namespace Protocol
     {
         public int rank;
         public string nickname;
-        public float time;
-        public PlayerResult(string _nickname, int _rank, float _time)
-        {
-            this.rank = _rank;
-            this.nickname = _nickname;
-            this.time = _time;
-        }
+        public float goalTime;
+        // public PlayerResult(string _nickname, int _rank, float _time)
+        // {
+        //     this.rank = _rank;
+        //     this.nickname = _nickname;
+        //     this.time = _time;
+        // }
     }
-    public class GameResultMessage : Message
+    public struct GameEndMessage// : Message
     {
+        public Type type;
+        public int roomID;
+        public string from;
         public List<PlayerResult> resultList;
-        public GameResultMessage(int _id, List<PlayerResult> _resultList) : base(Type.Receiver, _id)
-        {
-            this.from = _id;
-            this.resultList = new List<PlayerResult>(_resultList);
-        }
+        // public GameEndMessage(int _roomID, string _id, List<PlayerResult> _resultList) : base(Type.Receiver, _roomID, _id)
+        // {
+        //     this.roomID= _roomID;
+        //     this.from = _id;
+        //     this.resultList = new List<PlayerResult>(_resultList);
+        // }
     }
 }

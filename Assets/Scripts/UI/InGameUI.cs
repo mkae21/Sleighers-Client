@@ -69,7 +69,7 @@ public class InGameUI : MonoBehaviour
             Debug.Log("[InGameUI] LapManager가 없습니다.");
         UpdateLapText(1);
         rankElements = new Dictionary<string, GameObject>();
-        GameManager.Result += GameResultUI;
+        GameManager.End += GameResultUI;
         rankElementPrefab = Resources.Load<GameObject>("UI/RankElement");
     }
 
@@ -246,7 +246,7 @@ public class InGameUI : MonoBehaviour
             resultElemObj.transform.SetSiblingIndex(i);
             resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].rank.ToString();
             resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].nickname;
-            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].time.ToString("F2");
+            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].goalTime.ToString("F2");
         }
     }
 #endregion
