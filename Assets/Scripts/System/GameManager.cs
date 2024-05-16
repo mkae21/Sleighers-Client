@@ -42,9 +42,7 @@ public class GameManager : MonoBehaviour
     public static event Action MatchResult = delegate { };  // MatchResult 상태에서 실행되는 함수들
     public static event Action Ready = delegate { };        // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { };       // InGame 상태에서 실행되는 함수들
-    public static event Action End = delegate { };          // End 상태에서 실행되는 함수들
-    // InGame 상태에서 실행되는 함수들
-    public static UnityAction<List<PlayerResult>> Result;   // 게임이 끝나고 결과창을 띄울 때 실행되는 함수
+    public static UnityAction<List<PlayerResult>> End;   // 게임이 끝나고 결과창을 띄울 때 실행되는 함수
 
     public enum GameState { Login, Lobby, Garage, Record, Friend, MatchMaking, MatchReady, MatchResult, Ready, InGame, End, Result };
     public SoundManager soundManager = new SoundManager();
@@ -153,12 +151,9 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(InGameUpdateCoroutine);
                 break;
             case GameState.End:
-                End();
+                GameEndMessage gameResult = (GameEndMessage)msg;
+                End?.Invoke(gameResult.resultList);
                 soundManager.StopAll();
-                break;
-            case GameState.Result:
-                GameResultMessage gameResult = (GameResultMessage)msg;
-                Result?.Invoke(gameResult.resultList);
                 break;
             default:
                 Debug.Log("[GameManager] 알 수 없는 상태입니다.");

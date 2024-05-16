@@ -69,7 +69,7 @@ public class InGameUI : MonoBehaviour
             Debug.Log("[InGameUI] LapManager가 없습니다.");
         UpdateLapText(1);
         rankElements = new Dictionary<string, GameObject>();
-        GameManager.Result += GameResultUI;
+        GameManager.End += GameResultUI;
         rankElementPrefab = Resources.Load<GameObject>("UI/RankElement");
     }
 

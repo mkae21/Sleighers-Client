@@ -91,10 +91,10 @@ namespace Protocol
             this.time = _time;
         }
     }
-    public class GameResultMessage : Message
+    public class GameEndMessage : Message
     {
         public List<PlayerResult> resultList;
-        public GameResultMessage(int _roomID, string _id, List<PlayerResult> _resultList) : base(Type.Receiver, _roomID, _id)
+        public GameEndMessage(int _roomID, string _id, List<PlayerResult> _resultList) : base(Type.Receiver, _roomID, _id)
         {
             this.roomID= _roomID;
             this.from = _id;
