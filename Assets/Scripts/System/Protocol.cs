@@ -84,24 +84,26 @@ namespace Protocol
         public int rank;
         public string nickname;
         public float goalTime;
-        // public PlayerResult(string _nickname, int _rank, float _time)
-        // {
-        //     this.rank = _rank;
-        //     this.nickname = _nickname;
-        //     this.time = _time;
-        // }
     }
-    public struct GameEndMessage// : Message
+
+    public struct GameEndStruct
     {
         public Type type;
         public int roomID;
         public string from;
         public List<PlayerResult> resultList;
-        // public GameEndMessage(int _roomID, string _id, List<PlayerResult> _resultList) : base(Type.Receiver, _roomID, _id)
-        // {
-        //     this.roomID= _roomID;
-        //     this.from = _id;
-        //     this.resultList = new List<PlayerResult>(_resultList);
-        // }
+        public float endTime;
+    }
+    public class GameEndMessage : Message
+    {
+        public List<PlayerResult> resultList;
+        public float endTime;
+        public GameEndMessage(int _roomID, string _id, List<PlayerResult> _resultList, float _endTime) : base(Type.GameEnd, _roomID, _id)
+        {
+            this.roomID= _roomID;
+            this.from = _id;
+            this.resultList = new List<PlayerResult>(_resultList);
+            this.endTime = _endTime;
+        }
     }
 }
