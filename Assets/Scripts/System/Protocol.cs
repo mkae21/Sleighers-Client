@@ -6,18 +6,10 @@ namespace Protocol
     // 이벤트 타입
     public enum Type : byte
     {
-        Login = 1,              // 로그인
-        Logout,                 // 로그아웃
-        Signin,                 // 회원가입
-        StartMatchMaking = 10,  // 매치메이킹 시작
-        EnterWaitingRoom,       // 대기실 입장
-        LoadGameScene,          // 인게임 접속
+        LoadGameScene = 1,      // 인게임 접속
         PlayerReady,            // 로딩 완료
         GameStartCountDown,     // 게임 시작 카운트 다운
         GameStart,              // 게임 시작
-        Key = 20,               // 키 입력
-        Item,                   // 아이템 사용
-        PlayerReconnect,        // 플레이어 재접속
         PlayerDisconnect,       // 플레이어 접속 끊김
         PlayerGoal,             // 플레이어 골인
         GameEndCountDown,       // 1등 도착 후 카운트 다운 시작

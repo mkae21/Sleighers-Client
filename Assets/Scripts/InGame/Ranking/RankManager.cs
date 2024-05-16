@@ -44,7 +44,7 @@ public class RankManager : MonoBehaviour
     {   
         if (_player == null)
             return;
-        string nickname = _player.nickName;
+        string nickname = _player.nickname;
         // 딕셔너리 항목이 없는 경우 새 사전 항목 만들기
         if (!rankInfoDictionary.ContainsKey(nickname))
             rankInfoDictionary.Add(nickname, new RankInfo());
@@ -67,24 +67,24 @@ public class RankManager : MonoBehaviour
     // 플레이어의 랭킹 정보를 가져오거나 추가
     public RankInfo AddOrGetRankInfo(Player _player)
     {
-        string nickname = _player.nickName;
+        string nickname = _player.nickname;
         if (!rankInfoDictionary.ContainsKey(nickname))
         {
             RankInfo newRankInfo = new RankInfo()
             {
-                nickname = _player.nickName,
+                nickname = _player.nickname,
                 lap = 0,
                 checkpoint = 0
             };
             rankInfoDictionary.Add(nickname, newRankInfo);
-            InGameUI.instance.CreateRankUI(_player.nickName);
+            InGameUI.instance.CreateRankUI(_player.nickname);
             return newRankInfo;
         }
         return rankInfoDictionary[nickname];
     }
     public void DeleteRankInfo(Player _player)
     {
-        string nickname = _player.nickName;
+        string nickname = _player.nickname;
         if (rankInfoDictionary.ContainsKey(nickname))
         {
             rankInfoDictionary.Remove(nickname);
@@ -105,7 +105,7 @@ public class RankManager : MonoBehaviour
             rankInfo.lap = item.Value.lap;
             rankInfo.checkpoint = item.Value.checkpoint;
             sortedRanking.Add(rankInfo);
-            if (item.Key == WorldManager.instance.GetMyPlayer().nickName)
+            if (item.Key == WorldManager.instance.GetMyPlayer().nickname)
             {
                 WorldManager.instance.GetMyPlayer().myRank = sortedRanking.Count;
             }
@@ -116,7 +116,7 @@ public class RankManager : MonoBehaviour
 
     public void SetPlayerCheckpointCount(Player _player)
     {
-        string nickname = _player.nickName;
+        string nickname = _player.nickname;
         if (rankInfoDictionary.ContainsKey(nickname))
         {
             RankInfo lapInfo = rankInfoDictionary[nickname];
