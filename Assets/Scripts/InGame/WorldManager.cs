@@ -225,7 +225,7 @@ public class WorldManager : MonoBehaviour
 
     private void LoadGameScene(List<PlayerInfo> playerList)
     {
-        myPlayerId = UserData.instance.email;
+        myPlayerId = UserData.instance.nickName;
         int myidx = 0;
         int totalPlayerCount = playerList.Count;
         sessionInfo.totalPlayerCount = playerList.Count;
@@ -238,7 +238,7 @@ public class WorldManager : MonoBehaviour
         //miniMapController.SetTarget(miniMapTarget);
         for (int i = 0; i < totalPlayerCount; i++)
         {
-            string playerID = playerList[i].email;
+            string playerID = playerList[i].nickname;
             if (playerID == myPlayerId)
             {
                 myidx = i;
@@ -255,7 +255,7 @@ public class WorldManager : MonoBehaviour
 
         for (int i = 0; i < totalPlayerCount; i++)
         {
-            string playerID = playerList[i].email;
+            string playerID = playerList[i].nickname;
             if (playerID == myPlayerId)
                 continue;
             Transform _sp = startingPoints[i].transform;

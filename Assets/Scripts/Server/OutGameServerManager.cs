@@ -78,7 +78,8 @@ public partial class ServerManager : MonoBehaviour
 
         socket.On("setNameSucc", (res) =>
         {
-
+            Debug.Log("닉네임이 변경되었습니다.: " + res);
+            UserData.instance.nickName = res.GetValue<string>();
         });
 
         socket.On("setNameFail", (res) =>
@@ -98,7 +99,6 @@ public partial class ServerManager : MonoBehaviour
                 Debug.Log("endterRoomSucc:" + res);
                 roomData = ParseData(res.GetValue<string>());
 
-                Debug.Log(roomData.playerList[0].email);
                 OutGameUI.instance.PopupMatchMakingPanel();
 
                 // 파싱된 데이터 출력
@@ -134,9 +134,9 @@ public partial class ServerManager : MonoBehaviour
             return;
         PlayerInfo sendPacket = new PlayerInfo
         {
-            email = UserData.instance.email
+            nickname = UserData.instance.nickName
         };
-        Debug.Log("matchmaking id 보낸다 : "+sendPacket.email);
+        Debug.Log("matchmaking id 보낸다 : "+sendPacket.nickname);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
         OutGameUI.instance.MatchMakingUI();
