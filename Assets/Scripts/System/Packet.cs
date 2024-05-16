@@ -1,44 +1,34 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
-public class LoginInfo
+namespace API
 {
-    public string email;
+    public enum Type
+    {
+        login,
+        loginSucc,
+        signup,
+        setName,
+        matching,
+    }
 }
 
-public class DefaultLoginInfo : LoginInfo
+// 구글 로그인 - 이메일
+// 그냥 로그인 - 이메일, 비번
+// 회원가입 - 이메일, 비번, 닉네임
+// 매치메이킹 - 닉네임
+public class PlayerInfo
 {
-    public string password;
+    public string email = string.Empty;
+    public string password = string.Empty;
+    public string nickname = string.Empty;
+    public override string ToString()
+    {
+        return string.Format("email: {0}, password: {1}, nickname: {2}", email, password, nickname);
+    }
 }
 
-public class UserInfo : LoginInfo
+public class RoomData
 {
-    public string id;
-    public string name;
-    public string cart;
-    public int curCostume;
-    public int curCart;
-}
-
-public class SignupInfo : DefaultLoginInfo
-{
-    public string name;
-}
-
-// 매치메이킹 요청 패킷
-public class Packet
-{
-    public string id;
-}
-
-public class SetNameInfo : Packet
-{
-    public string name;
-}
-
-public class MatchInfo : Packet
-{
-    public string name;
-    public int curCart;
+    public int roomID;
+    public List<PlayerInfo> playerList;
 }

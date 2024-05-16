@@ -24,8 +24,8 @@ public class FollowMyPlayer : MonoBehaviour
     }
     private void TryGetMyPlayer()
     {
-        int myPlayerID = WorldManager.instance.myPlayerId;
-        if (myPlayerID == -1)
+        string myPlayerID = WorldManager.instance.myPlayerNickname;
+        if (myPlayerID == string.Empty)
             Invoke("TryGetMyPlayer", 1f);
         else
             sled = WorldManager.instance.GetMySled().transform;

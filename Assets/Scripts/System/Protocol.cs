@@ -6,18 +6,10 @@ namespace Protocol
     // 이벤트 타입
     public enum Type : byte
     {
-        Login = 1,              // 로그인
-        Logout,                 // 로그아웃
-        Signin,                 // 회원가입
-        StartMatchMaking = 10,  // 매치메이킹 시작
-        EnterWaitingRoom,       // 대기실 입장
-        LoadGameScene,          // 인게임 접속
+        LoadGameScene = 1,      // 인게임 접속
         PlayerReady,            // 로딩 완료
         GameStartCountDown,     // 게임 시작 카운트 다운
         GameStart,              // 게임 시작
-        Key = 20,               // 키 입력
-        Item,                   // 아이템 사용
-        PlayerReconnect,        // 플레이어 재접속
         PlayerDisconnect,       // 플레이어 접속 끊김
         PlayerGoal,             // 플레이어 골인
         GameEndCountDown,       // 1등 도착 후 카운트 다운 시작
@@ -30,10 +22,12 @@ namespace Protocol
     public class Message
     {
         public Type type;
-        public int from;
-        public Message(Type _type, int _id)
+        public int roomID;
+        public string from;
+        public Message(Type _type, int _roomID, string _id)
         {
             this.type = _type;
+            this.roomID = _roomID;
             this.from = _id;
         }
     }
@@ -43,8 +37,9 @@ namespace Protocol
         public Vector3 velocity;        // 속도
         public float rotation;          // 회전 (y축)
         public long timeStamp;          // 타임스탬프
-        public SyncMessage(int _id, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Sync, _id)
+        public SyncMessage(int _roomID, string _id, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Sync, _roomID, _id)
         {
+            this.roomID = _roomID;
             this.from = _id;
             this.position = _p;
             this.velocity = _v;
@@ -57,8 +52,9 @@ namespace Protocol
     {
         public int count;
         public List<int> list;
-        public LoadGameSceneMessage(int _id, int _count, List<int> _userList) : base(Type.Receiver, _id)
+        public LoadGameSceneMessage(int _roomID, string _id, int _count, List<int> _userList) : base(Type.Receiver, _roomID, _id)
         {
+            this.roomID = _roomID ;
             this.from = _id;
             this.count = _count;
             this.list = new List<int>(_userList);
@@ -68,8 +64,9 @@ namespace Protocol
     public class GameCountDownMessage : Message
     {
         public int count;
-        public GameCountDownMessage(int _id, int _count) : base(Type.Receiver, _id)
+        public GameCountDownMessage(int _roomID, string _id, int _count) : base(Type.Receiver, _roomID, _id)
         {
+            this.roomID = _roomID;
             this.from = _id;
             this.count = _count;
         }
@@ -78,21 +75,27 @@ namespace Protocol
     {
         public int rank;
         public string nickname;
-        public float time;
-        public PlayerResult(string _nickname, int _rank, float _time)
-        {
-            this.rank = _rank;
-            this.nickname = _nickname;
-            this.time = _time;
-        }
+        public float goalTime;
     }
-    public class GameResultMessage : Message
+
+    public struct GameEndStruct
+    {
+        public Type type;
+        public int roomID;
+        public string from;
+        public List<PlayerResult> resultList;
+        public float endTime;
+    }
+    public class GameEndMessage : Message
     {
         public List<PlayerResult> resultList;
-        public GameResultMessage(int _id, List<PlayerResult> _resultList) : base(Type.Receiver, _id)
+        public float endTime;
+        public GameEndMessage(int _roomID, string _id, List<PlayerResult> _resultList, float _endTime) : base(Type.GameEnd, _roomID, _id)
         {
+            this.roomID= _roomID;
             this.from = _id;
             this.resultList = new List<PlayerResult>(_resultList);
+            this.endTime = _endTime;
         }
     }
 }

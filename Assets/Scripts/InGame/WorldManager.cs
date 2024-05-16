@@ -5,6 +5,8 @@ using UnityEngine.Events;
 using Protocol;
 using System.Threading.Tasks;
 using System;
+using Newtonsoft.Json;
+using System.Text;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
@@ -20,7 +22,7 @@ public class WorldManager : MonoBehaviour
     private RankManager rankManager;
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
-    private Dictionary<int, Player> players;
+    private Dictionary<string, Player> players;
     private Transform[] startingPoints;
     private Queue<byte[]> messageQueue = new Queue<byte[]>();
     private int tick = 0;
@@ -28,7 +30,7 @@ public class WorldManager : MonoBehaviour
 
 #region PublicVariables
     static public WorldManager instance;
-    public int myPlayerId { get; private set; } = -1;
+    public string myPlayerNickname { get; private set; } = string.Empty;
     public bool isGameStart { get; private set; } = false;
     public bool isRaceFinish { get; private set; } = false;
     public GameObject playerPool;
@@ -37,7 +39,6 @@ public class WorldManager : MonoBehaviour
 
     // 레이스가 종료되면 호출되는 액션
     public UnityAction OnRaceFinished { get; set; }
-
 #endregion
 
 #region PrivateMethod
@@ -52,7 +53,7 @@ public class WorldManager : MonoBehaviour
     {
         instance = this;
         rankManager = GetComponent<RankManager>();
-        players = new Dictionary<int, Player>();
+        players = new Dictionary<string, Player>();
         rankManager.OnLapComplete += OnLapComplete;
         OnRaceFinished += FinishRace;
     }
@@ -60,13 +61,13 @@ public class WorldManager : MonoBehaviour
     {
         InitializeGame();
         // 서버에 접속이 되지 않으면 오프라인 테스트 진행
-        if (!ServerManager.Instance().IsConnect)
+        if (!ServerManager.Instance().isConnectInGame)
         {
             Debug.LogWarning("[WorldManager] 서버에 접속되지 않았습니다. 오프라인 테스트 진행");
             GameObject testPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-            players.Add(myPlayerId, testPlayer.GetComponent<Player>());
+            players.Add(myPlayerNickname, testPlayer.GetComponent<Player>());
             Transform sp = startingPoints[0];
-            testPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "TestPlayer", sp.position, sp.rotation.eulerAngles.y);
+            testPlayer.GetComponent<Player>().Initialize(true, "TestPlayer", sp.position, sp.rotation.eulerAngles.y);
             Transform miniMapTarget = testPlayer.transform.Find("Sled");
             miniMapController.SetTarget(miniMapTarget);
             GameManager.Instance().ChangeState(GameManager.GameState.InGame);
@@ -133,7 +134,7 @@ public class WorldManager : MonoBehaviour
                 Debug.LogWarning("[OnReceive] 메세지가 비어있습니다.");
                 return;
             }
-            if (msg.from == myPlayerId)
+            if (msg.from == myPlayerNickname)
             {
                 Debug.LogWarning("[OnReceive] 내 플레이어의 메세지입니다.");
                 return;
@@ -146,8 +147,7 @@ public class WorldManager : MonoBehaviour
             switch (msg.type)
             {
                 case Protocol.Type.LoadGameScene:
-                    LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
-                    ReceiveLoadGameSceneEvent(loadMessage);
+                    ReceiveLoadGameSceneEvent(ServerManager.instance.roomData.playerList);
                     break;
 
                 case Protocol.Type.GameStartCountDown:
@@ -165,17 +165,14 @@ public class WorldManager : MonoBehaviour
                     break;
 
                 case Protocol.Type.GameEnd:
-                    GameResultMessage gameResultMessage = DataParser.ReadJsonData<GameResultMessage>(data);
+                    GameEndStruct gameResultStruct = JsonConvert.DeserializeObject<GameEndStruct>(Encoding.Default.GetString(data));
+                    GameEndMessage gameResultMessage = new GameEndMessage(gameResultStruct.roomID, gameResultStruct.from, gameResultStruct.resultList, gameResultStruct.endTime);
                     ReceiveGameEndEvent(gameResultMessage);
                     break;
                 
                 case Protocol.Type.Sync:
                     SyncMessage syncMessage = DataParser.ReadJsonData<SyncMessage>(data);
                     ReceiveSyncEvent(syncMessage);
-                    break;
-
-                case Protocol.Type.PlayerReconnect:
-                    ReceivePlayerReconnectEvent(msg);
                     break;
 
                 case Protocol.Type.PlayerDisconnect:
@@ -196,7 +193,7 @@ public class WorldManager : MonoBehaviour
         {
             if (players == null || !isGameStart)
                 return;
-            int id = msg.from;
+            string id = msg.from;
             Vector3 position = msg.position;
             Vector3 velocity = msg.velocity;
             float rotation = msg.rotation;
@@ -209,46 +206,49 @@ public class WorldManager : MonoBehaviour
         });
     }
 
-    // 다른 플레이어 접속 이벤트 처리
-    private void ReceivePlayerReconnectEvent(Message msg)
-    {
-        int newId = msg.from;
-        Transform sp = startingPoints[sessionInfo.totalPlayerCount];
-        GameObject newInstance = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-        players.Add(newId, newInstance.GetComponent<Player>());
-        newInstance.GetComponent<Player>().Initialize(false, newId, "Player" + newId, sp.position, sp.rotation.eulerAngles.y);
-        sessionInfo.totalPlayerCount++;
-    }
     // 게임 씬 로드 이벤트 처리
-    private void ReceiveLoadGameSceneEvent(LoadGameSceneMessage msg)
+    private void ReceiveLoadGameSceneEvent(List<PlayerInfo> playerList)
     {
-        myPlayerId = msg.from;
-        int totalPlayerCount = msg.count;
-        sessionInfo.totalPlayerCount = totalPlayerCount + 1;
-        List<int> userList = msg.list;
-        Transform sp = startingPoints[totalPlayerCount].transform;
-
-        GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-        players.Add(myPlayerId, myPlayer.GetComponent<Player>());
-        myPlayer.GetComponent<Player>().Initialize(true, myPlayerId, "Player" + myPlayerId, sp.position, sp.rotation.eulerAngles.y);
-        Transform miniMapTarget = myPlayer.transform.Find("Sled");
-        miniMapController.SetTarget(miniMapTarget);
-        Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerId);
+        myPlayerNickname = ServerManager.instance.myNickname;
+        int myidx = 0;
+        int totalPlayerCount = playerList.Count;
+        sessionInfo.totalPlayerCount = playerList.Count;
 
         for (int i = 0; i < totalPlayerCount; i++)
         {
-            int otherPlayerId = userList[i];
+            string playerNickname = playerList[i].nickname;
+            if (playerNickname == myPlayerNickname)
+            {
+                myidx = i;
+                break;
+            }
+        }
+        Transform sp = startingPoints[myidx].transform;
+        GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+        players.Add(myPlayerNickname, myPlayer.GetComponent<Player>());
+        myPlayer.GetComponent<Player>().Initialize(true, ServerManager.instance.myNickname, sp.position, sp.rotation.eulerAngles.y);
+        Transform miniMapTarget = myPlayer.transform.Find("Sled");
+        miniMapController.SetTarget(miniMapTarget);
+        Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerNickname);
+
+        for (int i = 0; i < totalPlayerCount; i++)
+        {
+            string playerNickname = playerList[i].nickname;
+            if (playerNickname == myPlayerNickname)
+                continue;
             Transform _sp = startingPoints[i].transform;
-            GameObject otherPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-            players.Add(otherPlayerId, otherPlayer.GetComponent<Player>());
-            otherPlayer.GetComponent<Player>().Initialize(false, otherPlayerId, "Player" + otherPlayerId, _sp.position, _sp.rotation.eulerAngles.y);
+            GameObject Player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+            players.Add(playerNickname, Player.GetComponent<Player>());
+            Player.GetComponent<Player>().Initialize(false, playerNickname, _sp.position, _sp.rotation.eulerAngles.y);
+
         }
     }
+
     // 게임 시작 카운트 다운 이벤트 처리
     private void ReceiveGameStartCountDownEvent(GameCountDownMessage msg)
     {
-            int count = msg.count;
-            InGameUI.instance.SetCountDown(count);
+        int count = msg.count;
+        InGameUI.instance.SetCountDown(count);
     }
     // 게임 시작 이벤트 처리
     private void ReceiveGameStartEvent()
@@ -263,14 +263,14 @@ public class WorldManager : MonoBehaviour
         InGameUI.instance.SetGameEndCountDown(count);        
     }
     // 게임 종료 이벤트 처리
-    private void ReceiveGameEndEvent(GameResultMessage msg)
+    private void ReceiveGameEndEvent(GameEndMessage msg)
     {
         GameManager.Instance().ChangeState(GameManager.GameState.End, msg);
     }
     // 다른 플레이어 접속 끊김 이벤트 처리
     private void ReceivePlayerDisconnectEvent(Message msg)
     {
-        int userId = msg.from;
+        string userId = msg.from;
         Destroy(players[userId].gameObject);
         RankManager.instance.DeleteRankInfo(players[userId]);
         players.Remove(userId);
@@ -295,7 +295,7 @@ public class WorldManager : MonoBehaviour
         {
             if (isGameStart)
                 return;
-            Message msg = new Message(Protocol.Type.GameStart, myPlayerId);
+            Message msg = new Message(Protocol.Type.GameStart, ServerManager.instance.roomData.roomID, myPlayerNickname);
             ServerManager.Instance().SendDataToInGame(msg);
         });
     }
@@ -304,19 +304,11 @@ public class WorldManager : MonoBehaviour
     {
         await Task.Run(() =>
         {
-            Message msg = new Message(Protocol.Type.PlayerGoal, myPlayerId);
+            Message msg = new Message(Protocol.Type.PlayerGoal, ServerManager.instance.roomData.roomID, myPlayerNickname);
             ServerManager.Instance().SendDataToInGame(msg);
         });
     }
-    // 임시 서버 리셋
-    private async void SendResetServerEvent()
-    {
-        await Task.Run(() =>
-        {
-            Message msg = new Message(Protocol.Type.ResetServer, myPlayerId);
-            ServerManager.Instance().SendDataToInGame(msg);
-        });
-    }
+
     private int ReadBytes(byte[] buffer, int offset, int count, int timeoutCounts)
     {
         NetworkStream stream = ServerManager.Instance().Stream;
@@ -382,7 +374,7 @@ public class WorldManager : MonoBehaviour
     // 서버로 보내는 데이터 처리 핸들러
     public void OnSend(Protocol.Type _type)
     {
-        if (!ServerManager.Instance().IsConnect)
+        if (!ServerManager.Instance().isConnectInGame)
             return;
         if (_type != Protocol.Type.Sync)
         {
@@ -403,10 +395,6 @@ public class WorldManager : MonoBehaviour
                 SendPlayerGoalEvent();
                 break;
 
-            case Protocol.Type.ResetServer:
-                SendResetServerEvent();
-                break;
-
             default:
                 Debug.LogWarning("[OnSend] 알 수 없는 프로토콜 : "+ _type);
                 break;
@@ -415,13 +403,13 @@ public class WorldManager : MonoBehaviour
 
     public Player GetMyPlayer()
     {
-        return players[myPlayerId];
+        return players[myPlayerNickname];
     }
     public GameObject GetMySled()
     {
-        return players[myPlayerId].gameObject.transform.Find("Sled").gameObject;
+        return players[myPlayerNickname].gameObject.transform.Find("Sled").gameObject;
     }
-    public Player GetPlayerFromId(int _id)
+    public Player GetPlayerFromId(string _id)
     {
         if (players.ContainsKey(_id))
             return players[_id];

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Protocol;
@@ -69,7 +70,7 @@ public class InGameUI : MonoBehaviour
             Debug.Log("[InGameUI] LapManager가 없습니다.");
         UpdateLapText(1);
         rankElements = new Dictionary<string, GameObject>();
-        GameManager.Result += GameResultUI;
+        GameManager.End += GameResultUI;
         rankElementPrefab = Resources.Load<GameObject>("UI/RankElement");
     }
 
@@ -128,13 +129,13 @@ public class InGameUI : MonoBehaviour
         rankElements.Add(_nickname, rankElem);
 
         // 내 랭킹 요소면 투명도와 글자 색 조절
-        string myNickname = WorldManager.instance.GetMyPlayer().nickName;
+        string myNickname = WorldManager.instance.GetMyPlayer().nickname;
         if (_nickname == myNickname)
             rankElement.SetMyRankElement();
     }
     public void UpdateRankUI(List<RankInfo> _ranking)
     {
-        string myNickname = WorldManager.instance.GetMyPlayer().nickName;
+        string myNickname = WorldManager.instance.GetMyPlayer().nickname;
         int totalPlayer = _ranking.Count;
         for (int i = 0; i < totalPlayer; i++)
         {
@@ -243,10 +244,12 @@ public class InGameUI : MonoBehaviour
         for (int i = 0; i < _playerResults.Count; i++)
         {
             GameObject resultElemObj = Instantiate(resultElem, resultElemHolder);
+            string resultTime = string.Format("{0:D2}:{1:D2}:{2:D2}", TimeSpan.FromMilliseconds((long)_playerResults[i].goalTime).Minutes, TimeSpan.FromMilliseconds((long)_playerResults[i].goalTime).Seconds, TimeSpan.FromMilliseconds((long)_playerResults[i].goalTime).Milliseconds / 10);
+
             resultElemObj.transform.SetSiblingIndex(i);
             resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].rank.ToString();
             resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].nickname;
-            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].time.ToString("F2");
+            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = resultTime;
         }
     }
 #endregion

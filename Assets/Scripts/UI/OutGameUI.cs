@@ -1,8 +1,6 @@
-using TMPro;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine;
+using TMPro;
 
 public class OutGameUI : MonoBehaviour
 {
@@ -11,34 +9,79 @@ public class OutGameUI : MonoBehaviour
     
     [Space(10), Header("===== Panels =====")]
     public GameObject[] panels;
-    [Space(10), Header("===== Button =====")]
-    public Button loginBtn;
-    public Button matchMakingBtn;
     [Space(10), Header("===== Setting =====")]
     public Toggle soundToggle;
     public Slider volumeSlider;
-    public TMP_Text setNameText;
+    public TMP_InputField setNicknameField;
+    public Button setNicknameBtn;
+    [Space(10), Header("===== Matching Room =====")]
+    public Button matchMakingBtn;
+    public GameObject loadingObject;
+    public TMP_Text matchMakingBtnText;
+    public GameObject PlayerMatchList;
+    public GameObject PlayerMatchListPrefabs;
     public bool speedPostProcessing = true;
     public bool mainPostProcessing = true;
 
-    [Space(10), Header("===== TextField =====")]
-    public TMP_InputField idField;
-    public TMP_InputField settingNameField;
+    [Space(10), Header("===== Login =====")]
+    public TMP_InputField loginID;
+    public TMP_InputField loginPW;
+    public Button defaultLoginBtn;
+    public Button defaultSignupBtn;
+    public Button googleLoginBtn;
+
+    [Space(10), Header("===== SignUp =====")]
+    public TMP_InputField signupID;
+    public TMP_InputField signupPW;
+    public TMP_InputField signupNickname;
     [Space(10), Header("===== Bar =====")]
     public GameObject topBar;
     [Space(10), Header("===== Store =====")]
     public GameObject[] sledList;
     public int sledListCnt;
-    [Space(10), Header("===== MatchMaking =====")]
-    public TMP_Text matchMakingBtnText;
-    public GameObject loadingObject;
 #endregion
 
 #region PrivateMethod
+    private void Awake()
+    {
+        if (instance != null)
+            Destroy(instance);
+        instance = this;
+    }
+
     private void Start()
     {
-        instance = this;
-        loginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
+        defaultLoginBtn.onClick.AddListener(() => 
+        {
+            PlayerInfo playerInfo = new PlayerInfo()
+            {
+                email = loginID.text,
+                password = loginPW.text
+            };
+            ServerManager.instance.OnSendOutGame(API.Type.login, playerInfo);
+        });
+        defaultSignupBtn.onClick.AddListener(() => 
+        {
+            PlayerInfo playerInfo = new PlayerInfo()
+            {
+                email = signupID.text,
+                password = signupPW.text,
+                nickname = signupNickname.text
+            };
+            ServerManager.instance.OnSendOutGame(API.Type.signup, playerInfo);
+        });
+        setNicknameBtn.onClick.AddListener(() => 
+        {
+            PlayerInfo playerInfo = new PlayerInfo()
+            {
+                email = ServerManager.instance.myEmail,
+                nickname = setNicknameField.text
+            };
+            ServerManager.instance.myNickname = setNicknameField.text;
+            ServerManager.instance.OnSendOutGame(API.Type.setName, playerInfo);
+            setNicknameField.text = "";
+        });
+        googleLoginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
         matchMakingBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.MatchMaking));
 
         soundToggle.onValueChanged.AddListener((value) => SoundOnOff());
@@ -66,6 +109,29 @@ public class OutGameUI : MonoBehaviour
     {
         matchMakingBtnText.text = "매칭중";
         loadingObject.SetActive(true);
+    }
+    public void ReturnMatchMakingUI()
+    {
+        matchMakingBtnText.text = "매치메이킹";
+        loadingObject.SetActive(false);
+    }
+
+    public void DrawMatchPlayer(string name)
+    {
+        GameObject playerObject = Instantiate(PlayerMatchListPrefabs, PlayerMatchList.transform);
+        playerObject.GetComponentInChildren<TMP_Text>().text = name;
+    }
+
+    public void DestroyMatchPlayer()
+    {
+        foreach(Transform child in PlayerMatchList.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    public void PopupMatchMakingPanel()
+    {
         panels[6].SetActive(true);
     }
     public void RealExitGame()
@@ -83,11 +149,6 @@ public class OutGameUI : MonoBehaviour
     public void ToggleObject(GameObject obj)
     {
         obj.SetActive(!obj.activeSelf);
-    }
-    public void LoadInGame()
-    {
-        GameManager.Instance().ChangeState(GameManager.GameState.Ready);
-        SceneManager.LoadScene("InGame");
     }
     public void SoundOnOff()
     {
