@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
         return instance;
     }
 
-    public void ChangeState(GameState state, GameEndMessage msg = null)
+    public void ChangeState(GameState state, Message msg = null)
     {
         gameState = state;
 
@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(InGameUpdateCoroutine);
                 break;
             case GameState.End:
-                GameEndMessage gameResult = msg;
+                GameEndMessage gameResult = (GameEndMessage)msg;
                 End?.Invoke(gameResult.resultList);
                 soundManager.StopAll();
                 break;
