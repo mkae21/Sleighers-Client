@@ -5,6 +5,8 @@ using UnityEngine.Events;
 using Protocol;
 using System.Threading.Tasks;
 using System;
+
+using Newtonsoft.Json;
 /* WorldManager.cs
  * - 인게임 내의 모든 것을 관리
  * - 인게임 내에서 프로토콜 수신 및 처리
@@ -167,7 +169,8 @@ public class WorldManager : MonoBehaviour
                     break;
 
                 case Protocol.Type.GameEnd:
-                    GameEndMessage gameResultMessage = DataParser.ReadJsonData<GameEndMessage>(data);
+                    //GameEndMessage gameResultMessage = DataParser.ReadJsonData<GameEndMessage>(data);
+                    GameEndMessage gameResultMessage = JsonConverter.DeserializeObject<GameEndMessage>(Encoding.Default.GetString(data));
                     ReceiveGameEndEvent(gameResultMessage);
                     break;
                 

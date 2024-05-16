@@ -83,22 +83,25 @@ namespace Protocol
     {
         public int rank;
         public string nickname;
-        public float time;
-        public PlayerResult(string _nickname, int _rank, float _time)
-        {
-            this.rank = _rank;
-            this.nickname = _nickname;
-            this.time = _time;
-        }
+        public float goalTime;
+        // public PlayerResult(string _nickname, int _rank, float _time)
+        // {
+        //     this.rank = _rank;
+        //     this.nickname = _nickname;
+        //     this.time = _time;
+        // }
     }
-    public class GameEndMessage : Message
+    public struct GameEndMessage// : Message
     {
+        public Type type;
+        public int roomID;
+        public string from;
         public List<PlayerResult> resultList;
-        public GameEndMessage(int _roomID, string _id, List<PlayerResult> _resultList) : base(Type.Receiver, _roomID, _id)
-        {
-            this.roomID= _roomID;
-            this.from = _id;
-            this.resultList = new List<PlayerResult>(_resultList);
-        }
+        // public GameEndMessage(int _roomID, string _id, List<PlayerResult> _resultList) : base(Type.Receiver, _roomID, _id)
+        // {
+        //     this.roomID= _roomID;
+        //     this.from = _id;
+        //     this.resultList = new List<PlayerResult>(_resultList);
+        // }
     }
 }
