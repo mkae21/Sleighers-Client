@@ -74,9 +74,10 @@ public class OutGameUI : MonoBehaviour
         {
             PlayerInfo playerInfo = new PlayerInfo()
             {
-                email = UserData.instance.email,
+                email = ServerManager.instance.myEmail,
                 nickname = setNicknameField.text
             };
+            ServerManager.instance.myNickname = setNicknameField.text;
             ServerManager.instance.OnSendOutGame(API.Type.setName, playerInfo);
             setNicknameField.text = "";
         });

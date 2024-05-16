@@ -2,6 +2,10 @@ using UnityEngine;
 
 public partial class ServerManager : MonoBehaviour
 {
+#region PublicVariables
+    public string myEmail = string.Empty;
+    public string myNickname = string.Empty;
+#endregion
 #region PrivateMethod
     private void Awake()
     {
