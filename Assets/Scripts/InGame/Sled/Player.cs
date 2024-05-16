@@ -331,6 +331,7 @@ public class Player : MonoBehaviour
         {
             isMove = true;
             animator.SetBool("isMove",true);
+            animator.speed = 1f + NormalizedForwardSpeed;
         }
     }
 
