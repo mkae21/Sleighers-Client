@@ -171,7 +171,8 @@ public class WorldManager : MonoBehaviour
 
                 case Protocol.Type.GameEnd:
                     //GameEndMessage gameResultMessage = DataParser.ReadJsonData<GameEndMessage>(data);
-                    GameEndMessage gameResultMessage = JsonConvert.DeserializeObject<GameEndMessage>(Encoding.Default.GetString(data));
+                    GameEndStruct gameResultStruct = JsonConvert.DeserializeObject<GameEndStruct>(Encoding.Default.GetString(data));
+                    GameEndMessage gameResultMessage = new GameEndMessage(gameResultStruct.roomID, gameResultStruct.from, gameResultStruct.resultList, gameResultStruct.endTime);
                     ReceiveGameEndEvent(gameResultMessage);
                     break;
                 

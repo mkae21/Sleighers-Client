@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Protocol;
@@ -243,10 +244,12 @@ public class InGameUI : MonoBehaviour
         for (int i = 0; i < _playerResults.Count; i++)
         {
             GameObject resultElemObj = Instantiate(resultElem, resultElemHolder);
+            string resultTime = string.Format("{0:D2}:{1:D2}:{2:D2}", TimeSpan.FromMilliseconds((long)_playerResults[i].goalTime).Minutes, TimeSpan.FromMilliseconds((long)_playerResults[i].goalTime).Seconds, TimeSpan.FromMilliseconds((long)_playerResults[i].goalTime).Milliseconds / 10);
+
             resultElemObj.transform.SetSiblingIndex(i);
             resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].rank.ToString();
             resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].nickname;
-            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].goalTime.ToString("F2");
+            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = resultTime;
         }
     }
 #endregion

@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
         return instance;
     }
 
-    public void ChangeState(GameState state, GameEndMessage msg = new GameEndMessage())
+    public void ChangeState(GameState state, GameEndMessage msg = null)
     {
         gameState = state;
 
