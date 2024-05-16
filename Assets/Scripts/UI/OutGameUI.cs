@@ -1,4 +1,3 @@
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
@@ -149,11 +148,6 @@ public class OutGameUI : MonoBehaviour
     public void ToggleObject(GameObject obj)
     {
         obj.SetActive(!obj.activeSelf);
-    }
-    public void LoadInGame()
-    {
-        SceneManager.LoadScene("InGame");
-        GameManager.Instance().ChangeState(GameManager.GameState.Ready);
     }
     public void SoundOnOff()
     {

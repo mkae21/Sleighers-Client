@@ -7,7 +7,7 @@ using UnityEngine;
 public class GoogleAuth : MonoBehaviour
 {
 #region PrivateMethod
-    private void Start()
+    private void Awake()
     {
         GameManager.Lobby += GoogleOAuth;
     }

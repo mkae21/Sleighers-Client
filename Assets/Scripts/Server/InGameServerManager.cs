@@ -51,7 +51,6 @@ public partial class ServerManager : MonoBehaviour
         {
             Client = new TcpClient(inGameServerIP, inGameServerPort);
             Debug.LogFormat("[ServerManager] 인게임 서버 접속 성공 {0}:{1}", inGameServerIP, inGameServerPort);
-            // LogManager.instance.Log("[ServerManager] 인게임 서버 접속 성공 " + inGameServerIP + ":" + inGameServerPort.ToString());
             Stream = Client.GetStream();
             isConnectInGame = true;
             Message msg = new Message(Protocol.Type.Login, roomData.roomID, UserData.instance.email);
@@ -60,7 +59,6 @@ public partial class ServerManager : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogWarning("[ServerManager] 인게임 서버 접속 실패: " + e.Message);
-            // LogManager.instance.Log("[ServerManager] 인게임 서버 접속 실패 " + inGameServerIP + ":" + inGameServerPort.ToString());
             isConnectInGame = false;
             return;
         }

@@ -25,14 +25,14 @@ public partial class ServerManager : MonoBehaviour
         socket.OnConnected += (sender, e) =>
         {
             isConnectOutGame = true;
-            Debug.LogFormat("[OutGameServerManager] 서버 접속 성공 {0}:{1}", inGameServerIP, inGameServerPort);
+            Debug.LogFormat("[OutGameServerManager] 서버 접속 성공 {0}:{1}", outGameServerIP, outGameServerPort);
         };
 
         // 연결 해제 이벤트 핸들러
         socket.OnDisconnected += (sender, e) =>
         {
             isConnectOutGame = false;
-            Debug.LogFormat("[OutGameServerManager] 서버 접속 해제 {0}:{1}", inGameServerIP, inGameServerPort);
+            Debug.LogFormat("[OutGameServerManager] 서버 접속 해제 {0}:{1} {2}", outGameServerIP, outGameServerPort, e.ToString());
         };
 
         // 에러 이벤트 핸들러
@@ -112,10 +112,10 @@ public partial class ServerManager : MonoBehaviour
 
         socket.On("loadGameScene", (res) =>
         {
-            Debug.Log(res);
+            Debug.LogFormat("loadGameScene : {0}", res);
             UnityThread.executeInLateUpdate(() =>
-            {
-                OutGameUI.instance.LoadInGame();
+            {        
+                GameManager.Instance().ChangeState(GameManager.GameState.Ready);
             });
         });
 
@@ -141,7 +141,7 @@ public partial class ServerManager : MonoBehaviour
         socket.Emit("matching", jsonData);
         OutGameUI.instance.MatchMakingUI();
     }
-    private void SocketEmit(API.Type _type, PlayerInfo _playerInfo)
+    private void SendDataToOutGame(API.Type _type, PlayerInfo _playerInfo)
     {
         string jsonData = JsonUtility.ToJson(_playerInfo);
         socket.Emit(_type.ToString(), jsonData);
@@ -167,19 +167,19 @@ public partial class ServerManager : MonoBehaviour
         switch (_type)
         {
             case API.Type.login:
-                SocketEmit(_type, _playerInfo);
+                SendDataToOutGame(_type, _playerInfo);
                 break;
 
             case API.Type.loginSucc:
-                SocketEmit(_type, _playerInfo);
+                SendDataToOutGame(_type, _playerInfo);
                 break;
 
             case API.Type.signup:
-                SocketEmit(_type, _playerInfo);
+                SendDataToOutGame(_type, _playerInfo);
                 break;
 
             case API.Type.setName:
-                SocketEmit(_type, _playerInfo);
+                SendDataToOutGame(_type, _playerInfo);
                 break;
 
             case API.Type.matching:

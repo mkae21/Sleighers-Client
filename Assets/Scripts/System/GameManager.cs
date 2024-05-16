@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using Protocol;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 /* GameManager.cs
  * - 게임 전체적인 상태를 관리
- * - 인게임 내에서 코루틴 업데이트 실행으로 플레이어 입력 처리
  */
 public class GameManager : MonoBehaviour
 {
@@ -20,16 +20,13 @@ public class GameManager : MonoBehaviour
 #endregion
 
 #region PublicVariables
-/* Login - 로그인 전 상태
+/* Login - 로그인/회원가입
  * Lobby - 로비
- * Garage - 차고
- * Record - 전적 리스트
- * Friend - 친구 리스트
- * MatchResult - 매치메이킹 성사
+ * MatchMaking - 매치메이킹 중
+ * MatchResult - 매치메이킹 성사 시
  * Ready - 게임 시작 전 준비 (이때부터 인게임 씬)
  * InGame - 게임 중
- * End - 게임 종료 (피니시 라인 통과 시)
- * Result - 게임 결과창
+ * End - 게임 종료 (피니시 라인 통과 시) ? 결과창 ?
  */
     public static event Action Login = delegate { };        // Login 상태에서 실행되는 함수들
     public static event Action Lobby = delegate { };        // Lobby 상태에서 실행되는 함수들
@@ -39,7 +36,7 @@ public class GameManager : MonoBehaviour
     public static event Action InGame = delegate { };       // InGame 상태에서 실행되는 함수들
     public static UnityAction<List<PlayerResult>> End;   // 게임이 끝나고 결과창을 띄울 때 실행되는 함수
 
-    public enum GameState { Login, Lobby, MatchMaking, MatchResult, Ready, InGame, End, Result };
+    public enum GameState { Login, Lobby, MatchMaking, MatchResult, Ready, InGame, End };
     public SoundManager soundManager = new SoundManager();
 #endregion
 
@@ -111,9 +108,11 @@ public class GameManager : MonoBehaviour
                 MatchResult();
                 break;
             case GameState.Ready:
+                SceneManager.LoadScene("InGame");
                 soundManager.Stop("BGM/Lobby", SoundType.BGM);
                 soundManager.Play("BGM/Wind", SoundType.WIND);
                 soundManager.Play("BGM/InGame", SoundType.BGM);
+                Ready();
                 break;
             case GameState.InGame:
                 StartCoroutine(InGameUpdateCoroutine);
@@ -127,11 +126,6 @@ public class GameManager : MonoBehaviour
                 Debug.Log("[GameManager] 알 수 없는 상태입니다.");
                 break;
         }
-    }
-
-    public GameState GetGameState()
-    {
-        return gameState;
     }
 #endregion
 }
