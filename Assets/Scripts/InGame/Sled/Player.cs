@@ -122,7 +122,7 @@ public class Player : MonoBehaviour
     }
     private void CuerrentValue()
     {
-        currentSpeed = Mathf.SmoothStep(currentSpeed, speed, Time.deltaTime * 8f);//줄일 것
+        currentSpeed = Mathf.SmoothStep(currentSpeed, speed, Time.deltaTime * 8f);
         speed = 0f; // Reset for next frame
         currentRotate = Mathf.Lerp(currentRotate, rotate, Time.deltaTime * 2f);
         rotate = 0f; // Reset for next frame
