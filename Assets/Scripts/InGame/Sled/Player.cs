@@ -40,7 +40,7 @@ public class Player : MonoBehaviour
 #region PublicVariables
     public bool isMe { get; private set; } = false;
     public bool isBraking { get; private set;} = false;
-    public string playerId { get; private set; } = string.Empty;
+    public string playerId { get; private set; } = string.Empty;        // TODO: 닉네임으로 통일
     public string nickName {get; private set;} = string.Empty;
     public Transform curCheckpoint;
     public Transform nextCheckpoint;
@@ -349,7 +349,7 @@ public class Player : MonoBehaviour
     }
     public SyncMessage GetSyncData()
     {
-        return new SyncMessage(OutGameServerManager.instance.roomData.roomID, playerId, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        return new SyncMessage(ServerManager.instance.roomData.roomID, playerId, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
     public void SetDrift(bool isDrift)

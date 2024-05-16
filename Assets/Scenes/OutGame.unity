@@ -837,12 +837,12 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -858,12 +858,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1113373758}
+      objectReference: {fileID: 1916761440}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 1916761440}
+      objectReference: {fileID: 1823484530}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
@@ -887,7 +887,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Signup
+      value: SetActive
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -902,7 +902,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: OutGameServerManager, Assembly-CSharp
+      value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -922,7 +922,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -1226,7 +1226,7 @@ Transform:
   m_GameObject: {fileID: 41134522}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 515.8261, y: 398.2533, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3146,7 +3146,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Username
+  m_text: ID
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5094b715585444e90b7306721788dae5, type: 2}
   m_sharedMaterial: {fileID: 2393364598115949451, guid: 5094b715585444e90b7306721788dae5,
@@ -5107,7 +5107,7 @@ GameObject:
   - component: {fileID: 301606843}
   - component: {fileID: 301606842}
   m_Layer: 5
-  m_Name: InputField_UserName
+  m_Name: InputField_ID
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11972,6 +11972,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 733313778}
   m_CullTransparentMesh: 1
+--- !u!114 &736888912 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
+    type: 3}
+  m_PrefabInstance: {fileID: 27890264}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &741057419
 GameObject:
   m_ObjectHideFlags: 0
@@ -15242,7 +15254,7 @@ Transform:
   m_GameObject: {fileID: 977507944}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.430999, y: -2.4909651, z: 1.3126489}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17675,7 +17687,7 @@ PrefabInstance:
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
@@ -17701,7 +17713,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1113373758}
+      objectReference: {fileID: 0}
     - target: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
@@ -17875,7 +17887,7 @@ GameObject:
   - component: {fileID: 1113373757}
   - component: {fileID: 1113373758}
   m_Layer: 0
-  m_Name: OutGameServer
+  m_Name: ServerManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17890,7 +17902,7 @@ Transform:
   m_GameObject: {fileID: 1113373756}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.430999, y: -2.4909651, z: 1.3126489}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -17905,14 +17917,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1113373756}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 619a852ae665f35409d9631139d82af3, type: 3}
+  m_Script: {fileID: 11500000, guid: b168e963aabdebc4fb8d748f29d56f36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  idInputField: {fileID: 729808195}
-  pwInputField: {fileID: 1527312490}
-  idSignUpField: {fileID: 301606842}
-  pwSignUpField: {fileID: 1839526268}
-  nameSignUpField: {fileID: 18520809}
+  isConnectInGame: 0
+  isConnectOutGame: 0
 --- !u!1001 &1116207280
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18982,6 +18991,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1166165208}
   m_CullTransparentMesh: 1
+--- !u!114 &1171029974 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2681883656539044386, guid: f66fd021d07fb9c4cb31a01de400c0d3,
+    type: 3}
+  m_PrefabInstance: {fileID: 1112543013}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1180568477
 GameObject:
   m_ObjectHideFlags: 0
@@ -24745,7 +24766,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d158c0a39da6f74c93b03bb6c4b1110, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id: 
   email: 
   nickName: 
   cart: 
@@ -26601,19 +26621,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1572705401}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1113373758}
-        m_TargetAssemblyTypeName: OutGameServerManager, Assembly-CSharp
-        m_MethodName: SetName
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1572705401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31213,7 +31221,7 @@ Transform:
   m_GameObject: {fileID: 1846760656}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1008.5431, y: 516.95337, z: 5.0029116}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -31643,20 +31651,26 @@ MonoBehaviour:
   - {fileID: 406879826}
   - {fileID: 1652357913}
   - {fileID: 1898024901}
-  loginBtn: {fileID: 240474723}
-  matchMakingBtn: {fileID: 217197006}
   soundToggle: {fileID: 870550506}
   volumeSlider: {fileID: 1109577905}
-  setNameText: {fileID: 0}
-  speedPostProcessing: 1
-  mainPostProcessing: 1
+  setNicknameField: {fileID: 1543634049}
+  setNicknameBtn: {fileID: 1572705400}
+  matchMakingBtn: {fileID: 217197006}
   loadingObject: {fileID: 1683095089}
   matchMakingBtnText: {fileID: 811888475}
   PlayerMatchList: {fileID: 1718064438}
   PlayerMatchListPrefabs: {fileID: 8763370057744397414, guid: bb005da4494243b4eb2eecd8f88781d7,
     type: 3}
-  idField: {fileID: 729808195}
-  settingNameField: {fileID: 1543634049}
+  speedPostProcessing: 1
+  mainPostProcessing: 1
+  loginID: {fileID: 729808195}
+  loginPW: {fileID: 1527312490}
+  defaultLoginBtn: {fileID: 1171029974}
+  defaultSignupBtn: {fileID: 736888912}
+  googleLoginBtn: {fileID: 240474723}
+  signupID: {fileID: 301606842}
+  signupPW: {fileID: 1839526268}
+  signupNickname: {fileID: 18520809}
   topBar: {fileID: 1180568477}
   sledList:
   - {fileID: 356004450}
@@ -31664,7 +31678,6 @@ MonoBehaviour:
   - {fileID: 472201711}
   - {fileID: 1794392351}
   sledListCnt: 4
-  matchingListPanel: {fileID: 0}
 --- !u!4 &1891215498
 Transform:
   m_ObjectHideFlags: 0
@@ -31946,7 +31959,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1916761441}
   m_Layer: 5
-  m_Name: Signin
+  m_Name: Signup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31970,7 +31983,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0.75}
-  m_AnchoredPosition: {x: 0, y: -83.33331}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &1918875685
@@ -35461,12 +35474,12 @@ SceneRoots:
   - {fileID: 1303159044}
   - {fileID: 507721554267702773}
   - {fileID: 6340230159494497606}
+  - {fileID: 1113373757}
+  - {fileID: 977507945}
+  - {fileID: 1461626626}
   - {fileID: 41134523}
   - {fileID: 1488667367}
   - {fileID: 1891215498}
   - {fileID: 235306473}
   - {fileID: 1846760657}
   - {fileID: 169067630}
-  - {fileID: 1113373757}
-  - {fileID: 977507945}
-  - {fileID: 1461626626}

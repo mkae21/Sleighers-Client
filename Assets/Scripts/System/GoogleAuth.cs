@@ -6,12 +6,12 @@ using UnityEngine;
 
 public class GoogleAuth : MonoBehaviour
 {
-
-#region PrivateVariables
-#endregion
-
-#region PublicMethod
-    public async void GoogleOAuth()
+#region PrivateMethod
+    private void Start()
+    {
+        GameManager.Lobby += GoogleOAuth;
+    }
+    private async void GoogleOAuth()
     {
         var clientId = SecretLoader.googleAuth.id;
         var clientSecret = SecretLoader.googleAuth.secret;
@@ -38,22 +38,18 @@ public class GoogleAuth : MonoBehaviour
 
         if (!string.IsNullOrEmpty(profile.EmailAddress))
         {
-            // ¼­¹ö·Î ÀÌ¸ŞÀÏ ÁÖ¼Ò Àü¼Û
-            Debug.Log("ÀÌ¸ŞÀÏ ÁÖ¼Ò :" + profile.EmailAddress);
-            OutGameServerManager.instance.LoginSucc(profile.EmailAddress);
+            Debug.LogFormat("êµ¬ê¸€ ë¡œê·¸ì¸ ì„±ê³µ : {0}", profile.EmailAddress);
+            PlayerInfo playerInfo = new PlayerInfo
+            {
+                email = profile.EmailAddress
+            };
+            ServerManager.instance.OnSendOutGame(API.Type.loginSucc, playerInfo);
             OutGameUI.instance.SuccLoginPanel();
         }
         else
         {
-            Debug.LogError("»ç¿ëÀÚ ÀÌ¸ŞÀÏ ÁÖ¼Ò¸¦ °¡Á®¿À´Âµ¥ ½ÇÆĞÇß½À´Ï´Ù.");
+            Debug.LogError("ì‚¬ìš©ìì˜ ì´ë©”ì¼ ì£¼ì†Œë¥¼ ê°€ì ¸ì˜¤ëŠ”ë° ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤.");
         }
-    }
-    #endregion
-
-#region PrivateMethod
-    private void Start()
-    {
-        GameManager.Lobby += GoogleOAuth;
     }
 #endregion
 }

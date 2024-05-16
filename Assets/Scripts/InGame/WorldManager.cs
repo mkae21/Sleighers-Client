@@ -5,7 +5,6 @@ using UnityEngine.Events;
 using Protocol;
 using System.Threading.Tasks;
 using System;
-
 using Newtonsoft.Json;
 using System.Text;
 /* WorldManager.cs
@@ -40,8 +39,6 @@ public class WorldManager : MonoBehaviour
 
     // 레이스가 종료되면 호출되는 액션
     public UnityAction OnRaceFinished { get; set; }
-    
-
 #endregion
 
 #region PrivateMethod
@@ -64,7 +61,7 @@ public class WorldManager : MonoBehaviour
     {
         InitializeGame();
         // 서버에 접속이 되지 않으면 오프라인 테스트 진행
-        if (!ServerManager.Instance().IsConnect)
+        if (!ServerManager.Instance().isConnectInGame)
         {
             Debug.LogWarning("[WorldManager] 서버에 접속되지 않았습니다. 오프라인 테스트 진행");
             GameObject testPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
@@ -152,7 +149,7 @@ public class WorldManager : MonoBehaviour
                 case Protocol.Type.LoadGameScene:
                     //LoadGameSceneMessage loadMessage = DataParser.ReadJsonData<LoadGameSceneMessage>(data);
                     //ReceiveLoadGameSceneEvent(loadMessage);
-                    LoadGameScene(OutGameServerManager.instance.roomData.playerList);
+                    LoadGameScene(ServerManager.instance.roomData.playerList);
                     break;
 
                 case Protocol.Type.GameStartCountDown:
@@ -226,9 +223,9 @@ public class WorldManager : MonoBehaviour
     //    sessionInfo.totalPlayerCount++;
     //}
 
-    private void LoadGameScene(List<MatchInfo> playerList)
+    private void LoadGameScene(List<PlayerInfo> playerList)
     {
-        myPlayerId = UserData.instance.id;
+        myPlayerId = UserData.instance.email;
         int myidx = 0;
         int totalPlayerCount = playerList.Count;
         sessionInfo.totalPlayerCount = playerList.Count;
@@ -241,7 +238,7 @@ public class WorldManager : MonoBehaviour
         //miniMapController.SetTarget(miniMapTarget);
         for (int i = 0; i < totalPlayerCount; i++)
         {
-            string playerID = playerList[i].id;
+            string playerID = playerList[i].email;
             if (playerID == myPlayerId)
             {
                 myidx = i;
@@ -258,13 +255,13 @@ public class WorldManager : MonoBehaviour
 
         for (int i = 0; i < totalPlayerCount; i++)
         {
-            string playerID = playerList[i].id;
+            string playerID = playerList[i].email;
             if (playerID == myPlayerId)
                 continue;
             Transform _sp = startingPoints[i].transform;
             GameObject Player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
             players.Add(playerID, Player.GetComponent<Player>());
-            Player.GetComponent<Player>().Initialize(false, playerID, playerList[i].name, _sp.position, _sp.rotation.eulerAngles.y);
+            Player.GetComponent<Player>().Initialize(false, playerID, playerList[i].nickname, _sp.position, _sp.rotation.eulerAngles.y);
 
         }
     }
@@ -345,7 +342,7 @@ public class WorldManager : MonoBehaviour
         {
             if (isGameStart)
                 return;
-            Message msg = new Message(Protocol.Type.GameStart, OutGameServerManager.instance.roomData.roomID, myPlayerId);
+            Message msg = new Message(Protocol.Type.GameStart, ServerManager.instance.roomData.roomID, myPlayerId);
             ServerManager.Instance().SendDataToInGame(msg);
         });
     }
@@ -354,7 +351,7 @@ public class WorldManager : MonoBehaviour
     {
         await Task.Run(() =>
         {
-            Message msg = new Message(Protocol.Type.PlayerGoal, OutGameServerManager.instance.roomData.roomID, myPlayerId);
+            Message msg = new Message(Protocol.Type.PlayerGoal, ServerManager.instance.roomData.roomID, myPlayerId);
             ServerManager.Instance().SendDataToInGame(msg);
         });
     }
@@ -363,7 +360,7 @@ public class WorldManager : MonoBehaviour
     {
         await Task.Run(() =>
         {
-            Message msg = new Message(Protocol.Type.ResetServer, OutGameServerManager.instance.roomData.roomID, myPlayerId);
+            Message msg = new Message(Protocol.Type.ResetServer, ServerManager.instance.roomData.roomID, myPlayerId);
             ServerManager.Instance().SendDataToInGame(msg);
         });
     }
@@ -432,7 +429,7 @@ public class WorldManager : MonoBehaviour
     // 서버로 보내는 데이터 처리 핸들러
     public void OnSend(Protocol.Type _type)
     {
-        if (!ServerManager.Instance().IsConnect)
+        if (!ServerManager.Instance().isConnectInGame)
             return;
         if (_type != Protocol.Type.Sync)
         {

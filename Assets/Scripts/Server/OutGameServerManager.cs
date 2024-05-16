@@ -1,71 +1,38 @@
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using TMPro;
-
-public class OutGameServerManager : MonoBehaviour
+/* OutGameServerManager.cs
+ * - 아웃게임 서버와의 통신을 관리
+ */
+public partial class ServerManager : MonoBehaviour
 {
 #region PrivateVariables
-    private string serverIP = string.Empty;
-    private int serverPort = 0;
     private SocketIOUnity socket;
-
-    [SerializeField]
-    private TMP_InputField idInputField;
-    [SerializeField]
-    private TMP_InputField pwInputField;
-    [SerializeField]
-    private TMP_InputField idSignUpField;
-    [SerializeField]
-    private TMP_InputField pwSignUpField;
-    [SerializeField]
-    private TMP_InputField nameSignUpField;
-
+    private string outGameServerIP = string.Empty;
+    private int outGameServerPort = 0;
 #endregion
 
 #region PublicVariables
-    public static OutGameServerManager instance = null;
+    public static ServerManager instance = null;
     public RoomData roomData;
-
+    public bool isConnectOutGame = false;
 #endregion
 
-    #region PrivateMethod
-    private void Awake()
+#region PrivateMethod
+    private void ConnectOutGame()
     {
-        if (instance != null)
-            Destroy(instance);
-        instance = this;
-        DontDestroyOnLoad(this.gameObject);
-    }
-
-    void Start()
-    {
-        Init();
-        GameManager.MatchMaking += MatchMaking;
-    }
-
-    private void OnDestroy()
-    {
-        GameManager.MatchMaking -= MatchMaking;
-    }
-
-    private void Init()
-    {
-        // serverIP = "localhost"; // 로컬 테스트 용
-        serverIP = SecretLoader.outgameServer.ip;
-        serverPort = SecretLoader.outgameServer.port;
-        socket = new SocketIOUnity("http://" + serverIP +":"+serverPort);
+        socket = new SocketIOUnity($"http://{outGameServerIP}:{outGameServerPort}");
 
         socket.OnConnected += (sender, e) =>
         {
-            Debug.LogFormat("[OutGameServerManager] 서버 접속 성공 {0}:{1}", serverIP, serverPort);
+            isConnectOutGame = true;
+            Debug.LogFormat("[OutGameServerManager] 서버 접속 성공 {0}:{1}", inGameServerIP, inGameServerPort);
         };
 
         // 연결 해제 이벤트 핸들러
         socket.OnDisconnected += (sender, e) =>
         {
-            Debug.LogFormat("[OutGameServerManager] 서버 접속 해제 {0}:{1}", serverIP, serverPort);
+            isConnectOutGame = false;
+            Debug.LogFormat("[OutGameServerManager] 서버 접속 해제 {0}:{1}", inGameServerIP, inGameServerPort);
         };
 
         // 에러 이벤트 핸들러
@@ -78,7 +45,10 @@ public class OutGameServerManager : MonoBehaviour
         socket.On("loginSucc", (res) =>
         {
             Debug.Log("Login success: " + res);
-            DefaultLoginSucc();
+            UnityThread.executeInLateUpdate (() =>
+            {
+                OutGameUI.instance.SuccLoginPanel();
+            });
         });
 
         socket.On("loginFail", (res) =>
@@ -99,16 +69,11 @@ public class OutGameServerManager : MonoBehaviour
 
         socket.On("inquiryPlayer", (res) =>
         {
-            Debug.Log("inquiryPlayer: " + res);
+            Debug.Log("inquiryPlayer: 내 플레이어 정보 받음: " + res);
             string jsonString = res.GetValue<string>();
-            UserInfo userInfo = JsonUtility.FromJson<UserInfo>(jsonString);
-            UserData.instance.id = userInfo.id;
-            UserData.instance.nickName = userInfo.name;
-            UserData.instance.cart = userInfo.cart;
+            PlayerInfo userInfo = JsonUtility.FromJson<PlayerInfo>(jsonString);
+            UserData.instance.nickName = userInfo.nickname;
             UserData.instance.email = userInfo.email;
-            Debug.Log("inquiryPlayer: " + userInfo.name);
-            Debug.Log("inquiryPlayer: " + userInfo.cart);
-            Debug.Log("inquiryPlayer: " + userInfo.email);
         });
 
         socket.On("setNameSucc", (res) =>
@@ -133,23 +98,13 @@ public class OutGameServerManager : MonoBehaviour
                 Debug.Log("endterRoomSucc:" + res);
                 roomData = ParseData(res.GetValue<string>());
 
-                // 자신의 MatchInfo를 첫 번째 요소로 정렬
-                //roomData.playerList.Sort((a, b) =>
-                //{
-                //    if (a.id == UserData.instance.id)
-                //        return -1;
-                //    else if (b.id == UserData.instance.id)
-                //        return 1;
-                //    else
-                //        return 0;
-                //});
-                Debug.Log(roomData.playerList[0].id);
+                Debug.Log(roomData.playerList[0].email);
                 OutGameUI.instance.PopupMatchMakingPanel();
 
                 // 파싱된 데이터 출력
-                foreach (MatchInfo player in roomData.playerList)
+                foreach (PlayerInfo player in roomData.playerList)
                 {
-                    OutGameUI.instance.DrawMatchPlayer(player.name);
+                    OutGameUI.instance.DrawMatchPlayer(player.nickname);
                 }
                 OutGameUI.instance.ReturnMatchMakingUI();
             });
@@ -164,86 +119,77 @@ public class OutGameServerManager : MonoBehaviour
             });
         });
 
-
         // 서버 연결
         socket.Connect();
+    }
 
+    private RoomData ParseData(string jsonData)
+    {
+        RoomData roomData = JsonConvert.DeserializeObject<RoomData>(jsonData);
+        return roomData;
+    }
+    private void MatchMaking()
+    {
+        if (!isConnectOutGame)
+            return;
+        PlayerInfo sendPacket = new PlayerInfo
+        {
+            email = UserData.instance.email
+        };
+        Debug.Log("matchmaking id 보낸다 : "+sendPacket.email);
+        string jsonData = JsonUtility.ToJson(sendPacket);
+        socket.Emit("matching", jsonData);
+        OutGameUI.instance.MatchMakingUI();
+    }
+    private void SocketEmit(API.Type _type, PlayerInfo _playerInfo)
+    {
+        string jsonData = JsonUtility.ToJson(_playerInfo);
+        socket.Emit(_type.ToString(), jsonData);
     }
 #endregion
 
 #region PublicMethod
-    public static OutGameServerManager Instance()
+    public static ServerManager Instance()
     {
         if (instance == null)
         {
-            Debug.LogError("[OutGameServerManager] 인스턴스가 존재하지 않습니다.");
+            Debug.LogError("[ServerManager] 인스턴스가 존재하지 않습니다.");
             return null;
         }
 
         return instance;
     }
-
-    public RoomData ParseData(string jsonData)
+    public void OnSendOutGame(API.Type _type, PlayerInfo _playerInfo)
     {
-        RoomData roomData = JsonConvert.DeserializeObject<RoomData>(jsonData);
-        return roomData;
-    }
-
-    public void LoginSucc(string email)
-    {
-        LoginInfo sendPacket = new LoginInfo();
-        sendPacket.email = email;
-        Debug.Log("보낸다 : "+sendPacket);
-        string jsonData = JsonUtility.ToJson(sendPacket);
-        socket.Emit("loginSucc", jsonData);
-    }
-
-    public void DefaultLogin()
-    {
-        DefaultLoginInfo sendPacket = new DefaultLoginInfo();
-        sendPacket.email = idInputField.text;
-        sendPacket.password = pwInputField.text;
-        string jsonData = JsonUtility.ToJson(sendPacket);
-        socket.Emit("login", jsonData);
-    }
-
-    public void DefaultLoginSucc()
-    {
-        UnityThread.executeInLateUpdate (() =>
+        if (!isConnectOutGame)
+            return;
+        Debug.LogFormat("[ServerManager] OnSendOutGame: {0} / {1}", _type, _playerInfo.ToString());
+        switch (_type)
         {
-            OutGameUI.instance.SuccLoginPanel();
-        });
-    }
+            case API.Type.login:
+                SocketEmit(_type, _playerInfo);
+                break;
 
-    public void Signup()
-    {
-        SignupInfo sendPacket = new SignupInfo();
-        sendPacket.email = idSignUpField.text;
-        sendPacket.password = pwSignUpField.text;
-        sendPacket.name = nameSignUpField.text;
-        string jsonData = JsonUtility.ToJson(sendPacket);
-        socket.Emit("signup", jsonData);
-    }
+            case API.Type.loginSucc:
+                SocketEmit(_type, _playerInfo);
+                break;
 
-    public void MatchMaking()
-    {
-        Packet sendPacket = new Packet();
-        sendPacket.id = UserData.instance.id;
-        Debug.Log("matchmaking id 보낸다 : "+sendPacket.id);
-        string jsonData = JsonUtility.ToJson(sendPacket);
-        socket.Emit("matching", jsonData);
-        OutGameUI.instance.MatchMakingUI();
-    }
+            case API.Type.signup:
+                SocketEmit(_type, _playerInfo);
+                break;
 
-    public void SetName()
-    {
-        SetNameInfo sendPacket = new SetNameInfo();
-        sendPacket.id = UserData.instance.id;
-        sendPacket.name = OutGameUI.instance.settingNameField.text;
-        OutGameUI.instance.settingNameField.text = "";
-        Debug.Log("setName 보낸다 : " + sendPacket);
-        string jsonData = JsonUtility.ToJson(sendPacket);
-        socket.Emit("setName", jsonData);
+            case API.Type.setName:
+                SocketEmit(_type, _playerInfo);
+                break;
+
+            case API.Type.matching:
+
+                break;
+
+            default:
+                Debug.LogWarning("[ServerManager] OnSendOutGame: 잘못된 API 타입입니다.");
+                break;
+        }
     }
 
 #endregion

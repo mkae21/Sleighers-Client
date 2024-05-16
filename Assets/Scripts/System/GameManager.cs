@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour
 #region PrivateVariables
     private static bool isCreate = false;
     private static GameManager instance;
-    private IEnumerator ReadyUpdateCoroutine;
     private IEnumerator InGameUpdateCoroutine;
     private GameState gameState;
 #endregion
@@ -34,17 +33,13 @@ public class GameManager : MonoBehaviour
  */
     public static event Action Login = delegate { };        // Login 상태에서 실행되는 함수들
     public static event Action Lobby = delegate { };        // Lobby 상태에서 실행되는 함수들
-    public static event Action Garage = delegate { };       // Garage 상태에서 실행되는 함수들
-    public static event Action Record = delegate { };       // Record 상태에서 실행되는 함수들
-    public static event Action Friend = delegate { };       // Friend 상태에서 실행되는 함수들
     public static event Action MatchMaking = delegate { };  // MatchMaking 상태에서 실행되는 함수들
-    public static event Action MatchReady = delegate { };   // MatchReady 상태에서 실행되는 함수들
     public static event Action MatchResult = delegate { };  // MatchResult 상태에서 실행되는 함수들
     public static event Action Ready = delegate { };        // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { };       // InGame 상태에서 실행되는 함수들
     public static UnityAction<List<PlayerResult>> End;   // 게임이 끝나고 결과창을 띄울 때 실행되는 함수
 
-    public enum GameState { Login, Lobby, Garage, Record, Friend, MatchMaking, MatchReady, MatchResult, Ready, InGame, End, Result };
+    public enum GameState { Login, Lobby, MatchMaking, MatchResult, Ready, InGame, End, Result };
     public SoundManager soundManager = new SoundManager();
 #endregion
 
@@ -53,7 +48,6 @@ public class GameManager : MonoBehaviour
     {
         if (!instance)
             instance = this;
-        ReadyUpdateCoroutine = ReadyUpdate();
         InGameUpdateCoroutine = InGameUpdate();
         DontDestroyOnLoad(this.gameObject);
     }
@@ -69,20 +63,7 @@ public class GameManager : MonoBehaviour
         soundManager.Init();
         ChangeState(GameState.Login);
     }
-    // Ready 상태에서 실행되는 코루틴
-    private IEnumerator ReadyUpdate()
-    {
-       while (true)
-       {
-           if (gameState != GameState.Ready)
-           {
-               StopCoroutine(ReadyUpdateCoroutine);
-               yield return null;
-           }
-           Ready();
-           yield return new WaitForSeconds(0.0333f);
-       }
-    }
+
     // 인게임에서 실행되는 코루틴
     private IEnumerator InGameUpdate()
     {
@@ -123,20 +104,8 @@ public class GameManager : MonoBehaviour
             case GameState.Lobby:
                 Lobby();
                 break;
-            case GameState.Garage:
-                Garage();
-                break;
-            case GameState.Record:
-                Record();
-                break;
-            case GameState.Friend:
-                Friend();
-                break;
             case GameState.MatchMaking:
                 MatchMaking();
-                break;
-            case GameState.MatchReady:
-                MatchReady();
                 break;
             case GameState.MatchResult:
                 MatchResult();
@@ -145,7 +114,6 @@ public class GameManager : MonoBehaviour
                 soundManager.Stop("BGM/Lobby", SoundType.BGM);
                 soundManager.Play("BGM/Wind", SoundType.WIND);
                 soundManager.Play("BGM/InGame", SoundType.BGM);
-                StartCoroutine(ReadyUpdateCoroutine);
                 break;
             case GameState.InGame:
                 StartCoroutine(InGameUpdateCoroutine);
