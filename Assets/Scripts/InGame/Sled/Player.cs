@@ -40,8 +40,7 @@ public class Player : MonoBehaviour
 #region PublicVariables
     public bool isMe { get; private set; } = false;
     public bool isBraking { get; private set;} = false;
-    public string playerId { get; private set; } = string.Empty;        // TODO: 닉네임으로 통일
-    public string nickName {get; private set;} = string.Empty;
+    public string nickname {get; private set;} = string.Empty;
     public Transform curCheckpoint;
     public Transform nextCheckpoint;
     public Rigidbody sphere;
@@ -192,7 +191,7 @@ public class Player : MonoBehaviour
         if (other.gameObject.tag == "Finish")
         {
             WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
-            Debug.LogFormat("플레이어 {0} 도착", playerId);
+            Debug.LogFormat("플레이어 {0} 도착", nickname);
         }
     }
 
@@ -262,16 +261,15 @@ public class Player : MonoBehaviour
 
 #region PublicMethod
     // 내 플레이어와 다른 플레이어 객체 초기화
-    public void Initialize(bool _isMe, string _playerId, string _nickName, Vector3 position, float rotation)
+    public void Initialize(bool _isMe, string _nickName, Vector3 position, float rotation)
     {
         isMe = _isMe;
-        this.playerId = _playerId;
-        this.nickName = _nickName;
+        this.nickname = _nickName;
 
         miniMapComponent.Init(sled.gameObject);
 
         nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, sledModel);
-        nameObject.GetComponent<TMP_Text>().text = this.nickName;
+        nameObject.GetComponent<TMP_Text>().text = this.nickname;
         nameObject.transform.position = GetNameUIPos();
 
         sled.transform.position = position;
@@ -349,7 +347,7 @@ public class Player : MonoBehaviour
     }
     public SyncMessage GetSyncData()
     {
-        return new SyncMessage(ServerManager.instance.roomData.roomID, playerId, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        return new SyncMessage(ServerManager.instance.roomData.roomID, nickname, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
     public void SetDrift(bool isDrift)

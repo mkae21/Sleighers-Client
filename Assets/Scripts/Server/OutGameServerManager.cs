@@ -72,14 +72,14 @@ public partial class ServerManager : MonoBehaviour
             Debug.Log("inquiryPlayer: 내 플레이어 정보 받음: " + res);
             string jsonString = res.GetValue<string>();
             PlayerInfo userInfo = JsonUtility.FromJson<PlayerInfo>(jsonString);
-            UserData.instance.nickName = userInfo.nickname;
-            UserData.instance.email = userInfo.email;
+            myNickname = userInfo.nickname;
+            myEmail = userInfo.email;
         });
 
         socket.On("setNameSucc", (res) =>
         {
             Debug.Log("닉네임이 변경되었습니다.: " + res);
-            UserData.instance.nickName = res.GetValue<string>();
+            myNickname = res.GetValue<string>();
         });
 
         socket.On("setNameFail", (res) =>
@@ -134,7 +134,7 @@ public partial class ServerManager : MonoBehaviour
             return;
         PlayerInfo sendPacket = new PlayerInfo
         {
-            nickname = UserData.instance.nickName
+            nickname = myNickname
         };
         Debug.Log("matchmaking id 보낸다 : "+sendPacket.nickname);
         string jsonData = JsonUtility.ToJson(sendPacket);

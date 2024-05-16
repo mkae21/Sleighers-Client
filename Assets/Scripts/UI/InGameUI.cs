@@ -129,13 +129,13 @@ public class InGameUI : MonoBehaviour
         rankElements.Add(_nickname, rankElem);
 
         // 내 랭킹 요소면 투명도와 글자 색 조절
-        string myNickname = WorldManager.instance.GetMyPlayer().nickName;
+        string myNickname = WorldManager.instance.GetMyPlayer().nickname;
         if (_nickname == myNickname)
             rankElement.SetMyRankElement();
     }
     public void UpdateRankUI(List<RankInfo> _ranking)
     {
-        string myNickname = WorldManager.instance.GetMyPlayer().nickName;
+        string myNickname = WorldManager.instance.GetMyPlayer().nickname;
         int totalPlayer = _ranking.Count;
         for (int i = 0; i < totalPlayer; i++)
         {
