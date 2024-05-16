@@ -167,7 +167,7 @@ public class WorldManager : MonoBehaviour
                     break;
 
                 case Protocol.Type.GameEnd:
-                    GameResultMessage gameResultMessage = DataParser.ReadJsonData<GameResultMessage>(data);
+                    GameEndMessage gameResultMessage = DataParser.ReadJsonData<GameEndMessage>(data);
                     ReceiveGameEndEvent(gameResultMessage);
                     break;
                 
@@ -309,7 +309,7 @@ public class WorldManager : MonoBehaviour
         InGameUI.instance.SetGameEndCountDown(count);        
     }
     // 게임 종료 이벤트 처리
-    private void ReceiveGameEndEvent(GameResultMessage msg)
+    private void ReceiveGameEndEvent(GameEndMessage msg)
     {
         GameManager.Instance().ChangeState(GameManager.GameState.End, msg);
     }
