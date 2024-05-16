@@ -45,7 +45,7 @@ public class GameManager : MonoBehaviour
     {
         if (!instance)
             instance = this;
-        InGameUpdateCoroutine = InGameUpdate();
+        // InGameUpdateCoroutine = InGameUpdate();
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -62,18 +62,26 @@ public class GameManager : MonoBehaviour
     }
 
     // 인게임에서 실행되는 코루틴
-    private IEnumerator InGameUpdate()
+    // private IEnumerator InGameUpdate()
+    // {
+    //    while (true)
+    //    {
+    //        if (gameState != GameState.InGame)
+    //        {
+    //            StopCoroutine(InGameUpdateCoroutine);
+    //            yield return null;
+    //        }
+    //        InGame();
+    //        yield return new WaitForSeconds(0.0333f);
+    //    }
+    // }
+    private void FixedUpdate()
     {
-       while (true)
-       {
-           if (gameState != GameState.InGame)
-           {
-               StopCoroutine(InGameUpdateCoroutine);
-               yield return null;
-           }
-           InGame();
-           yield return new WaitForSeconds(0.0333f);
-       }
+        if (gameState == GameState.InGame)
+        {
+            InGame();
+        }
+    
     }
 #endregion
 
@@ -115,7 +123,7 @@ public class GameManager : MonoBehaviour
                 Ready();
                 break;
             case GameState.InGame:
-                StartCoroutine(InGameUpdateCoroutine);
+                // StartCoroutine(InGameUpdateCoroutine);
                 break;
             case GameState.End:
                 GameEndMessage gameResult = (GameEndMessage)msg;
