@@ -27,7 +27,7 @@ public class Player : MonoBehaviour
     private long toTimeStamp;
 
     // 최대속도 제한, 드리프트
-    private float maxSpeed = 75f;
+    private float maxSpeed = 50f;
     private float speed;
     private float currentSpeed;
     private float rotate;
@@ -83,7 +83,6 @@ public class Player : MonoBehaviour
         SteerHandle();
         GetVerticalSpeed();
         CuerrentValue();
-        CheckVelocity();
     }
 
     private void FixedUpdate()
@@ -93,6 +92,7 @@ public class Player : MonoBehaviour
         {
             ApplyPhysics(hitData);
         }
+        CheckVelocity();
     }
 
     private void GetVerticalSpeed()
@@ -100,7 +100,7 @@ public class Player : MonoBehaviour
         if (moveVector.z > 0)
             speed = acceleration;
         else if (moveVector.z < 0)
-            speed = -acceleration;
+            speed = -acceleration / 2;
         else
             speed = 0;
     }
@@ -115,16 +115,16 @@ public class Player : MonoBehaviour
                 amount = Mathf.Abs(moveVector.x);
             }
             else
-                amount = Math.Abs(moveVector.x) * 10f;//더 크게 회전
+                amount = Math.Abs(moveVector.x) * 5f;//더 크게 회전
             
             Steer(dir, amount);
         }
     }
     private void CuerrentValue()
     {
-        currentSpeed = Mathf.SmoothStep(currentSpeed, speed, Time.deltaTime * 10f);
+        currentSpeed = Mathf.SmoothStep(currentSpeed, speed, Time.deltaTime * 8f);
         speed = 0f; // Reset for next frame
-        currentRotate = Mathf.Lerp(currentRotate, rotate, Time.deltaTime * 4f);
+        currentRotate = Mathf.Lerp(currentRotate, rotate, Time.deltaTime * 2f);
         rotate = 0f; // Reset for next frame
     }
 
@@ -138,9 +138,9 @@ public class Player : MonoBehaviour
 
         if (hitNear.collider != null)// If the sled is on the ground
         {
-            float weight = (myRank - 1) * 10f; // 등수에 따른 속도 가중치
+            float weight = (myRank - 1) * 3f; // 등수에 따른 속도 가중치
             sphere.AddForce(sledModel.forward * (currentSpeed + weight), ForceMode.Acceleration);
-            sled.eulerAngles = Vector3.Lerp(sled.eulerAngles, new Vector3(0, sled.eulerAngles.y + currentRotate, 0), Time.deltaTime * 5f);
+            sled.eulerAngles = Vector3.Lerp(sled.eulerAngles, new Vector3(0, sled.eulerAngles.y + currentRotate, 0), Time.fixedDeltaTime * 3f);
             
             if(hitNear.collider.gameObject.tag == "Ramp")
             {
@@ -152,8 +152,8 @@ public class Player : MonoBehaviour
             if(onRamp)
             {
                 // Ramp를 벗어날 때의 방향과 속도를 기반으로 힘을 가함
-                Vector3 launchDirection = sledModel.forward * 5f + sledModel.up * 5f;
-                sphere.AddForce(launchDirection.normalized * sphere.velocity.magnitude * 10f, ForceMode.Impulse);
+                Vector3 launchDirection = sledModel.forward * 8f + sledModel.up * 8f;
+                sphere.AddForce(launchDirection.normalized * sphere.velocity.magnitude * 25f, ForceMode.Impulse);
                 onRamp = false;
             }
         }
@@ -197,8 +197,8 @@ public class Player : MonoBehaviour
 
     private void CheckVelocity()
     {
-        float maxWeight = (myRank - 1) * 10f;
-        maxSpeed = 75f + maxWeight;//등수에 따른 최대 속도 증가
+        float maxWeight = (myRank - 1) * 5f;
+        maxSpeed = 50f + maxWeight;//등수에 따른 최대 속도 증가
         if (sphere.velocity.magnitude > maxSpeed)
         {
             sphere.velocity = sphere.velocity.normalized * maxSpeed;
@@ -218,7 +218,7 @@ public class Player : MonoBehaviour
 
     // ExtraPolation, InterPolation
     private void Polation()
-    {
+    {   
         float latency = (toTimeStamp - previousTimeStamp) / 1000f;
         float lerpAmount = Mathf.Clamp01(latency / timeToReachTarget);
         Vector3 fromPosition = sphere.transform.position;
