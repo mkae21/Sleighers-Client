@@ -230,8 +230,13 @@ public class InGameUI : MonoBehaviour
     public void UpdateSpeedometer()
     {
         speed = WorldManager.instance.GetMyPlayer().GetSpeed();
-        if(text_speedLabel != null)
+        if(text_speedLabel != null){
             text_speedLabel.text = string.Format("{0}", (int)speed);
+            if ((int)speed >= 100)
+                text_speedLabel.color = Color.red;
+            else
+                text_speedLabel.color = Color.black;
+        } 
     }
     public void LoadOutGameScene()
     {
