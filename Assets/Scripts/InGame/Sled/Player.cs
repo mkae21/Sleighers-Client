@@ -287,12 +287,12 @@ public class Player : MonoBehaviour
         toRotationY = GetRotationY();
         toTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        if(isMe && OutGameUI.instance.mainPostProcessing == false)
+        if(isMe && SettingManager.backgroundPostProcessing == false)
         {
             GameObject.FindWithTag("MainPostProcessing").SetActive(false);
         }
 
-        if(isMe && OutGameUI.instance.speedPostProcessing == false)
+        if(isMe && SettingManager.speedPostProcessing == false)
         {
             gameObject.GetComponentInChildren<PostProcessVolume>().enabled = false;
         }
