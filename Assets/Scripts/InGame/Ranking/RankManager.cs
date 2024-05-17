@@ -90,7 +90,7 @@ public class RankManager : MonoBehaviour
 
             foreach(var player in group)
             {
-                SetDistanceToNextCheckpoint(WorldManager.instance.players[player.nickname]);
+                SetDistanceToNextCheckpoint(WorldManager.instance.GetPlayerFromNickName(player.nickname));
                 rankingUpdated = true;
             }
         }
