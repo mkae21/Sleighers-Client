@@ -53,7 +53,7 @@ MonoBehaviour:
   sledModel: {fileID: 1124282087261648207}
   sled: {fileID: 8019215902595706464}
   playerModel: {fileID: 5482736996447002876}
-  acceleration: 100
+  acceleration: 50
   steering: 20
   gravity: 3
   amount: 0
