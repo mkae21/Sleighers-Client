@@ -7,9 +7,17 @@ public class FollowMyPlayer : MonoBehaviour
 {
 #region PrivateVariables
     private Transform sled = null;
+    private new ParticleSystem particleSystem;
+    private Player player;
+    private float currentYVelocity = 0;
+    private float currentZVelocity;
 #endregion
 
 #region PrivateMethod
+    private void Awake()
+    {
+        particleSystem = gameObject.GetComponent<ParticleSystem>();
+    }
     private void Start()
     {
         TryGetMyPlayer();
@@ -20,7 +28,31 @@ public class FollowMyPlayer : MonoBehaviour
         {
             transform.position = new Vector3(sled.position.x, sled.position.y + 20, sled.position.z);
             transform.position += sled.forward * 30f;
+            transform.rotation = Quaternion.LookRotation(-sled.forward);
         }
+        if(particleSystem != null && player != null)
+        {
+            var velocityOverLifetime = particleSystem.velocityOverLifetime;
+
+            float targetYVelocity = player.NormalizedForwardSpeed * -70f;
+            float targetZVelocity = player.NormalizedForwardSpeed * 230f;
+
+            // Use Lerp to gradually change the velocity values
+            if(player.GetSpeed() > 60)
+            {
+                currentYVelocity = Mathf.Lerp(currentYVelocity, targetYVelocity, Time.deltaTime);
+                currentZVelocity = Mathf.Lerp(currentZVelocity, targetZVelocity, Time.deltaTime);
+            }
+            else
+            {
+                currentYVelocity = Mathf.Lerp(currentYVelocity, 0, Time.deltaTime);
+                currentZVelocity = Mathf.Lerp(currentZVelocity, 0, Time.deltaTime);
+            }
+
+            velocityOverLifetime.y = new ParticleSystem.MinMaxCurve(currentYVelocity); // Y-axis velocity
+            velocityOverLifetime.z = new ParticleSystem.MinMaxCurve(currentZVelocity); // Z-axis velocity
+        }
+
     }
     private void TryGetMyPlayer()
     {
@@ -28,7 +60,10 @@ public class FollowMyPlayer : MonoBehaviour
         if (myPlayerID == string.Empty)
             Invoke("TryGetMyPlayer", 1f);
         else
+        {
             sled = WorldManager.instance.GetMySled().transform;
+            player = WorldManager.instance.GetMyPlayer();
+        }
     }
 #endregion
 }
