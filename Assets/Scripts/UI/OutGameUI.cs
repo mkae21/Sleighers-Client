@@ -10,18 +10,18 @@ public class OutGameUI : MonoBehaviour
     [Space(10), Header("===== Panels =====")]
     public GameObject[] panels;
     [Space(10), Header("===== Setting =====")]
-    public Toggle soundToggle;
+    public Toggle volumeToggle;
     public Slider volumeSlider;
     public TMP_InputField setNicknameField;
     public Button setNicknameBtn;
+    public Toggle backgroundPostProcessingToggle;
+    public Toggle speedPostProcessingToggle;
     [Space(10), Header("===== Matching Room =====")]
     public Button matchMakingBtn;
     public GameObject loadingObject;
     public TMP_Text matchMakingBtnText;
     public GameObject PlayerMatchList;
     public GameObject PlayerMatchListPrefabs;
-    public bool speedPostProcessing = true;
-    public bool mainPostProcessing = true;
 
     [Space(10), Header("===== Login =====")]
     public TMP_InputField loginID;
@@ -84,14 +84,25 @@ public class OutGameUI : MonoBehaviour
         googleLoginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
         matchMakingBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.MatchMaking));
 
-        soundToggle.onValueChanged.AddListener((value) => SoundOnOff());
-        volumeSlider.onValueChanged.AddListener((value) => VolumeSlider()); 
+        volumeToggle.onValueChanged.AddListener((value) => SettingManager.VolumeToggle(value));
+        volumeToggle.onValueChanged.AddListener((value) => volumeSlider.interactable = value);
+        volumeSlider.onValueChanged.AddListener((value) => SettingManager.VolumeSlide(value)); 
         volumeSlider.value = 0.5f;
+
+        backgroundPostProcessingToggle.isOn = SettingManager.backgroundPostProcessing;
+        speedPostProcessingToggle.isOn = SettingManager.speedPostProcessing;
+        backgroundPostProcessingToggle.onValueChanged.AddListener((value) => SettingManager.ToggleBackgroundPostProcessing());
+        speedPostProcessingToggle.onValueChanged.AddListener((value) => SettingManager.ToggleSpeedPostProcessing());
         
         Button[] buttons = Resources.FindObjectsOfTypeAll<Button>();
         foreach(Button button in buttons)
         {
             button.onClick.AddListener(()=> GameManager.Instance().soundManager.Play("Effect/Click", SoundType.EFFECT));
+        }
+        Toggle[] toggles = Resources.FindObjectsOfTypeAll<Toggle>();
+        foreach(Toggle toggle in toggles)
+        {
+            toggle.onValueChanged.AddListener((value) => GameManager.Instance().soundManager.Play("Effect/Click", SoundType.EFFECT));
         }
 
     }
@@ -149,38 +160,6 @@ public class OutGameUI : MonoBehaviour
     public void ToggleObject(GameObject obj)
     {
         obj.SetActive(!obj.activeSelf);
-    }
-    public void SoundOnOff()
-    {
-        if(soundToggle.isOn && volumeSlider.value > 0)
-        {
-            AudioListener.volume = 1;
-        }
-        else
-        {
-            AudioListener.volume = 0;
-        }
-    }
-    
-    public void VolumeSlider()
-    {
-        if(soundToggle.isOn)
-        {
-            AudioListener.volume = volumeSlider.value;
-        }
-        else
-        {
-            AudioListener.volume = 0;
-        }
-    }
-    public void ToggleMainPostProcessing()
-    {
-        mainPostProcessing = !mainPostProcessing;
-    }
-
-    public void ToggleSpeedProcessing()
-    {  
-        speedPostProcessing = !speedPostProcessing;
     }
 #endregion
 }
