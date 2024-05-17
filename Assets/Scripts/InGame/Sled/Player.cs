@@ -83,6 +83,9 @@ public class Player : MonoBehaviour
         SteerHandle();
         GetVerticalSpeed();
         CuerrentValue();
+                
+        if(isMe)
+            BlurEffect();
     }
 
     private void FixedUpdate()
@@ -329,7 +332,7 @@ public class Player : MonoBehaviour
         {
             isMove = true;
             animator.SetBool("isMove",true);
-            animator.speed = 1f + NormalizedForwardSpeed;
+            animator.speed = 0.5f + NormalizedForwardSpeed;
         }
     }
 
@@ -372,6 +375,15 @@ public class Player : MonoBehaviour
             float normalizedSpeed = (speed > 30f) ? Mathf.Clamp01(speed / (maxSpeed * 3.6f)) : 0.0f;
             return normalizedSpeed * 2;
         }
+    }
+    public void BlurEffect()
+    {
+        float checkSpeed = GetSpeed();
+        
+        if(checkSpeed > 60)
+            RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,2f * NormalizedForwardSpeed,Time.fixedDeltaTime);
+        else
+            RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,0f,Time.fixedDeltaTime);
     }
     public void Respawn()
     {
