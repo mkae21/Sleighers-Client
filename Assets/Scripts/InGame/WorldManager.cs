@@ -22,7 +22,6 @@ public class WorldManager : MonoBehaviour
     private RankManager rankManager;
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
-    private Dictionary<string, Player> players;
     private Transform[] startingPoints;
     private Queue<byte[]> messageQueue = new Queue<byte[]>();
     private int tick = 0;
@@ -30,6 +29,7 @@ public class WorldManager : MonoBehaviour
 
 #region PublicVariables
     static public WorldManager instance;
+    public Dictionary<string, Player> players;
     public string myPlayerNickname { get; private set; } = string.Empty;
     public bool isGameStart { get; private set; } = false;
     public bool isRaceFinish { get; private set; } = false;
