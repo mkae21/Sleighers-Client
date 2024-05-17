@@ -3,14 +3,14 @@ using UnityEngine;
 /* [ FollowMyPlayer.cs ]
  * 내리는 눈 파티클 시스템이 내 플레이어를 따라가는 스크립트이다.
  */
-public class FollowMyPlayer : MonoBehaviour
+public class BackGroundSnowParticle : MonoBehaviour
 {
 #region PrivateVariables
     private Transform sled = null;
     private new ParticleSystem particleSystem;
     private Player player;
     private float currentYVelocity = 0;
-    private float currentZVelocity;
+    private float currentZVelocity = 0;
 #endregion
 
 #region PrivateMethod
