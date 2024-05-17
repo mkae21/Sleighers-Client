@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour
 #region PrivateVariables
     private static bool isCreate = false;
     private static GameManager instance;
-    private IEnumerator InGameUpdateCoroutine;
     private GameState gameState;
 #endregion
 
@@ -109,7 +108,6 @@ public class GameManager : MonoBehaviour
                 Ready();
                 break;
             case GameState.InGame:
-                // StartCoroutine(InGameUpdateCoroutine);
                 break;
             case GameState.End:
                 GameEndMessage gameResult = (GameEndMessage)msg;
