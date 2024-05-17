@@ -20,9 +20,9 @@ public class WorldManager : MonoBehaviour
     }
 #region PrivateVariables
     private RankManager rankManager;
+    private Dictionary<string, Player> players;
     private GameObject playerPrefab;
     private SessionInfo sessionInfo;
-    private Dictionary<string, Player> players;
     private Transform[] startingPoints;
     private Queue<byte[]> messageQueue = new Queue<byte[]>();
     private int tick = 0;
@@ -199,7 +199,7 @@ public class WorldManager : MonoBehaviour
             float rotation = msg.rotation;
             long timeStamp = msg.timeStamp;
 
-            Player player = GetPlayerFromId(id);
+            Player player = GetPlayerFromNickName(id);
             if (player == null)
                 return;
             player.SetSyncData(position, velocity, rotation, timeStamp);
@@ -409,10 +409,10 @@ public class WorldManager : MonoBehaviour
     {
         return players[myPlayerNickname].gameObject.transform.Find("Sled").gameObject;
     }
-    public Player GetPlayerFromId(string _id)
+    public Player GetPlayerFromNickName(string _nickname)
     {
-        if (players.ContainsKey(_id))
-            return players[_id];
+        if (players.ContainsKey(_nickname))
+            return players[_nickname];
         else
             return null;
     }
