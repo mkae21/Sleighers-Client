@@ -239,14 +239,14 @@ public class Player : MonoBehaviour
         {
             if (toPosition != fromPosition)
             {
-                sphere.transform.position = Vector3.Lerp(fromPosition, toPosition, lerpAmount);            
+                sphere.transform.position = Vector3.Slerp(fromPosition, toPosition, lerpAmount);            
             }
         }
         // Extrapolation Position
         else
         {
             Vector3 extrapolatedPosition = toPosition + (toVelocity * (1 + latency * extrapolationMultiplier));
-            sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
+            sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
         }  
         
         // Interpolation Rotation
