@@ -274,7 +274,7 @@ public class InGameUI : MonoBehaviour
             if ((int)speed >= 100)
                 text_speedLabel.color = Color.red;
             else
-                text_speedLabel.color = Color.black;
+                text_speedLabel.color = Color.white;
         } 
     }
     public void LoadOutGameScene()
