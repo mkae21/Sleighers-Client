@@ -55,7 +55,7 @@ MonoBehaviour:
   playerModel: {fileID: 5482736996447002876}
   acceleration: 50
   steering: 20
-  gravity: 3
+  gravity: 1
   amount: 0
   <moveVector>k__BackingField: {x: 0, y: 0, z: 0}
   <isMove>k__BackingField: 0
