@@ -130,7 +130,7 @@ public class InGameUI : MonoBehaviour
             for (int i = _playerResults.Count; i < rankElements.Count; i++)
             {
                 string key = keys[i];
-                playerResults.Add(new PlayerResult { nickname = key, rank = i, goalTime = 0 });
+                playerResults.Add(new PlayerResult { nickname = key, rank = i+1, goalTime = 0 });
             }
         }
         
