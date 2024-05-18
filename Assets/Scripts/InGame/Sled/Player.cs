@@ -18,7 +18,6 @@ public class Player : MonoBehaviour
     private bool onRamp = false;
     private float timeToReachTarget = 0.3f;
     private float squareMovementThreshold = 3.5f;
-    private float extrapolationMultiplier = 1.2f;
     private Vector3 previousPosition;
     private long previousTimeStamp;
     private Vector3 toPosition;
