@@ -44,6 +44,9 @@ public class InGameUI : MonoBehaviour
     private float speed = 0.0f;
     private float timer = 0.0f;
 
+    // 게임 결과 저장 변수
+    private List<PlayerResult> playerResults;
+
     // Blink 코루틴 변수
     private float blinkDuration = 0.1f;         // 블링크 지속 시간 (초)
     private Color originalColor = Color.white;  // 원래 색상
@@ -242,18 +245,25 @@ public class InGameUI : MonoBehaviour
     {
         SceneManager.LoadScene("OutGame");
     }
+
     public void GameResultUI(List<PlayerResult> _playerResults)
+    {
+        playerResults = _playerResults; // 게임 결과를 저장
+        Invoke("ShowGameResultUI", 2f); // 2초 후에 ShowGameResultUI 메서드 호출
+    }
+
+    private void ShowGameResultUI()
     {
         resultPanel.SetActive(true);
 
-        for (int i = 0; i < _playerResults.Count; i++)
+        for (int i = 0; i < playerResults.Count; i++)
         {
             GameObject resultElemObj = Instantiate(resultElem, resultElemHolder);
-            string resultTime = string.Format("{0:D2}:{1:D2}:{2:D2}", TimeSpan.FromMilliseconds((long)_playerResults[i].goalTime).Minutes, TimeSpan.FromMilliseconds((long)_playerResults[i].goalTime).Seconds, TimeSpan.FromMilliseconds((long)_playerResults[i].goalTime).Milliseconds / 10);
+            string resultTime = string.Format("{0:D2}:{1:D2}:{2:D2}", TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Minutes, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Seconds, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Milliseconds / 10);
 
             resultElemObj.transform.SetSiblingIndex(i);
-            resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].rank.ToString();
-            resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = _playerResults[i].nickname;
+            resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].rank.ToString();
+            resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].nickname;
             resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = resultTime;
         }
     }
