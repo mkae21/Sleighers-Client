@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
     private bool isDrifting;
     // Polation
     private bool onRamp = false;
-    private float timeToReachTarget = 0.2f;
+    private float timeToReachTarget = 0.1f;
     private float movementThreshold = 3.5f;
     private float squareMovementThreshold;
     private Vector3 previousPosition;
