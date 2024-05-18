@@ -109,6 +109,9 @@ public class OutGameUI : MonoBehaviour
         }
 
         PlayerMatchElemPrefabs = Resources.Load<GameObject>("UI/PlayerMatchElem");
+        
+        if (ServerManager.Instance().myNickname != string.Empty)
+            SuccLoginPanel();
     }
 #endregion
 

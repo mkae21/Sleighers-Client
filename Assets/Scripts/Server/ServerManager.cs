@@ -9,10 +9,13 @@ public partial class ServerManager : MonoBehaviour
 #region PrivateMethod
     private void Awake()
     {
-        if (instance != null)
-            Destroy(instance);
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         instance = this;
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
 
         GetServerInfo();
         GameManager.Login += ConnectOutGame;
