@@ -164,6 +164,7 @@ public class InGameUI : MonoBehaviour
         int totalPlayer = _ranking.Count;
         for (int i = 0; i < totalPlayer; i++)
         {
+            Debug.Log("rank : " + _ranking[i].nickname);
             string nickname = _ranking[i].nickname;
             int lap = _ranking[i].lap;
             int checkpoint = _ranking[i].checkpoint;
@@ -185,7 +186,8 @@ public class InGameUI : MonoBehaviour
     }
     public void DeleteRankUI(string _nickname)
     {
-        Destroy(rankElements[_nickname].transform.parent.gameObject);
+        // Destroy(rankElements[_nickname].transform.parent.gameObject);
+        Destroy(rankElements[_nickname].transform.gameObject);
         rankElements.Remove(_nickname);
     }
     public void UpdateTimer()
