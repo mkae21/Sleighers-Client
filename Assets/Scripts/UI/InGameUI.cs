@@ -279,6 +279,7 @@ public class InGameUI : MonoBehaviour
     }
     public void LoadOutGameScene()
     {
+        ServerManager.Instance().DisconnectInGame();
         SceneManager.LoadScene("OutGame");
     }
 #endregion
