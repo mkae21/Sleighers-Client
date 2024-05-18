@@ -193,7 +193,7 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.tag == "Finish")
         {
-            WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
+            WorldManager.instance.OnSendInGame(Protocol.Type.PlayerGoal);
             Debug.LogFormat("플레이어 {0} 도착", nickname);
         }
     }
@@ -361,6 +361,11 @@ public class Player : MonoBehaviour
     {   
         // km/h로 변환
         return sphere.velocity.magnitude * 3.6f;
+    }
+    
+    public float UpdateDistanceToNextCheckpoint()
+    {
+        return Vector3.Distance(sphere.transform.position, nextCheckpoint.position);
     }
     // 앞으로 나아가는 차량 속도의 양
     public float ForwardSpeed => Vector3.Dot(sphere.velocity, sled.forward);

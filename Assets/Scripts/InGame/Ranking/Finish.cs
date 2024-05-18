@@ -39,16 +39,7 @@ public class Finish : MonoBehaviour
             // 첫번째 체크포인트만 통과해야 함.
             if (_checkpoint == checkpoints.First())
             {
-                checkpointInfo.SetLastCheckpoint(_checkpoint);
-
-                Checkpoint nextCheckpoint = GetNextCheckpoint(_checkpoint);
-                _player.nextCheckpoint = nextCheckpoint.transform;
-                _player.curCheckpoint = _checkpoint.transform;
-                checkpointInfo.SetNextCheckpoint(nextCheckpoint);
-          
-                RankManager.instance.SetPlayerCheckpointCount(_player);
-                List<RankInfo> ranking = RankManager.instance.GetRanking();
-                InGameUI.instance.UpdateRankUI(ranking);
+                UpdateCheckpointInfo(_player, _checkpoint, checkpointInfo);
             }
         }
         // 그렇지 않으면 통과한 체크포인트가 통과해야 하는 다음 체크포인트인 경우, 그 다음 체크포인트를 잠금 해제합니다.
@@ -57,19 +48,24 @@ public class Finish : MonoBehaviour
             // 마지막 체크포인트를 통과한 경우 결승선을 활성화
             if (_checkpoint == checkpoints.Last())
                 checkpointInfo.canPassFinish = true;
-
-            checkpointInfo.SetLastCheckpoint(_checkpoint);
-
-            Checkpoint nextCheckpoint = GetNextCheckpoint(_checkpoint);
-            _player.nextCheckpoint = nextCheckpoint.transform;
-            _player.curCheckpoint = _checkpoint.transform;
-            checkpointInfo.SetNextCheckpoint(nextCheckpoint);
-
-            RankManager.instance.SetPlayerCheckpointCount(_player);
-            List<RankInfo> ranking = RankManager.instance.GetRanking();
-            InGameUI.instance.UpdateRankUI(ranking);
+            
+            UpdateCheckpointInfo(_player, _checkpoint, checkpointInfo);
         } 
     }
+
+    private void UpdateCheckpointInfo(Player _player, Checkpoint _checkpoint, CheckpointInfo _checkpointInfo)
+    {
+        _checkpointInfo.SetLastCheckpoint(_checkpoint);
+        Checkpoint nextCheckpoint = GetNextCheckpoint(_checkpoint);
+        _player.nextCheckpoint = nextCheckpoint.transform;
+        _player.curCheckpoint = _checkpoint.transform;
+        _checkpointInfo.SetNextCheckpoint(nextCheckpoint);
+
+        RankManager.instance.SetPlayerCheckpointCount(_player);  
+        List<RankInfo> ranking = RankManager.instance.GetRanking();
+        InGameUI.instance.UpdateRankUI(ranking);
+    }
+
     // 주어진 체크포인트의 다음 체크포인트를 반환
     private Checkpoint GetNextCheckpoint(Checkpoint _checkpoint)
     {
