@@ -69,6 +69,10 @@ public class Player : MonoBehaviour
     }
     private void Update()
     {
+        if (!isMe && WorldManager.instance.isGameStart)
+        {
+            Polation();
+        }
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -86,10 +90,6 @@ public class Player : MonoBehaviour
             ApplyPhysics(hitData);
         }
         CheckVelocity();
-        if (!isMe && WorldManager.instance.isGameStart)
-        {
-            Polation();
-        }
     }
 
     private void GetVerticalSpeed()
