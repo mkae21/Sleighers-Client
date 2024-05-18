@@ -232,7 +232,6 @@ public class Player : MonoBehaviour
         else
             animator.SetBool("isMove", false);
 
-        Debug.LogFormat("{0} / {1}", (toPosition - previousPosition).sqrMagnitude, lerpAmount);
         // Interpolation Position
         if (squareMagnitude < squareMovementThreshold)
         {
