@@ -16,8 +16,8 @@ public class Player : MonoBehaviour
     private bool isDrifting;
     // Polation
     private bool onRamp = false;
-    private float timeToReachTarget = 0.5f;
-    private float movementThreshold = 4f;
+    private float timeToReachTarget = 0.2f;
+    private float movementThreshold = 3.5f;
     private float squareMovementThreshold;
     private Vector3 previousPosition;
     private long previousTimeStamp;
@@ -214,8 +214,8 @@ public class Player : MonoBehaviour
 
     private bool IsMoving(Vector3 fromPosition, Vector3 toPosition)
     {   
-        //일정 거리 이상 움직였는지 여부를 판단한다.
-        float movementThreshold = 0.1f; //움직임 여부를 판단하는 임계값
+        // 일정 거리 이상 움직였는지 여부를 판단한다.
+        float movementThreshold = 1f; // 움직임 여부를 판단하는 임계값
         return Vector3.Distance(fromPosition, toPosition) > movementThreshold;
     }
 
@@ -232,11 +232,10 @@ public class Player : MonoBehaviour
         if(isMove)
         {     
             animator.SetBool("isMove", true);
+            animator.speed = 0.5f + NormalizedForwardSpeed;
         }
         else
-        {
             animator.SetBool("isMove", false);
-        }
 
         // Interpolation Position
         if ((toPosition - previousPosition).sqrMagnitude < squareMovementThreshold)
@@ -256,7 +255,7 @@ public class Player : MonoBehaviour
         }  
         
         // Interpolation Rotation
-        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.75f);
+        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, lerpAmount);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
     }
 #endregion
