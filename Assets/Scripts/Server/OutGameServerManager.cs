@@ -47,7 +47,7 @@ public partial class ServerManager : MonoBehaviour
             Debug.Log("Login success: " + res);
             UnityThread.executeInLateUpdate (() =>
             {
-                OutGameUI.instance.SuccLoginPanel();
+                OutGameUI.instance.OnLobbyPanel();
             });
         });
 

@@ -16,9 +16,8 @@ public class Player : MonoBehaviour
     private bool isDrifting;
     // Polation
     private bool onRamp = false;
-    private float timeToReachTarget = 0.5f;
-    private float movementThreshold = 4f;
-    private float squareMovementThreshold;
+    private float timeToReachTarget = 0.3f;
+    private float squareMovementThreshold = 3.5f;
     private Vector3 previousPosition;
     private long previousTimeStamp;
     private Vector3 toPosition;
@@ -68,17 +67,8 @@ public class Player : MonoBehaviour
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
         animator = playerModel.GetComponent<Animator>();
     }
-    private void Start()
-    {
-        squareMovementThreshold = movementThreshold * movementThreshold;
-    }
     private void Update()
     {
-        if (!isMe && WorldManager.instance.isGameStart)
-        {
-            Polation();
-        }
-
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -96,6 +86,10 @@ public class Player : MonoBehaviour
             ApplyPhysics(hitData);
         }
         CheckVelocity();
+        if (!isMe && WorldManager.instance.isGameStart)
+        {
+            Polation();
+        }
     }
 
     private void GetVerticalSpeed()
@@ -155,8 +149,8 @@ public class Player : MonoBehaviour
             if(onRamp)
             {
                 // Ramp를 벗어날 때의 방향과 속도를 기반으로 힘을 가함
-                Vector3 launchDirection = sledModel.forward * 8f + sledModel.up * 8f;
-                sphere.AddForce(launchDirection.normalized * sphere.velocity.magnitude * 25f, ForceMode.Impulse);
+                Vector3 launchDirection = sledModel.forward * 15f + sledModel.up * 25f;
+                sphere.AddForce(launchDirection.normalized * sphere.velocity.magnitude * 55f, ForceMode.Impulse);
                 onRamp = false;
             }
         }
@@ -214,8 +208,8 @@ public class Player : MonoBehaviour
 
     private bool IsMoving(Vector3 fromPosition, Vector3 toPosition)
     {   
-        //일정 거리 이상 움직였는지 여부를 판단한다.
-        float movementThreshold = 0.1f; //움직임 여부를 판단하는 임계값
+        // 일정 거리 이상 움직였는지 여부를 판단한다.
+        float movementThreshold = 1f; // 움직임 여부를 판단하는 임계값
         return Vector3.Distance(fromPosition, toPosition) > movementThreshold;
     }
 
@@ -225,6 +219,7 @@ public class Player : MonoBehaviour
         float latency = (toTimeStamp - previousTimeStamp) / 1000f;
         float lerpAmount = Mathf.Clamp01(latency / timeToReachTarget);
         Vector3 fromPosition = sphere.transform.position;
+        float squareMagnitude = (toPosition - previousPosition).sqrMagnitude;
 
         //플레이어가 움직였는지 확인
         isMove = IsMoving(fromPosition, toPosition);
@@ -232,31 +227,28 @@ public class Player : MonoBehaviour
         if(isMove)
         {     
             animator.SetBool("isMove", true);
+            animator.speed = 0.5f + Mathf.Clamp01(squareMagnitude / squareMovementThreshold);
         }
         else
-        {
             animator.SetBool("isMove", false);
-        }
 
         // Interpolation Position
-        if ((toPosition - previousPosition).sqrMagnitude < squareMovementThreshold)
+        if (squareMagnitude < squareMovementThreshold)
         {
             if (toPosition != fromPosition)
             {
-                // Debug.Log("Interpolation");
-                sphere.transform.position = Vector3.Lerp(fromPosition, toPosition, lerpAmount);            
+                sphere.transform.position = Vector3.Slerp(fromPosition, toPosition, lerpAmount);            
             }
         }
         // Extrapolation Position
         else
         {
-            // Debug.Log("Extrapolation");
             Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
-            sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
+            sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
         }  
         
         // Interpolation Rotation
-        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, 0.75f);
+        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, lerpAmount);
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
     }
 #endregion
