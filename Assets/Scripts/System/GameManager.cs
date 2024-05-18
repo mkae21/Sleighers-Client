@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Protocol;
 using UnityEngine;
@@ -33,7 +32,7 @@ public class GameManager : MonoBehaviour
     public static event Action MatchResult = delegate { };  // MatchResult 상태에서 실행되는 함수들
     public static event Action Ready = delegate { };        // Ready 상태에서 실행되는 함수들
     public static event Action InGame = delegate { };       // InGame 상태에서 실행되는 함수들
-    public static UnityAction<List<PlayerResult>> End;   // 게임이 끝나고 결과창을 띄울 때 실행되는 함수
+    public static UnityAction<List<PlayerResult>> End;      // 게임이 끝나고 결과창을 띄울 때 실행되는 함수
 
     public enum GameState { Login, Lobby, MatchMaking, MatchResult, Ready, InGame, End };
     public SoundManager soundManager = new SoundManager();
@@ -65,7 +64,6 @@ public class GameManager : MonoBehaviour
         {
             InGame();
         }
-    
     }
 
 #endregion
