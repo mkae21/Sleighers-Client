@@ -21,7 +21,6 @@ public class OutGameUI : MonoBehaviour
     public GameObject loadingObject;
     public TMP_Text matchMakingBtnText;
     public GameObject PlayerMatchList;
-    public GameObject PlayerMatchListPrefabs;
 
     [Space(10), Header("===== Login =====")]
     public TMP_InputField loginID;
@@ -39,6 +38,10 @@ public class OutGameUI : MonoBehaviour
     [Space(10), Header("===== Store =====")]
     public GameObject[] sledList;
     public int sledListCnt;
+#endregion
+
+#region PrivateVariables
+    private GameObject PlayerMatchElemPrefabs;
 #endregion
 
 #region PrivateMethod
@@ -105,6 +108,7 @@ public class OutGameUI : MonoBehaviour
             toggle.onValueChanged.AddListener((value) => GameManager.Instance().soundManager.Play("Effect/Click", SoundType.EFFECT));
         }
 
+        PlayerMatchElemPrefabs = Resources.Load<GameObject>("UI/PlayerMatchElem");
     }
 #endregion
 
@@ -129,7 +133,7 @@ public class OutGameUI : MonoBehaviour
 
     public void DrawMatchPlayer(string name)
     {
-        GameObject playerObject = Instantiate(PlayerMatchListPrefabs, PlayerMatchList.transform);
+        GameObject playerObject = Instantiate(PlayerMatchElemPrefabs, PlayerMatchList.transform);
         playerObject.GetComponentInChildren<TMP_Text>().text = name;
     }
 
