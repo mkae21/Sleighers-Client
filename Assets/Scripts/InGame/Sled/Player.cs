@@ -155,8 +155,8 @@ public class Player : MonoBehaviour
             if(onRamp)
             {
                 // Ramp를 벗어날 때의 방향과 속도를 기반으로 힘을 가함
-                Vector3 launchDirection = sledModel.forward * 8f + sledModel.up * 18f;
-                sphere.AddForce(launchDirection.normalized * sphere.velocity.magnitude * 30f, ForceMode.Impulse);
+                Vector3 launchDirection = sledModel.forward * 20f + sledModel.up * 30f;
+                sphere.AddForce(launchDirection.normalized * sphere.velocity.magnitude * 40f, ForceMode.Impulse);
                 onRamp = false;
             }
         }
