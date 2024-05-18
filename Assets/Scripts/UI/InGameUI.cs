@@ -199,7 +199,7 @@ public class InGameUI : MonoBehaviour
     }
     public void DeleteRankUI(string _nickname)
     {
-        Destroy(rankElements[_nickname].transform.parent.gameObject);
+        Destroy(rankElements[_nickname]);
         rankElements.Remove(_nickname);
     }
     public void UpdateTimer()
