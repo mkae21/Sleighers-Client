@@ -124,6 +124,16 @@ public class InGameUI : MonoBehaviour
     private void GameResultUI(List<PlayerResult> _playerResults)
     {
         playerResults = _playerResults; // 게임 결과를 저장
+
+        if (rankElements.Count != _playerResults.Count) {
+            List<string> keys = new List<string>(rankElements.Keys);
+            for (int i = _playerResults.Count; i < rankElements.Count; i++)
+            {
+                string key = keys[i];
+                playerResults.Add(new PlayerResult { nickname = key, rank = i, goalTime = 0 });
+            }
+        }
+        
         Invoke("ShowGameResultUI", 2f); // 2초 후에 ShowGameResultUI 메서드 호출
     }
 
@@ -134,7 +144,11 @@ public class InGameUI : MonoBehaviour
         for (int i = 0; i < playerResults.Count; i++)
         {
             GameObject resultElemObj = Instantiate(resultElem, resultElemHolder);
-            string resultTime = string.Format("{0:D2}:{1:D2}:{2:D2}", TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Minutes, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Seconds, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Milliseconds / 10);
+            string resultTime;
+            if ((long)playerResults[i].goalTime == 0)
+                resultTime = "Game Over";
+            else
+                resultTime = string.Format("{0:D2}:{1:D2}:{2:D2}", TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Minutes, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Seconds, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Milliseconds / 10);
 
             resultElemObj.transform.SetSiblingIndex(i);
             resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].rank.ToString();
