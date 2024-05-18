@@ -17,8 +17,8 @@ public class Player : MonoBehaviour
     // Polation
     private bool onRamp = false;
     private float timeToReachTarget = 0.3f;
-    private float movementThreshold = 3.5f;
-    private float squareMovementThreshold;
+    private float squareMovementThreshold = 3.5f;
+    private float extrapolationMultiplier = 1.2f;
     private Vector3 previousPosition;
     private long previousTimeStamp;
     private Vector3 toPosition;
@@ -67,10 +67,6 @@ public class Player : MonoBehaviour
     {
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
         animator = playerModel.GetComponent<Animator>();
-    }
-    private void Start()
-    {
-        squareMovementThreshold = movementThreshold * movementThreshold;
     }
     private void Update()
     {
@@ -224,6 +220,7 @@ public class Player : MonoBehaviour
         float latency = (toTimeStamp - previousTimeStamp) / 1000f;
         float lerpAmount = Mathf.Clamp01(latency / timeToReachTarget);
         Vector3 fromPosition = sphere.transform.position;
+        float squareMagnitude = (toPosition - previousPosition).sqrMagnitude;
 
         //플레이어가 움직였는지 확인
         isMove = IsMoving(fromPosition, toPosition);
@@ -231,14 +228,14 @@ public class Player : MonoBehaviour
         if(isMove)
         {     
             animator.SetBool("isMove", true);
-            animator.speed = 0.5f + NormalizedForwardSpeed;
+            animator.speed = 0.5f + Mathf.Clamp01(squareMagnitude / squareMovementThreshold);
         }
         else
             animator.SetBool("isMove", false);
 
         Debug.LogFormat("{0} / {1}", (toPosition - previousPosition).sqrMagnitude, lerpAmount);
         // Interpolation Position
-        if ((toPosition - previousPosition).sqrMagnitude < squareMovementThreshold)
+        if (squareMagnitude < squareMovementThreshold)
         {
             if (toPosition != fromPosition)
             {
@@ -248,7 +245,7 @@ public class Player : MonoBehaviour
         // Extrapolation Position
         else
         {
-            Vector3 extrapolatedPosition = toPosition + (toVelocity * 1.2f);
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * (1 + latency * extrapolationMultiplier));
             sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
         }  
         
