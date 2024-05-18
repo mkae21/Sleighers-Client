@@ -1,7 +1,7 @@
 using UnityEngine;
 /* InputManager.cs
  * - 인게임에서 플레이어 입력 처리
- * - 플레이어 스크립트는 여러 개 생성되기에 여기서 플레이어의 입력을 받아서 서버로 전송 및 플레이어 이동 처리
+ * - 플레이어 스크립트는 여러 개 생성되기에 여기서 플레이어의 입력을 받아서 플레이어 이동 처리
  */
 public class InputManager : MonoBehaviour    
 {
@@ -18,24 +18,13 @@ public class InputManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
-    }
-    private void Start()
-    {
-        GameManager.Ready += ReadyInput;
         GameManager.InGame += KeyInput;
-    }
-    private void ReadyInput()
-    {
-        if (Input.GetKey(KeyCode.R))
-            WorldManager.instance.OnSend(Protocol.Type.ResetServer);
-        if (Input.GetKey(KeyCode.T))
-            WorldManager.instance.OnSend(Protocol.Type.GameStart);
     }
 
     private void KeyInput()
     {
         if (Input.GetKey(KeyCode.G))
-            WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
+            WorldManager.instance.OnSendInGame(Protocol.Type.PlayerGoal);
         if (Input.GetKey(KeyCode.Escape))
             WorldManager.instance.GetMyPlayer().Respawn();
         
@@ -52,9 +41,5 @@ public class InputManager : MonoBehaviour
         WorldManager.instance.GetMyPlayer().SetDrift(drifting);
         WorldManager.instance.GetMyPlayer().SetMoveVector(acceleration);
     }
-#endregion
-
-#region PublicMethod
-#endregion
-    
+#endregion  
 }

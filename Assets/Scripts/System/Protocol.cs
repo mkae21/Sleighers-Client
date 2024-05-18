@@ -6,8 +6,8 @@ namespace Protocol
     // 이벤트 타입
     public enum Type : byte
     {
-        LoadGameScene = 1,      // 인게임 접속
-        PlayerReady,            // 로딩 완료
+        PlayerReady = 1,        // 인게임 로딩 완료
+        GameSetUp,              // 게임에 참가한 플레이어들 생성
         GameStartCountDown,     // 게임 시작 카운트 다운
         GameStart,              // 게임 시작
         PlayerDisconnect,       // 플레이어 접속 끊김
@@ -15,7 +15,6 @@ namespace Protocol
         GameEndCountDown,       // 1등 도착 후 카운트 다운 시작
         GameEnd,                // 게임 종료
         Sync = 30,              // 게임 싱크
-        ResetServer = 100,      // 서버 리셋
         Receiver = 255          // 수신 전용
     }
 
@@ -86,6 +85,7 @@ namespace Protocol
         public List<PlayerResult> resultList;
         public float endTime;
     }
+
     public class GameEndMessage : Message
     {
         public List<PlayerResult> resultList;
