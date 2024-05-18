@@ -111,12 +111,12 @@ public class OutGameUI : MonoBehaviour
         PlayerMatchElemPrefabs = Resources.Load<GameObject>("UI/PlayerMatchElem");
         
         if (ServerManager.Instance().myNickname != string.Empty)
-            SuccLoginPanel();
+            OnLobbyPanel();
     }
 #endregion
 
 #region PublicMethod
-    public void SuccLoginPanel()
+    public void OnLobbyPanel()
     {
         panels[0].SetActive(false);  // auth panel
         panels[1].SetActive(true);   // lobby panel
