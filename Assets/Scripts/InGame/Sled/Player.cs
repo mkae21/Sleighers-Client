@@ -74,11 +74,6 @@ public class Player : MonoBehaviour
     }
     private void Update()
     {
-        if (!isMe && WorldManager.instance.isGameStart)
-        {
-            Polation();
-        }
-
         SledPosition();
         SteerHandle();
         GetVerticalSpeed();
@@ -96,6 +91,10 @@ public class Player : MonoBehaviour
             ApplyPhysics(hitData);
         }
         CheckVelocity();
+        if (!isMe && WorldManager.instance.isGameStart)
+        {
+            Polation();
+        }
     }
 
     private void GetVerticalSpeed()
@@ -237,19 +236,18 @@ public class Player : MonoBehaviour
         else
             animator.SetBool("isMove", false);
 
+        Debug.LogFormat("{0} / {1}", (toPosition - previousPosition).sqrMagnitude, lerpAmount);
         // Interpolation Position
         if ((toPosition - previousPosition).sqrMagnitude < squareMovementThreshold)
         {
             if (toPosition != fromPosition)
             {
-                // Debug.Log("Interpolation");
                 sphere.transform.position = Vector3.Lerp(fromPosition, toPosition, lerpAmount);            
             }
         }
         // Extrapolation Position
         else
         {
-            // Debug.Log("Extrapolation");
             Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
             sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
         }  
