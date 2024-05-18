@@ -248,7 +248,7 @@ public class Player : MonoBehaviour
         // Extrapolation Position
         else
         {
-            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * 1.2f);
             sphere.transform.position = Vector3.Lerp(fromPosition, extrapolatedPosition, lerpAmount);
         }  
         
