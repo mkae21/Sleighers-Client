@@ -193,7 +193,7 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.tag == "Finish")
         {
-            WorldManager.instance.OnSend(Protocol.Type.PlayerGoal);
+            WorldManager.instance.OnSendInGame(Protocol.Type.PlayerGoal);
             Debug.LogFormat("플레이어 {0} 도착", nickname);
         }
     }

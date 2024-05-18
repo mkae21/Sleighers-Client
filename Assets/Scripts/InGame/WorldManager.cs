@@ -36,9 +36,7 @@ public class WorldManager : MonoBehaviour
     public GameObject playerPool;
     public Transform startingPointHolder;
     public MiniMapController miniMapController;
-
-    // 레이스가 종료되면 호출되는 액션
-    public UnityAction OnRaceFinished { get; set; }
+    public UnityAction OnRaceFinished { get; set; }     // 레이스가 종료되면 호출되는 액션
 #endregion
 
 #region PrivateMethod
@@ -77,7 +75,7 @@ public class WorldManager : MonoBehaviour
     private void FixedUpdate()
     {
         if (tick % 4 == 0)
-            OnSend(Protocol.Type.Sync);
+            OnSendInGame(Protocol.Type.Sync);
         tick++;
         OnReceive();
     }
@@ -115,7 +113,7 @@ public class WorldManager : MonoBehaviour
     private void FinishRace()
     {
         isRaceFinish = true;
-        OnSend(Protocol.Type.PlayerGoal);
+        OnSendInGame(Protocol.Type.PlayerGoal);
     }
 
 #region Receive 프로토콜 처리
@@ -146,8 +144,8 @@ public class WorldManager : MonoBehaviour
             }
             switch (msg.type)
             {
-                case Protocol.Type.LoadGameScene:
-                    ReceiveLoadGameSceneEvent(ServerManager.instance.roomData.playerList);
+                case Protocol.Type.GameSetUp:
+                    ReceiveGameSetUp(ServerManager.instance.roomData.playerList);
                     break;
 
                 case Protocol.Type.GameStartCountDown:
@@ -207,7 +205,7 @@ public class WorldManager : MonoBehaviour
     }
 
     // 게임 씬 로드 이벤트 처리
-    private void ReceiveLoadGameSceneEvent(List<PlayerInfo> playerList)
+    private void ReceiveGameSetUp(List<PlayerInfo> playerList)
     {
         myPlayerNickname = ServerManager.instance.myNickname;
         int myidx = 0;
@@ -240,7 +238,6 @@ public class WorldManager : MonoBehaviour
             GameObject Player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
             players.Add(playerNickname, Player.GetComponent<Player>());
             Player.GetComponent<Player>().Initialize(false, playerNickname, _sp.position, _sp.rotation.eulerAngles.y);
-
         }
     }
 
@@ -279,6 +276,12 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region Send 프로토콜 처리
+    // 플레이어 준비 완료 이벤트를 서버에 알림
+    private void SendPlayerReadyEvent()
+    {
+        Message msg = new Message(Protocol.Type.PlayerReady, ServerManager.instance.roomData.roomID, myPlayerNickname);
+        ServerManager.Instance().SendDataToInGame(msg);
+    }
     // 동기화 이벤트를 서버에 알림
     private void SendSyncEvent()
     {
@@ -288,17 +291,6 @@ public class WorldManager : MonoBehaviour
         ServerManager.Instance().SendDataToInGame(msg);
     }
 
-    // 게임 시작 이벤트를 서버에 알림
-    private async void SendGameStartEvent()
-    {
-        await Task.Run(() =>
-        {
-            if (isGameStart)
-                return;
-            Message msg = new Message(Protocol.Type.GameStart, ServerManager.instance.roomData.roomID, myPlayerNickname);
-            ServerManager.Instance().SendDataToInGame(msg);
-        });
-    }
     // 내 플레이어가 골인했음을 서버에 알림
     private async void SendPlayerGoalEvent()
     {
@@ -371,8 +363,8 @@ public class WorldManager : MonoBehaviour
             Debug.LogWarningFormat("[Polling] 데이터 수신 중 에러 발생 : {0}", ex.Message);
         }
     }
-    // 서버로 보내는 데이터 처리 핸들러
-    public void OnSend(Protocol.Type _type)
+    // 인게임 서버로 보내는 데이터 처리 핸들러
+    public void OnSendInGame(Protocol.Type _type)
     {
         if (!ServerManager.Instance().isConnectInGame)
             return;
@@ -387,8 +379,8 @@ public class WorldManager : MonoBehaviour
                 SendSyncEvent();
                 break;
 
-            case Protocol.Type.GameStart:
-                SendGameStartEvent();
+            case Protocol.Type.PlayerReady:
+                SendPlayerReadyEvent();
                 break;
 
             case Protocol.Type.PlayerGoal:
