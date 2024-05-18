@@ -121,6 +121,28 @@ public class InGameUI : MonoBehaviour
         }
     }
 
+    private void GameResultUI(List<PlayerResult> _playerResults)
+    {
+        playerResults = _playerResults; // 게임 결과를 저장
+        Invoke("ShowGameResultUI", 2f); // 2초 후에 ShowGameResultUI 메서드 호출
+    }
+
+    private void ShowGameResultUI()
+    {
+        resultPanel.SetActive(true);
+
+        for (int i = 0; i < playerResults.Count; i++)
+        {
+            GameObject resultElemObj = Instantiate(resultElem, resultElemHolder);
+            string resultTime = string.Format("{0:D2}:{1:D2}:{2:D2}", TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Minutes, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Seconds, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Milliseconds / 10);
+
+            resultElemObj.transform.SetSiblingIndex(i);
+            resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].rank.ToString();
+            resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].nickname;
+            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = resultTime;
+        }
+    }
+
 #endregion
 
 #region PublicMethod
@@ -244,28 +266,6 @@ public class InGameUI : MonoBehaviour
     public void LoadOutGameScene()
     {
         SceneManager.LoadScene("OutGame");
-    }
-
-    public void GameResultUI(List<PlayerResult> _playerResults)
-    {
-        playerResults = _playerResults; // 게임 결과를 저장
-        Invoke("ShowGameResultUI", 2f); // 2초 후에 ShowGameResultUI 메서드 호출
-    }
-
-    private void ShowGameResultUI()
-    {
-        resultPanel.SetActive(true);
-
-        for (int i = 0; i < playerResults.Count; i++)
-        {
-            GameObject resultElemObj = Instantiate(resultElem, resultElemHolder);
-            string resultTime = string.Format("{0:D2}:{1:D2}:{2:D2}", TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Minutes, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Seconds, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Milliseconds / 10);
-
-            resultElemObj.transform.SetSiblingIndex(i);
-            resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].rank.ToString();
-            resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].nickname;
-            resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = resultTime;
-        }
     }
 #endregion
 }
