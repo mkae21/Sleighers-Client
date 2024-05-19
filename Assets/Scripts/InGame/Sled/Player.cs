@@ -69,6 +69,7 @@ public class Player : MonoBehaviour
     }
     private void Update()
     {
+        SledPosition();
         SteerHandle();
         GetVerticalSpeed();
         CuerrentValue();
@@ -86,7 +87,6 @@ public class Player : MonoBehaviour
         if (isMove && isMe)
             ApplyPhysics(hitData);
 
-        SledPosition();
         CheckVelocity();
     }
 
