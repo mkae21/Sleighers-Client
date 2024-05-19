@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
     private bool isDrifting;
     // Polation
     private bool onRamp = false;
-    private float timeToReachTarget = 0.3f;
+    private float timeToReachTarget = 1f;
     private float squareMovementThreshold = 3.5f;
     private Vector3 previousPosition;
     private long previousTimeStamp;
@@ -75,6 +75,8 @@ public class Player : MonoBehaviour
                 
         if(isMe)
             BlurEffect();
+        if (WorldManager.instance.isGameStart && !isMe)
+            Polation();
     }
 
     private void FixedUpdate()
@@ -83,9 +85,6 @@ public class Player : MonoBehaviour
 
         if (isMove && isMe)
             ApplyPhysics(hitData);
-
-        if (WorldManager.instance.isGameStart && !isMe)
-            Polation();
 
         SledPosition();
         CheckVelocity();
@@ -219,6 +218,7 @@ public class Player : MonoBehaviour
         float lerpAmount = Mathf.Clamp01(latency / timeToReachTarget);
         Vector3 fromPosition = sphere.transform.position;
         float squareMagnitude = (toPosition - previousPosition).sqrMagnitude;
+        Debug.Log($"latency {latency} LerpAmount {lerpAmount} SquareMagnitude {squareMagnitude}");
 
         //플레이어가 움직였는지 확인
         isMove = IsMoving(fromPosition, toPosition);
