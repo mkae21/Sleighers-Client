@@ -69,7 +69,6 @@ public class Player : MonoBehaviour
     }
     private void Update()
     {
-        SledPosition();
         SteerHandle();
         GetVerticalSpeed();
         CuerrentValue();
@@ -81,15 +80,15 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         RaycastHit hitData = AdJustBottom();
+
         if (isMove && isMe)
-        {
             ApplyPhysics(hitData);
-        }
-        CheckVelocity();
-        if (!isMe && WorldManager.instance.isGameStart)
-        {
+
+        if (WorldManager.instance.isGameStart && !isMe)
             Polation();
-        }
+
+        SledPosition();
+        CheckVelocity();
     }
 
     private void GetVerticalSpeed()
@@ -243,7 +242,7 @@ public class Player : MonoBehaviour
         // Extrapolation Position
         else
         {
-            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * 2);
             sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
         }  
         
