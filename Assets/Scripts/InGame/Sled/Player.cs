@@ -384,6 +384,7 @@ public class Player : MonoBehaviour
     }
     public void Respawn()
     {
+        GameManager.Instance().soundManager.Play("Effect/Reset", SoundType.EFFECT);
         sphere.velocity = Vector3.zero;
         sphere.angularVelocity = Vector3.zero;
         sphere.transform.position = curCheckpoint.position;
