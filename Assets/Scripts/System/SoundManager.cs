@@ -155,6 +155,11 @@ public class SoundManager
         Stop(audioClip, type);
     }
 
+    public void Stop(AudioSource audioSource)
+    {
+        audioSource.Stop();
+    }
+
     public void StopAll()
     {
         foreach (AudioSource audioSource in audioSources)

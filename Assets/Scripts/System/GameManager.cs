@@ -65,16 +65,6 @@ public class GameManager : MonoBehaviour
             InGame();
         }
     }
-
-    private void SledSoundOff()
-    {
-        SledAudioEffect sledAudioEffect = FindObjectOfType<SledAudioEffect>();
-        if (sledAudioEffect != null)
-        {
-            sledAudioEffect.SledAudioOff();
-        }
-    }
-
 #endregion
 
 #region PublicMethod
@@ -123,7 +113,8 @@ public class GameManager : MonoBehaviour
                 End?.Invoke(gameResult.resultList);
                 soundManager.Stop("BGM/Wind", SoundType.WIND);
                 soundManager.Stop("BGM/InGame", SoundType.BGM);
-                SledSoundOff();
+                AudioSource sledFriction = FindObjectOfType<SledFrictionAudioEffect>().sledFrictionAudioSource;
+                soundManager.Stop(sledFriction);
                 break;
             default:
                 Debug.Log("[GameManager] 알 수 없는 상태입니다.");

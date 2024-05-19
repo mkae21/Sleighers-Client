@@ -165,15 +165,6 @@ public class InGameUI : MonoBehaviour
         }
     }
 
-    private void SledSoundOff()
-    {
-        SledAudioEffect sledAudioEffect = FindObjectOfType<SledAudioEffect>();
-        if (sledAudioEffect != null)
-        {
-            sledAudioEffect.SledAudioOff();
-        }
-    }
-
 #endregion
 
 #region PublicMethod
@@ -282,7 +273,8 @@ public class InGameUI : MonoBehaviour
         {
             isGoal = true;
             GameManager.Instance().soundManager.Stop("BGM/Wind", SoundType.WIND);
-            SledSoundOff();
+            AudioSource sledFriction = FindObjectOfType<SledFrictionAudioEffect>().sledFrictionAudioSource;
+            GameManager.Instance().soundManager.Stop(sledFriction);
             GameManager.Instance().soundManager.Play("Effect/Goal", SoundType.EFFECT);
             text_gameEndCountDown.gameObject.SetActive(true);
             text_gameEndCountDown.text = "완주!";
