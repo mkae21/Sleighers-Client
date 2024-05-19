@@ -44,7 +44,7 @@ public class GoogleAuth : MonoBehaviour
                 email = profile.EmailAddress
             };
             ServerManager.instance.OnSendOutGame(API.Type.loginSucc, playerInfo);
-            OutGameUI.instance.SuccLoginPanel();
+            OutGameUI.instance.OnLobbyPanel();
         }
         else
         {

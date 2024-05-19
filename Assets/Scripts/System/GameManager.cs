@@ -65,7 +65,6 @@ public class GameManager : MonoBehaviour
             InGame();
         }
     }
-
 #endregion
 
 #region PublicMethod
@@ -90,6 +89,8 @@ public class GameManager : MonoBehaviour
                 Login();
                 break;
             case GameState.Lobby:
+                soundManager.StopAll();
+                soundManager.Play("BGM/Lobby", SoundType.BGM);
                 Lobby();
                 break;
             case GameState.MatchMaking:
@@ -110,7 +111,10 @@ public class GameManager : MonoBehaviour
             case GameState.End:
                 GameEndMessage gameResult = (GameEndMessage)msg;
                 End?.Invoke(gameResult.resultList);
-                soundManager.StopAll();
+                soundManager.Stop("BGM/Wind", SoundType.WIND);
+                soundManager.Stop("BGM/InGame", SoundType.BGM);
+                AudioSource sledFriction = FindObjectOfType<SledFrictionAudioEffect>().sledFrictionAudioSource;
+                soundManager.Stop(sledFriction);
                 break;
             default:
                 Debug.Log("[GameManager] 알 수 없는 상태입니다.");
