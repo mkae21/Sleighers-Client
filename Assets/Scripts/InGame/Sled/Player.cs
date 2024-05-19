@@ -246,7 +246,11 @@ public class Player : MonoBehaviour
         }  
         
         // Interpolation Rotation
-        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, lerpAmount);
+        float fromRotation = sled.transform.rotation.eulerAngles.y;
+        float adjustedFromRotation = fromRotation > 180 ? fromRotation - 360 : fromRotation;
+        float adjustedToRotation = toRotationY > 180 ? toRotationY - 360 : toRotationY;
+        float quaternionY = Mathf.Lerp(adjustedFromRotation, adjustedToRotation, lerpAmount);
+        quaternionY = quaternionY < 0 ? quaternionY + 360 : quaternionY;
         sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
     }
 #endregion
