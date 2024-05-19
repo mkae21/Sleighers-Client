@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
     private bool isDrifting;
     // Polation
     private bool onRamp = false;
-    private float timeToReachTarget = 0.3f;
+    private float timeToReachTarget = 1f;
     private float squareMovementThreshold = 3.5f;
     private Vector3 previousPosition;
     private long previousTimeStamp;
@@ -76,20 +76,18 @@ public class Player : MonoBehaviour
                 
         if(isMe)
             BlurEffect();
+        if (WorldManager.instance.isGameStart && !isMe)
+            Polation();
     }
 
     private void FixedUpdate()
     {
         RaycastHit hitData = AdJustBottom();
+
         if (isMove && isMe)
-        {
             ApplyPhysics(hitData);
-        }
+
         CheckVelocity();
-        if (!isMe && WorldManager.instance.isGameStart)
-        {
-            Polation();
-        }
     }
 
     private void GetVerticalSpeed()
@@ -243,7 +241,7 @@ public class Player : MonoBehaviour
         // Extrapolation Position
         else
         {
-            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency);
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * 2);
             sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
         }  
         
