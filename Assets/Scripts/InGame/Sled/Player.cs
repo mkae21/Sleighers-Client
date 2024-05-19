@@ -218,7 +218,6 @@ public class Player : MonoBehaviour
         float lerpAmount = Mathf.Clamp01(latency / timeToReachTarget);
         Vector3 fromPosition = sphere.transform.position;
         float squareMagnitude = (toPosition - previousPosition).sqrMagnitude;
-        Debug.Log($"latency {latency} LerpAmount {lerpAmount} SquareMagnitude {squareMagnitude}");
 
         //플레이어가 움직였는지 확인
         isMove = IsMoving(fromPosition, toPosition);
