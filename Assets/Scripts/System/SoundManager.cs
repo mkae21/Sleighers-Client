@@ -129,6 +129,15 @@ public class SoundManager
                 audioSource.clip = null;
             }
         }
+        else if (type == SoundType.WIND) // BGM 배경음악 정지
+        {
+            AudioSource audioSource = audioSources[(int)SoundType.WIND];
+            if (audioSource.clip == audioClip)
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
+            }
+        }
         else // Effect 효과음 정지
         {
             AudioSource audioSource = audioSources[(int)SoundType.EFFECT];

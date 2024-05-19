@@ -28,4 +28,14 @@ public class SledAudioEffect : MonoBehaviour
                 audioSource.pitch = Mathf.Lerp(minPitch, maxPitch, player.NormalizedForwardSpeed * multiplier);
         }
 #endregion
+
+#region PublicMethod
+    public void SledAudioOff()
+    {
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+        }
+    }
+#endregion
 }

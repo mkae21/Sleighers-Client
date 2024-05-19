@@ -46,7 +46,7 @@ public class InGameUI : MonoBehaviour
 
     // 게임 결과 저장 변수
     private List<PlayerResult> playerResults;
-
+    private bool isGoal = false;
     // Blink 코루틴 변수
     private float blinkDuration = 0.1f;         // 블링크 지속 시간 (초)
     private Color originalColor = Color.white;  // 원래 색상
@@ -75,6 +75,11 @@ public class InGameUI : MonoBehaviour
         rankElements = new Dictionary<string, GameObject>();
         GameManager.End += GameResultUI;
         rankElementPrefab = Resources.Load<GameObject>("UI/RankElement");
+    }
+
+    private void OnDestroy()
+    {
+        CancelInvoke("ShowGameResultUI"); // InGameUI 객체가 파괴되기 전에 예약된 메서드 호출 취소
     }
 
     // 텍스트 숨기기
@@ -133,14 +138,17 @@ public class InGameUI : MonoBehaviour
                 playerResults.Add(new PlayerResult { nickname = key, rank = i+1, goalTime = 0 });
             }
         }
-        
-        Invoke("ShowGameResultUI", 2f); // 2초 후에 ShowGameResultUI 메서드 호출
+
+        if (this != null && enabled)
+        {
+            Invoke("ShowGameResultUI", 3f); // 2초 후에 ShowGameResultUI 메서드 호출
+        }
     }
 
     private void ShowGameResultUI()
     {
         resultPanel.SetActive(true);
-
+        GameManager.Instance().soundManager.Play("BGM/GameEndFanfare", SoundType.BGM);
         for (int i = 0; i < playerResults.Count; i++)
         {
             GameObject resultElemObj = Instantiate(resultElem, resultElemHolder);
@@ -154,6 +162,15 @@ public class InGameUI : MonoBehaviour
             resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].rank.ToString();
             resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].nickname;
             resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = resultTime;
+        }
+    }
+
+    private void SledSoundOff()
+    {
+        SledAudioEffect sledAudioEffect = FindObjectOfType<SledAudioEffect>();
+        if (sledAudioEffect != null)
+        {
+            sledAudioEffect.SledAudioOff();
         }
     }
 
@@ -244,28 +261,32 @@ public class InGameUI : MonoBehaviour
     {
         if(!WorldManager.instance.isRaceFinish)
         {
-            GameManager.Instance().soundManager.Play("Effect/EndCount", SoundType.EFFECT);
 
             if(text_gameEndCountDown != null)
             {
                 if(_count > 0)
                 {
+                    GameManager.Instance().soundManager.Play("Effect/EndCount", SoundType.EFFECT);
                     text_gameEndCountDown.text = _count.ToString();
                     text_gameEndCountDown.gameObject.SetActive(true);
                 }
                 else
                 {
+                    GameManager.Instance().soundManager.Play("Effect/Retire", SoundType.EFFECT);
                     text_gameEndCountDown.text = "Game End";
                     Invoke("HideCountDown", 1f);
                 }
             }
         }
-        else
+        else if(WorldManager.instance.isRaceFinish && !isGoal)
         {
+            isGoal = true;
+            GameManager.Instance().soundManager.Stop("BGM/Wind", SoundType.WIND);
+            SledSoundOff();
+            GameManager.Instance().soundManager.Play("Effect/Goal", SoundType.EFFECT);
             text_gameEndCountDown.gameObject.SetActive(true);
             text_gameEndCountDown.text = "완주!";
         }
-        
     }
     public void UpdateSpeedometer()
     {
@@ -281,6 +302,7 @@ public class InGameUI : MonoBehaviour
     public void LoadOutGameScene()
     {
         ServerManager.Instance().DisconnectInGame();
+        GameManager.Instance().ChangeState(GameManager.GameState.Lobby);
         SceneManager.LoadScene("OutGame");
     }
 #endregion
