@@ -276,7 +276,7 @@ public class Player : MonoBehaviour
 
         toPosition = GetPosition();
         toVelocity = GetVelocity();
-        toRotation = GetRotationY();
+        toRotation = GetRotation();
         toTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         if(isMe && SettingManager.backgroundPostProcessing == false)
@@ -333,14 +333,13 @@ public class Player : MonoBehaviour
     {
         return sphere.velocity;
     }
-    public Quaternion GetRotationY()
+    public Quaternion GetRotation()
     {
         return sled.transform.rotation;
-        // return sled.transform.rotation.eulerAngles.y;
     }
     public SyncMessage GetSyncData()
     {
-        return new SyncMessage(ServerManager.instance.roomData.roomID, nickname, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        return new SyncMessage(ServerManager.instance.roomData.roomID, nickname, GetPosition(), GetVelocity(), GetRotation(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
     public void SetDrift(bool isDrift)
