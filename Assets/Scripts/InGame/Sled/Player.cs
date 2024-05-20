@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     private long previousTimeStamp;
     private Vector3 toPosition;
     private Vector3 toVelocity;
-    private float toRotationY;
+    private Quaternion toRotation;
     private long toTimeStamp;
 
     // 최대속도 제한, 드리프트
@@ -249,8 +249,7 @@ public class Player : MonoBehaviour
         }  
         
         // Interpolation Rotation
-        float quaternionY = Mathf.Lerp(sled.transform.rotation.eulerAngles.y, toRotationY, lerpAmount);
-        sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
+        sled.transform.rotation = Quaternion.Slerp(sled.transform.rotation, toRotation, lerpAmount);
     }
 #endregion
 
@@ -280,7 +279,7 @@ public class Player : MonoBehaviour
 
         toPosition = GetPosition();
         toVelocity = GetVelocity();
-        toRotationY = GetRotationY();
+        toRotation = GetRotation();
         toTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         if(isMe && SettingManager.backgroundPostProcessing == false)
@@ -304,14 +303,14 @@ public class Player : MonoBehaviour
         this.moveVector = new Vector3(0, 0, 0);
     }
 
-    public void SetSyncData(Vector3 _position, Vector3 _velocity, float _rotationY, long _timeStamp)
+    public void SetSyncData(Vector3 _position, Vector3 _velocity, Quaternion _rotation, long _timeStamp)
     {
         previousPosition = toPosition;
         previousTimeStamp = toTimeStamp;
 
         toPosition = _position;
         toVelocity = _velocity;
-        toRotationY = _rotationY;
+        toRotation = _rotation;
         toTimeStamp = _timeStamp;
     }
 
@@ -337,13 +336,13 @@ public class Player : MonoBehaviour
     {
         return sphere.velocity;
     }
-    public float GetRotationY()
+    public Quaternion GetRotation()
     {
-        return sled.transform.rotation.eulerAngles.y;
+        return sled.transform.rotation;
     }
     public SyncMessage GetSyncData()
     {
-        return new SyncMessage(ServerManager.instance.roomData.roomID, nickname, GetPosition(), GetVelocity(), GetRotationY(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        return new SyncMessage(ServerManager.instance.roomData.roomID, nickname, GetPosition(), GetVelocity(), GetRotation(), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 
     public void SetDrift(bool isDrift)

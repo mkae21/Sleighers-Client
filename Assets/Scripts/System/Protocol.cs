@@ -34,15 +34,15 @@ namespace Protocol
     {
         public Vector3 position;        // 위치
         public Vector3 velocity;        // 속도
-        public float rotation;          // 회전 (y축)
+        public Quaternion rotation;     // 회전
         public long timeStamp;          // 타임스탬프
-        public SyncMessage(int _roomID, string _id, Vector3 _p, Vector3 _v, float _rY, long _timeStamp) : base(Type.Sync, _roomID, _id)
+        public SyncMessage(int _roomID, string _id, Vector3 _p, Vector3 _v, Quaternion _r, long _timeStamp) : base(Type.Sync, _roomID, _id)
         {
             this.roomID = _roomID;
             this.from = _id;
             this.position = _p;
             this.velocity = _v;
-            this.rotation = _rY;
+            this.rotation = _r;
             this.timeStamp = _timeStamp;
         }
     }

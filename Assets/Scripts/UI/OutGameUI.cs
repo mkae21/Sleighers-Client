@@ -150,8 +150,16 @@ public class OutGameUI : MonoBehaviour
 
     public void PopupMatchMakingPanel()
     {
-        panels[6].SetActive(true);
+        for (int i = 0; i < panels.Length; i++)
+        {
+            if (i == 6)
+                panels[i].SetActive(true);
+            else
+                panels[i].SetActive(false);
+        }
+        topBar.SetActive(false);
     }
+    
     public void RealExitGame()
     {
         Debug.Log("Exit Game");
