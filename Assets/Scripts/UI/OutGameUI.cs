@@ -155,12 +155,11 @@ public class OutGameUI : MonoBehaviour
             if (i == 6)
                 panels[i].SetActive(true);
             else
-            {
                 panels[i].SetActive(false);
-                topBar.SetActive(false);
-            }       
         }
+        topBar.SetActive(false);
     }
+    
     public void RealExitGame()
     {
         Debug.Log("Exit Game");
