@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     private bool onRamp = false;
     private float timeToReachTarget = 1f;
     private float squareMovementThreshold = 3.5f;
+    private float extrapolationWeight = 2f;
     private Vector3 previousPosition;
     private long previousTimeStamp;
     private Vector3 toPosition;
@@ -235,25 +236,10 @@ public class Player : MonoBehaviour
 
         if (toPosition != fromPosition)
         {
-            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * 2.5f);
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * extrapolationWeight);
             sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
         }
 
-        // // Interpolation Position
-        // if (squareMagnitude < squareMovementThreshold)
-        // {
-        //     if (toPosition != fromPosition)
-        //     {
-        //         sphere.transform.position = Vector3.Slerp(fromPosition, toPosition, lerpAmount);            
-        //     }
-        // }
-        // // Extrapolation Position
-        // else
-        // {
-        //     Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * 2);
-        //     sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
-        // }  
-        
         // Interpolation Rotation
         sled.transform.rotation = Quaternion.Slerp(sled.transform.rotation, toRotation, lerpAmount);
     }
