@@ -6,8 +6,8 @@ namespace Protocol
     // 이벤트 타입
     public enum Type : byte
     {
-        PlayerReady = 1,        // 인게임 로딩 완료
-        GameSetUp,              // 게임에 참가한 플레이어들 생성
+        GameSetUp = 1,          // 게임에 참가한 플레이어들 생성
+        PlayerReady,            // 인게임 로딩 및 타임라인 완료
         GameStartCountDown,     // 게임 시작 카운트 다운
         GameStart,              // 게임 시작
         PlayerDisconnect,       // 플레이어 접속 끊김

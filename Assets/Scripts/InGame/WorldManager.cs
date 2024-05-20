@@ -60,19 +60,7 @@ public class WorldManager : MonoBehaviour
     private void Start()
     {
         InitializeGame();
-        // 서버에 접속이 되지 않으면 오프라인 테스트 진행
-        if (!ServerManager.Instance().isConnectInGame)
-        {
-            Debug.LogWarning("[WorldManager] 서버에 접속되지 않았습니다. 오프라인 테스트 진행");
-            GameObject testPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
-            players.Add(myPlayerNickname, testPlayer.GetComponent<Player>());
-            Transform sp = startingPoints[0];
-            testPlayer.GetComponent<Player>().Initialize(true, "TestPlayer", sp.position, sp.rotation.eulerAngles.y);
-            Transform miniMapTarget = testPlayer.transform.Find("Sled");
-            miniMapController.SetTarget(miniMapTarget);
-            GameManager.Instance().ChangeState(GameManager.GameState.InGame);
-            Debug.Log("[WorldManager] 테스트 플레이어 생성 완료");
-        }
+        OfflineTest();
     }
     private void FixedUpdate()
     {
@@ -80,6 +68,21 @@ public class WorldManager : MonoBehaviour
             OnSendInGame(Protocol.Type.Sync);
         tick++;
         OnReceive();
+    }
+    // 서버에 접속이 되지 않으면 오프라인 테스트 진행
+    private void OfflineTest()
+    {
+        if (ServerManager.Instance().isConnectInGame)
+            return;
+        Debug.LogWarning("[WorldManager] 서버에 접속되지 않았습니다. 오프라인 테스트 진행");
+        GameObject testPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+        players.Add(myPlayerNickname, testPlayer.GetComponent<Player>());
+        Transform sp = startingPoints[0];
+        testPlayer.GetComponent<Player>().Initialize(true, "TestPlayer", sp.position, sp.rotation.eulerAngles.y);
+        Transform miniMapTarget = testPlayer.transform.Find("Sled");
+        miniMapController.SetTarget(miniMapTarget);
+        GameManager.Instance().ChangeState(GameManager.GameState.InGame);
+        Debug.Log("[WorldManager] 테스트 플레이어 생성 완료");
     }
     // 인게임 초기화
     private void InitializeGame()
@@ -96,6 +99,7 @@ public class WorldManager : MonoBehaviour
         startingPoints = new Transform[startingPointHolder.childCount];
         for (int i = 0; i < startingPointHolder.childCount; i++)
             startingPoints[i] = startingPointHolder.GetChild(i);
+        OnSendInGame(Protocol.Type.GameSetUp);
         Timeline.instance.StartTimeline();
     }
     // 플레이어가 한 바퀴를 완주했을 때 호출되는 콜백
@@ -283,6 +287,12 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region Send 프로토콜 처리
+    // 게임 셋업 이벤트를 서버에 알림
+    private void SendGameSetUpEvent()
+    {
+        Message msg = new Message(Protocol.Type.GameSetUp, ServerManager.instance.roomData.roomID, ServerManager.instance.myNickname);
+        ServerManager.Instance().SendDataToInGame(msg);
+    }
     // 플레이어 준비 완료 이벤트를 서버에 알림
     private void SendPlayerReadyEvent()
     {
@@ -384,6 +394,10 @@ public class WorldManager : MonoBehaviour
         {
             case Protocol.Type.Sync:
                 SendSyncEvent();
+                break;
+
+            case Protocol.Type.GameSetUp:
+                SendGameSetUpEvent();
                 break;
 
             case Protocol.Type.PlayerReady:
