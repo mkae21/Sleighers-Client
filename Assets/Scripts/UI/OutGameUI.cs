@@ -85,6 +85,7 @@ public class OutGameUI : MonoBehaviour
             setNicknameField.text = "";
         });
         googleLoginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
+        googleLoginBtn.onClick.AddListener(() => GoogleAuth.GoogleOAuth());
         matchMakingBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.MatchMaking));
 
         volumeToggle.onValueChanged.AddListener((value) => SettingManager.VolumeToggle(value));

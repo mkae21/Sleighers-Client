@@ -6,12 +6,8 @@ using UnityEngine;
 
 public class GoogleAuth : MonoBehaviour
 {
-#region PrivateMethod
-    private void Awake()
-    {
-        GameManager.Lobby += GoogleOAuth;
-    }
-    private async void GoogleOAuth()
+#region PublicMethod
+    public static async void GoogleOAuth()
     {
         var clientId = SecretLoader.googleAuth.id;
         var clientSecret = SecretLoader.googleAuth.secret;
