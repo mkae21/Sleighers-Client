@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using Cinemachine;
 using System;
+using System.Collections;
 using Protocol;
 using System.Collections.Generic;
 using UnityEngine.Rendering.PostProcessing;
@@ -34,6 +35,11 @@ public class Player : MonoBehaviour
 
     private float currentRotate;
     private Animator animator;
+
+    [SerializeField]
+    private Material[] opaqueMaterials;
+    [SerializeField]
+    private Material[] fadeMaterials;
 
 #endregion
 
@@ -388,6 +394,43 @@ public class Player : MonoBehaviour
         rot.x = 0;
         rot.z = 0;
         sled.transform.rotation = rot;
+
+        StartCoroutine(RespawnEffect());
+    }
+    
+    public float changeSpeed = 60;
+    float tt = 60;
+    bool change = false;
+
+    private IEnumerator RespawnEffect()
+    {
+        GameObject myModel = gameObject.transform.Find("Sled").Find("Character").Find("Character_Male").gameObject;
+        
+        while(true)
+        {
+            if (!change)
+            {
+                tt += 2;
+
+                if (tt >= changeSpeed)
+                {
+                    change = true;
+                }
+            }
+            else
+            {
+                tt -= 2;
+
+                if (tt <= 60)
+                {
+                    change = false;
+                }
+            }
+
+            myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, tt / changeSpeed);
+
+            yield return new WaitForSeconds(0.2f);
+        }
     }
 #endregion
 }
