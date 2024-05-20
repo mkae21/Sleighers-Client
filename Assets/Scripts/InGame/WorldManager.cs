@@ -99,6 +99,7 @@ public class WorldManager : MonoBehaviour
         startingPoints = new Transform[startingPointHolder.childCount];
         for (int i = 0; i < startingPointHolder.childCount; i++)
             startingPoints[i] = startingPointHolder.GetChild(i);
+        OnSendInGame(Protocol.Type.GameSetUp);
         Timeline.instance.StartTimeline();
     }
     // 플레이어가 한 바퀴를 완주했을 때 호출되는 콜백
@@ -286,6 +287,12 @@ public class WorldManager : MonoBehaviour
 #endregion
 
 #region Send 프로토콜 처리
+    // 게임 셋업 이벤트를 서버에 알림
+    private void SendGameSetUpEvent()
+    {
+        Message msg = new Message(Protocol.Type.GameSetUp, ServerManager.instance.roomData.roomID, ServerManager.instance.myNickname);
+        ServerManager.Instance().SendDataToInGame(msg);
+    }
     // 플레이어 준비 완료 이벤트를 서버에 알림
     private void SendPlayerReadyEvent()
     {
@@ -387,6 +394,10 @@ public class WorldManager : MonoBehaviour
         {
             case Protocol.Type.Sync:
                 SendSyncEvent();
+                break;
+
+            case Protocol.Type.GameSetUp:
+                SendGameSetUpEvent();
                 break;
 
             case Protocol.Type.PlayerReady:
