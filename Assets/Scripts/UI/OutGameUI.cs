@@ -1,6 +1,8 @@
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
+using Protocol;
+using System.Security.Cryptography;
 
 public class OutGameUI : MonoBehaviour
 {
@@ -20,6 +22,7 @@ public class OutGameUI : MonoBehaviour
     public Button matchMakingBtn;
     public GameObject loadingObject;
     public TMP_Text matchMakingBtnText;
+    public TMP_Text matchMakingText;
     public GameObject PlayerMatchList;
 
     [Space(10), Header("===== Login =====")]
@@ -126,13 +129,18 @@ public class OutGameUI : MonoBehaviour
 
     public void MatchMakingUI()
     {
-        matchMakingBtnText.text = "매칭중";
-        loadingObject.SetActive(true);
-    }
-    public void ReturnMatchMakingUI()
-    {
-        matchMakingBtnText.text = "매치메이킹";
-        loadingObject.SetActive(false);
+        panels[1].SetActive(false);
+        panels[6].SetActive(true);        
+        topBar.SetActive(false);
+        if(ServerManager.instance.isMatchSuccess)
+        {
+            matchMakingText.text = "매칭 성공";
+            Invoke("PopupMatchMakingPanel", 2.0f);
+        }
+        else
+        {
+            matchMakingText.text = "매칭 중";
+        }
     }
 
     public void DrawMatchPlayer(string name)
@@ -153,7 +161,7 @@ public class OutGameUI : MonoBehaviour
     {
         for (int i = 0; i < panels.Length; i++)
         {
-            if (i == 6)
+            if (i == 7)
                 panels[i].SetActive(true);
             else
                 panels[i].SetActive(false);

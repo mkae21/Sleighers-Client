@@ -15,6 +15,7 @@ public partial class ServerManager : MonoBehaviour
     public static ServerManager instance = null;
     public RoomData roomData;
     public bool isConnectOutGame = false;
+    public bool isMatchSuccess = false;
 #endregion
 
 #region PrivateMethod
@@ -90,6 +91,7 @@ public partial class ServerManager : MonoBehaviour
         socket.On("enterRoomFail", (res) =>
         {
             Debug.Log("enterRoomFail: " + res);
+            isMatchSuccess = false;
         });
 
         socket.On("enterRoomSucc", (res) =>
@@ -98,15 +100,14 @@ public partial class ServerManager : MonoBehaviour
             {
                 Debug.Log("endterRoomSucc:" + res);
                 roomData = ParseData(res.GetValue<string>());
-
-                OutGameUI.instance.PopupMatchMakingPanel();
+                isMatchSuccess = true;
+                OutGameUI.instance.MatchMakingUI();
 
                 // 파싱된 데이터 출력
                 foreach (PlayerInfo player in roomData.playerList)
                 {
                     OutGameUI.instance.DrawMatchPlayer(player.nickname);
                 }
-                OutGameUI.instance.ReturnMatchMakingUI();
             });
         });
 
@@ -140,6 +141,7 @@ public partial class ServerManager : MonoBehaviour
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
         OutGameUI.instance.MatchMakingUI();
+
     }
     private void SendDataToOutGame(API.Type _type, PlayerInfo _playerInfo)
     {
