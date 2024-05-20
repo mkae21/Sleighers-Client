@@ -205,7 +205,7 @@ public class Player : MonoBehaviour
     }
     private void SetCamera()
     {
-        CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
+        CinemachineCore.Instance.GetVirtualCamera(0).Follow = sled.transform;
     }
 
     private bool IsMoving(Vector3 fromPosition, Vector3 toPosition)
