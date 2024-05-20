@@ -108,27 +108,6 @@ public class InGameUI : MonoBehaviour
         if (rankManager != null)
             text_lab.text = $"<size=160>{_currentLap}</size=160>/{rankManager.laps} LAP";
     }
-    // 랭킹 UI 깜박임 효과
-    private IEnumerator RankEffectCoroutine(Image _target)
-    {
-        // 점차 어두워짐
-        for (float t = 0; t <= blinkDuration; t += blinkInterval)
-        {
-            _target.color = Color.Lerp(originalColor, blinkColor, t / blinkDuration);
-            _target.transform.localScale = Vector3.one * Mathf.Lerp(1.0f, highlightScale, t / blinkDuration);
-            yield return new WaitForSeconds(blinkInterval);
-        }
-
-        yield return new WaitForSeconds(0.01f);
-        // 점차 밝아짐
-        for (float t = 0; t <= blinkDuration; t += blinkInterval)
-        {
-            _target.color = Color.Lerp(blinkColor, originalColor, t / blinkDuration);
-            _target.transform.localScale = Vector3.one * Mathf.Lerp(highlightScale, 1.0f, t / blinkDuration);
-            yield return new WaitForSeconds(blinkInterval);
-        }
-
-    }
 
     private void GameResultUI(List<PlayerResult> _playerResults)
     {
@@ -200,11 +179,6 @@ public class InGameUI : MonoBehaviour
             if (nickname == myNickname)
             {
                 int currentRank = i + 1;
-                // 내 등수가 이전 등수보다 높으면 깜박임 효과
-                // if (currentRank < RankManager.instance.previousRank)
-                // {
-                //     StartCoroutine(RankEffectCoroutine(rankElements[nickname].transform.GetComponent<Image>()));
-                // }
                 text_rank.text = $"<size=160>{currentRank}</size>/{totalPlayer}";
                 RankManager.instance.previousRank = currentRank;
             }
