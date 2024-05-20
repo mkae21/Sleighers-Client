@@ -205,7 +205,7 @@ public class Player : MonoBehaviour
     }
     private void SetCamera()
     {
-        CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera.Follow = sled.transform;
+        CinemachineCore.Instance.GetVirtualCamera(0).Follow = sled.transform;
     }
 
     private bool IsMoving(Vector3 fromPosition, Vector3 toPosition)
@@ -236,7 +236,7 @@ public class Player : MonoBehaviour
 
         if (toPosition != fromPosition)
         {
-            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * extrapolationWeight);
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * Mathf.Clamp01(latency) * extrapolationWeight);
             sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
         }
 

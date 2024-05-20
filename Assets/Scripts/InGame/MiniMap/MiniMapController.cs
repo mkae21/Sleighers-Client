@@ -132,13 +132,7 @@ public class MiniMapController : MonoBehaviour {
 	void SetCam(){
 		mapCamera.orthographicSize = camSize;
 		mapCamera.farClipPlane = camFarClip;
-		if (target == null) 
-		{
-			#if UNITY_EDITOR
-			Debug.Log ("Please assign the target");
-			#endif
-		} 
-		else 
+		if (target)
 		{
 			mapCamera.transform.eulerAngles = rotationOfCam;
 

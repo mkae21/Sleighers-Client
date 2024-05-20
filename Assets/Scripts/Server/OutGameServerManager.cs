@@ -98,15 +98,12 @@ public partial class ServerManager : MonoBehaviour
             {
                 Debug.Log("endterRoomSucc:" + res);
                 roomData = ParseData(res.GetValue<string>());
-
-                OutGameUI.instance.PopupMatchMakingPanel();
-
+                OutGameUI.instance.MatchMakingSuccessUI();
                 // 파싱된 데이터 출력
                 foreach (PlayerInfo player in roomData.playerList)
                 {
                     OutGameUI.instance.DrawMatchPlayer(player.nickname);
                 }
-                OutGameUI.instance.ReturnMatchMakingUI();
             });
         });
 
@@ -139,7 +136,7 @@ public partial class ServerManager : MonoBehaviour
         Debug.Log("matchmaking id 보낸다 : "+sendPacket.nickname);
         string jsonData = JsonUtility.ToJson(sendPacket);
         socket.Emit("matching", jsonData);
-        OutGameUI.instance.MatchMakingUI();
+        OutGameUI.instance.MatchMakingStartUI();
     }
     private void SendDataToOutGame(API.Type _type, PlayerInfo _playerInfo)
     {
