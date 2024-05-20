@@ -131,11 +131,11 @@ public class InGameUI : MonoBehaviour
         playerResults = _playerResults; // 게임 결과를 저장
 
         if (rankElements.Count != _playerResults.Count) {
-            List<string> keys = new List<string>(rankElements.Keys);
-            for (int i = _playerResults.Count; i < rankElements.Count; i++)
+            List<RankInfo> rankInfos = RankManager.instance.GetRanking();
+            for (int i = _playerResults.Count; i < rankInfos.Count; i++)
             {
-                string key = keys[i];
-                playerResults.Add(new PlayerResult { nickname = key, rank = i+1, goalTime = 0 });
+                string nickname = rankInfos[i].nickname;
+                playerResults.Add(new PlayerResult { nickname = nickname, rank = i+1, goalTime = 0 });
             }
         }
 
