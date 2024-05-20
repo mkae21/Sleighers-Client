@@ -395,7 +395,6 @@ public class WorldManager : MonoBehaviour
 
     public Player GetMyPlayer()
     {
-        return players[myPlayerNickname];
         return GetPlayerFromNickName(myPlayerNickname);
     }
     public GameObject GetMySled()
