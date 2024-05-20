@@ -89,8 +89,6 @@ public class GameManager : MonoBehaviour
                 Login();
                 break;
             case GameState.Lobby:
-                soundManager.StopAll();
-                soundManager.Play("BGM/Lobby", SoundType.BGM);
                 Lobby();
                 break;
             case GameState.MatchMaking:
