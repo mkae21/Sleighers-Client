@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     private long previousTimeStamp;
     private Vector3 toPosition;
     private Vector3 toVelocity;
-    private float toRotationY;
+    private Quaternion toRotation;
     private long toTimeStamp;
 
     // 최대속도 제한, 드리프트
@@ -246,12 +246,7 @@ public class Player : MonoBehaviour
         }  
         
         // Interpolation Rotation
-        float fromRotation = sled.transform.rotation.eulerAngles.y;
-        float adjustedFromRotation = fromRotation > 180 ? fromRotation - 360 : fromRotation;
-        float adjustedToRotation = toRotationY > 180 ? toRotationY - 360 : toRotationY;
-        float quaternionY = Mathf.Lerp(adjustedFromRotation, adjustedToRotation, lerpAmount);
-        quaternionY = quaternionY < 0 ? quaternionY + 360 : quaternionY;
-        sled.transform.rotation = Quaternion.Euler(0f, quaternionY, 0f);
+        sled.transform.rotation = Quaternion.Slerp(sled.transform.rotation, toRotation, lerpAmount);
     }
 #endregion
 
@@ -281,7 +276,7 @@ public class Player : MonoBehaviour
 
         toPosition = GetPosition();
         toVelocity = GetVelocity();
-        toRotationY = GetRotationY();
+        toRotation = GetRotationY();
         toTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         if(isMe && SettingManager.backgroundPostProcessing == false)
@@ -305,14 +300,14 @@ public class Player : MonoBehaviour
         this.moveVector = new Vector3(0, 0, 0);
     }
 
-    public void SetSyncData(Vector3 _position, Vector3 _velocity, float _rotationY, long _timeStamp)
+    public void SetSyncData(Vector3 _position, Vector3 _velocity, Quaternion _rotation, long _timeStamp)
     {
         previousPosition = toPosition;
         previousTimeStamp = toTimeStamp;
 
         toPosition = _position;
         toVelocity = _velocity;
-        toRotationY = _rotationY;
+        toRotation = _rotation;
         toTimeStamp = _timeStamp;
     }
 
@@ -338,9 +333,10 @@ public class Player : MonoBehaviour
     {
         return sphere.velocity;
     }
-    public float GetRotationY()
+    public Quaternion GetRotationY()
     {
-        return sled.transform.rotation.eulerAngles.y;
+        return sled.transform.rotation;
+        // return sled.transform.rotation.eulerAngles.y;
     }
     public SyncMessage GetSyncData()
     {
