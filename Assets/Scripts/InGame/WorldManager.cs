@@ -94,6 +94,7 @@ public class WorldManager : MonoBehaviour
         startingPoints = new Transform[startingPointHolder.childCount];
         for (int i = 0; i < startingPointHolder.childCount; i++)
             startingPoints[i] = startingPointHolder.GetChild(i);
+        Timeline.instance.StartTimeline();
     }
     // 플레이어가 한 바퀴를 완주했을 때 호출되는 콜백
     private void OnLapComplete(Player _player, RankInfo _lapInfo)
@@ -279,7 +280,7 @@ public class WorldManager : MonoBehaviour
     // 플레이어 준비 완료 이벤트를 서버에 알림
     private void SendPlayerReadyEvent()
     {
-        Message msg = new Message(Protocol.Type.PlayerReady, ServerManager.instance.roomData.roomID, myPlayerNickname);
+        Message msg = new Message(Protocol.Type.PlayerReady, ServerManager.instance.roomData.roomID, ServerManager.instance.myNickname);
         ServerManager.Instance().SendDataToInGame(msg);
     }
     // 동기화 이벤트를 서버에 알림
