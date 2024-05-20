@@ -50,7 +50,8 @@ public class InGameUI : MonoBehaviour
     // Blink 코루틴 변수
     private float blinkDuration = 0.1f;         // 블링크 지속 시간 (초)
     private Color originalColor = Color.white;  // 원래 색상
-    private Color blinkColor = Color.grey;      // 블링크 색상
+    private Color blinkColor = Color.gray;      // 블링크 색상
+    private float blinkInterval = 0.02f;        // 블링크 간격
     private const float highlightScale = 1.5f;  // 블링크 크기
     // ResultElem 텍스트 인덱스
     private const int rankIndex = 0;
@@ -106,24 +107,6 @@ public class InGameUI : MonoBehaviour
     {
         if (rankManager != null)
             text_lab.text = $"<size=160>{_currentLap}</size=160>/{rankManager.laps} LAP";
-    }
-    // 랭킹 UI 깜박임 효과
-    private IEnumerator RankEffectCoroutine(Image _target)
-    {
-        // 점차 어두워짐
-        for (float t = 0; t <= blinkDuration; t += Time.deltaTime)
-        {
-            _target.color = Color.Lerp(originalColor, blinkColor, t / blinkDuration);
-            _target.transform.localScale = Vector3.one * Mathf.Lerp(1.0f, highlightScale, t / blinkDuration);
-            yield return null;
-        }
-        // 점차 밝아짐
-        for (float t = 0; t <= blinkDuration; t += Time.deltaTime)
-        {
-            _target.color = Color.Lerp(blinkColor, originalColor, t / blinkDuration);
-            _target.transform.localScale = Vector3.one * Mathf.Lerp(highlightScale, 1.0f, t / blinkDuration);
-            yield return null;
-        }
     }
 
     private void GameResultUI(List<PlayerResult> _playerResults)
@@ -195,13 +178,9 @@ public class InGameUI : MonoBehaviour
             // 내 등수 업데이트
             if (nickname == myNickname)
             {
-                // 내 등수가 이전 등수보다 높으면 깜박임 효과
-                if (i + 1 < RankManager.instance.previousRank)
-                {
-                    StartCoroutine(RankEffectCoroutine(rankElements[nickname].transform.GetComponent<Image>()));
-                }
-                text_rank.text = $"<size=160>{i + 1}</size>/{totalPlayer}";
-                RankManager.instance.previousRank = i + 1;
+                int currentRank = i + 1;
+                text_rank.text = $"<size=160>{currentRank}</size>/{totalPlayer}";
+                RankManager.instance.previousRank = currentRank;
             }
         }
     }
@@ -295,6 +274,8 @@ public class InGameUI : MonoBehaviour
     {
         ServerManager.Instance().DisconnectInGame();
         GameManager.Instance().ChangeState(GameManager.GameState.Lobby);
+        GameManager.Instance().soundManager.StopAll();
+        GameManager.Instance().soundManager.Play("BGM/Lobby", SoundType.BGM);
         SceneManager.LoadScene("OutGame");
     }
 #endregion
