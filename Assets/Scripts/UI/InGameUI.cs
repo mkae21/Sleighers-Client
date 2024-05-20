@@ -113,15 +113,6 @@ public class InGameUI : MonoBehaviour
     {
         playerResults = _playerResults; // 게임 결과를 저장
 
-        if (rankElements.Count != _playerResults.Count) {
-            List<string> keys = new List<string>(rankElements.Keys);
-            for (int i = _playerResults.Count; i < rankElements.Count; i++)
-            {
-                string key = keys[i];
-                playerResults.Add(new PlayerResult { nickname = key, rank = i+1, goalTime = 0 });
-            }
-        }
-
         if (this != null && enabled)
         {
             Invoke("ShowGameResultUI", 3f); // 2초 후에 ShowGameResultUI 메서드 호출
@@ -141,8 +132,14 @@ public class InGameUI : MonoBehaviour
             else
                 resultTime = string.Format("{0:D2}:{1:D2}:{2:D2}", TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Minutes, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Seconds, TimeSpan.FromMilliseconds((long)playerResults[i].goalTime).Milliseconds / 10);
 
+            string rankText;
+            if (playerResults[i].rank == 0)
+                rankText = "-";
+            else
+                rankText = playerResults[i].rank.ToString();
+
             resultElemObj.transform.SetSiblingIndex(i);
-            resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].rank.ToString();
+            resultElemObj.transform.GetChild(rankIndex).GetComponent<TextMeshProUGUI>().text = rankText;
             resultElemObj.transform.GetChild(nicknameIndex).GetComponent<TextMeshProUGUI>().text = playerResults[i].nickname;
             resultElemObj.transform.GetChild(timeIndex).GetComponent<TextMeshProUGUI>().text = resultTime;
         }
