@@ -26,6 +26,8 @@ public class WorldManager : MonoBehaviour
     private Transform[] startingPoints;
     private Queue<byte[]> messageQueue = new Queue<byte[]>();
     private int tick = 0;
+    [SerializeField]
+    private Material[] playerMaterials;
 #endregion
 
 #region PublicVariables
@@ -224,6 +226,8 @@ public class WorldManager : MonoBehaviour
         }
         Transform sp = startingPoints[myidx].transform;
         GameObject myPlayer = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+        GameObject myModel = myPlayer.transform.Find("Sled").Find("Character").Find("Character_Male").gameObject;
+        myModel.GetComponent<Renderer>().material = playerMaterials[myidx];
         players.Add(myPlayerNickname, myPlayer.GetComponent<Player>());
         myPlayer.GetComponent<Player>().Initialize(true, ServerManager.instance.myNickname, sp.position, sp.rotation.eulerAngles.y);
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
@@ -237,6 +241,8 @@ public class WorldManager : MonoBehaviour
                 continue;
             Transform _sp = startingPoints[i].transform;
             GameObject Player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity, playerPool.transform);
+            GameObject characterModel = Player.transform.Find("Sled").Find("Character").Find("Character_Male").gameObject;
+            characterModel.GetComponent<Renderer>().material = playerMaterials[i];
             players.Add(playerNickname, Player.GetComponent<Player>());
             Player.GetComponent<Player>().Initialize(false, playerNickname, _sp.position, _sp.rotation.eulerAngles.y);
         }
