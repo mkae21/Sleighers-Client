@@ -53,8 +53,6 @@ public partial class ServerManager : MonoBehaviour
             Debug.LogFormat("[ServerManager] 인게임 서버 접속 성공 {0}:{1}", inGameServerIP, inGameServerPort);
             Stream = Client.GetStream();
             isConnectInGame = true;
-            Message msg = new Message(Protocol.Type.PlayerReady, roomData.roomID, myNickname);  // TODO: OnSendInGame으로 변경
-            SendDataToInGame(msg);
         }
         catch (Exception e)
         {

@@ -295,6 +295,8 @@ public class InGameUI : MonoBehaviour
     {
         ServerManager.Instance().DisconnectInGame();
         GameManager.Instance().ChangeState(GameManager.GameState.Lobby);
+        GameManager.Instance().soundManager.StopAll();
+        GameManager.Instance().soundManager.Play("BGM/Lobby", SoundType.BGM);
         SceneManager.LoadScene("OutGame");
     }
 #endregion
