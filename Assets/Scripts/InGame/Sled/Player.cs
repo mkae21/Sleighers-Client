@@ -74,7 +74,7 @@ public class Player : MonoBehaviour
         GetVerticalSpeed();
         CuerrentValue();
                 
-        if(isMe)
+        if (isMe)
             BlurEffect();
         if (WorldManager.instance.isGameStart && !isMe)
             Polation();
@@ -222,7 +222,7 @@ public class Player : MonoBehaviour
         //플레이어가 움직였는지 확인
         isMove = IsMoving(fromPosition, toPosition);
 
-        if(isMove)
+        if (isMove)
         {     
             animator.SetBool("isMove", true);
             animator.speed = 0.5f + Mathf.Clamp01(squareMagnitude / squareMovementThreshold);
@@ -230,20 +230,26 @@ public class Player : MonoBehaviour
         else
             animator.SetBool("isMove", false);
 
-        // Interpolation Position
-        if (squareMagnitude < squareMovementThreshold)
-        {
-            if (toPosition != fromPosition)
-            {
-                sphere.transform.position = Vector3.Slerp(fromPosition, toPosition, lerpAmount);            
-            }
-        }
-        // Extrapolation Position
-        else
+        if (toPosition != fromPosition)
         {
             Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * 2);
             sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
-        }  
+        }
+
+        // // Interpolation Position
+        // if (squareMagnitude < squareMovementThreshold)
+        // {
+        //     if (toPosition != fromPosition)
+        //     {
+        //         sphere.transform.position = Vector3.Slerp(fromPosition, toPosition, lerpAmount);            
+        //     }
+        // }
+        // // Extrapolation Position
+        // else
+        // {
+        //     Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * 2);
+        //     sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
+        // }  
         
         // Interpolation Rotation
         sled.transform.rotation = Quaternion.Slerp(sled.transform.rotation, toRotation, lerpAmount);
