@@ -529,7 +529,17 @@ PrefabInstance:
     - target: {fileID: 870278781229233269, guid: 26626d58048d9b54fbee5c299a5636c3,
         type: 3}
       propertyPath: m_Name
-      value: Character_Skier_02
+      value: Character
+      objectReference: {fileID: 0}
+    - target: {fileID: 3754586037095898188, guid: 26626d58048d9b54fbee5c299a5636c3,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9d35c905ec7409d41b7b6d421e567f85, type: 2}
+    - target: {fileID: 7605907991220075628, guid: 26626d58048d9b54fbee5c299a5636c3,
+        type: 3}
+      propertyPath: m_Name
+      value: Character_Male
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

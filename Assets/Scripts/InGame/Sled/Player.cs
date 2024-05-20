@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     private bool onRamp = false;
     private float timeToReachTarget = 1f;
     private float squareMovementThreshold = 3.5f;
+    private float extrapolationWeight = 2f;
     private Vector3 previousPosition;
     private long previousTimeStamp;
     private Vector3 toPosition;
@@ -74,7 +75,7 @@ public class Player : MonoBehaviour
         GetVerticalSpeed();
         CuerrentValue();
                 
-        if(isMe)
+        if (isMe)
             BlurEffect();
         if (WorldManager.instance.isGameStart && !isMe)
             Polation();
@@ -225,7 +226,7 @@ public class Player : MonoBehaviour
         //플레이어가 움직였는지 확인
         isMove = IsMoving(fromPosition, toPosition);
 
-        if(isMove)
+        if (isMove)
         {     
             animator.SetBool("isMove", true);
             animator.speed = 0.5f + Mathf.Clamp01(squareMagnitude / squareMovementThreshold);
@@ -233,21 +234,12 @@ public class Player : MonoBehaviour
         else
             animator.SetBool("isMove", false);
 
-        // Interpolation Position
-        if (squareMagnitude < squareMovementThreshold)
+        if (toPosition != fromPosition)
         {
-            if (toPosition != fromPosition)
-            {
-                sphere.transform.position = Vector3.Slerp(fromPosition, toPosition, lerpAmount);            
-            }
-        }
-        // Extrapolation Position
-        else
-        {
-            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * 2);
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * extrapolationWeight);
             sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
-        }  
-        
+        }
+
         // Interpolation Rotation
         sled.transform.rotation = Quaternion.Slerp(sled.transform.rotation, toRotation, lerpAmount);
     }
