@@ -194,7 +194,7 @@ public class WorldManager : MonoBehaviour
             string id = msg.from;
             Vector3 position = msg.position;
             Vector3 velocity = msg.velocity;
-            float rotation = msg.rotation;
+            Quaternion rotation = msg.rotation;
             long timeStamp = msg.timeStamp;
 
             Player player = GetPlayerFromNickName(id);
