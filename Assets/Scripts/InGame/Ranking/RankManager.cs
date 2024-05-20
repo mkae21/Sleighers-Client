@@ -146,7 +146,8 @@ public class RankManager : MonoBehaviour
 
         for (int i = 0; i < sortedRanking.Count; i++)
         {
-            if (sortedRanking[i].nickname == WorldManager.instance.GetMyPlayer().nickname)
+            string nickname = sortedRanking[i].nickname;
+            if (nickname == WorldManager.instance.GetMyPlayer().nickname)
             {
                 WorldManager.instance.GetMyPlayer().myRank = i + 1;
                 break;
