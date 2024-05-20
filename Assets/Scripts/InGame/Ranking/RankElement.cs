@@ -31,7 +31,7 @@ public class RankElement : MonoBehaviour
         Color imageColor = new Color(221f / 255f, 122f / 255f, 53f / 255f, 1f);
         GetComponentsInChildren<Image>()[1].color = imageColor;
         nicknameText.color = Color.black;
-        transform.localScale = new Vector3(1.15f, 1.15f, 1.15f);
+        transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
         RectTransform rectTransform = GetComponent<RectTransform>();
         rectTransform.pivot = new Vector2(0f, 0.5f);
     }
