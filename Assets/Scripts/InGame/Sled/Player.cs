@@ -236,7 +236,7 @@ public class Player : MonoBehaviour
 
         if (toPosition != fromPosition)
         {
-            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * extrapolationWeight);
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * Mathf.Clamp01(latency) * extrapolationWeight);
             sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
         }
 
