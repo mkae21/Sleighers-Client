@@ -13,7 +13,7 @@ public class RadialBlur : MonoBehaviour
 {
     public Shader shader;
 
-    public float blurStrength = 2.2f;
+    public float blurStrength = 2f;
     public float blurWidth = 1.0f;
     public static RadialBlur instance;
 
