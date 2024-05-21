@@ -41,6 +41,10 @@ public class Finish : MonoBehaviour
 
         RankManager.instance.SetPlayerCheckpointCount(_player, checkpointIndex);
 
+        // 마지막 체크포인트는 랭킹을 업데이트하지 않음
+        if (checkpointIndex == checkpoints.Count - 1)
+            return;
+
         List<RankInfo> ranking = RankManager.instance.GetRanking();
         InGameUI.instance.UpdateRankUI(ranking);
     }

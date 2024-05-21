@@ -9,7 +9,7 @@ public class Checkpoint : MonoBehaviour
 
 #region PublicVariables
     public UnityAction<Player, Checkpoint> OnPlayerEnterCheckpoint; // 플레이어가 체크포인트에 진입할 때 호출되는 콜백
-    public int checkpointIndex = 0;           // 체크포인트 인덱스
+    [HideInInspector] public int checkpointIndex = 0;           // 체크포인트 인덱스
 #endregion
 
 #region PrivateMethod
