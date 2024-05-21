@@ -35,11 +35,12 @@ public class Player : MonoBehaviour
 
     private float currentRotate;
     private Animator animator;
-
+    public List<string> playerList = new List<string>();
     [SerializeField]
     private Material[] opaqueMaterials;
     [SerializeField]
     private Material[] fadeMaterials;
+    private IEnumerator respawnCoroutine;
 
 #endregion
 
@@ -73,6 +74,7 @@ public class Player : MonoBehaviour
     {
         nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
         animator = playerModel.GetComponent<Animator>();
+        respawnCoroutine = RespawnEffect();
     }
     private void Update()
     {
@@ -85,6 +87,12 @@ public class Player : MonoBehaviour
             BlurEffect();
         if (WorldManager.instance.isGameStart && !isMe)
             Polation();
+
+        if (alphaCount >= 5) {
+            StopCoroutine(respawnCoroutine);
+            alphaCount = 0;
+            ChangeMaterial("Opaque");
+        }
     }
 
     private void FixedUpdate()
@@ -380,6 +388,39 @@ public class Player : MonoBehaviour
         else
             RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,0f,Time.fixedDeltaTime);
     }
+    public void SetPlayerList(List<PlayerInfo> playerList)
+    {
+        for (int i = 0; i < playerList.Count; i++)
+        {
+            this.playerList.Add(playerList[i].nickname);
+        }
+    }
+    private int GetPlayerIndex(string nickname)
+    {
+        for (int i = 0; i < playerList.Count; i++)
+        {
+            if (playerList[i] == nickname)
+            {
+                myRank = i;
+                break;
+            }
+        }
+        return myRank;
+    }
+    private void ChangeMaterial(string materialName)
+    {
+        string myPlayerNickname = ServerManager.instance.myNickname;
+        if (materialName == "Opaque")
+        {
+            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = opaqueMaterials[GetPlayerIndex(myPlayerNickname)];
+            sledModel.GetComponent<Renderer>().material = opaqueMaterials[GetPlayerIndex(myPlayerNickname)];
+        }
+        else if (materialName == "Fade")
+        {
+            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = fadeMaterials[GetPlayerIndex(myPlayerNickname)];
+            sledModel.GetComponent<Renderer>().material = fadeMaterials[GetPlayerIndex(myPlayerNickname)];
+        }
+    }
     public void Respawn()
     {
         if (isMe)
@@ -395,41 +436,37 @@ public class Player : MonoBehaviour
         rot.z = 0;
         sled.transform.rotation = rot;
 
-        StartCoroutine(RespawnEffect());
+        ChangeMaterial("Fade");
+        StartCoroutine(respawnCoroutine);
     }
     
     public float changeSpeed = 60;
     float tt = 60;
     bool change = false;
+    private int alphaCount = 0;
 
     private IEnumerator RespawnEffect()
     {
         GameObject myModel = gameObject.transform.Find("Sled").Find("Character").Find("Character_Male").gameObject;
+        GameObject mySled = sledModel.gameObject;
         
         while(true)
         {
             if (!change)
             {
-                tt += 2;
-
-                if (tt >= changeSpeed)
-                {
-                    change = true;
-                }
+                change = true;
+                myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
             }
             else
             {
-                tt -= 2;
-
-                if (tt <= 60)
-                {
-                    change = false;
-                }
+                change = false;
+                myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                alphaCount++;
             }
 
-            myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, tt / changeSpeed);
-
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.5f);
         }
     }
 #endregion

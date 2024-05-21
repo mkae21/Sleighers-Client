@@ -234,6 +234,7 @@ public class WorldManager : MonoBehaviour
         myModel.GetComponent<Renderer>().material = playerMaterials[myidx];
         players.Add(myPlayerNickname, myPlayer.GetComponent<Player>());
         myPlayer.GetComponent<Player>().Initialize(true, ServerManager.instance.myNickname, sp.position, sp.rotation.eulerAngles.y);
+        myPlayer.GetComponent<Player>().SetPlayerList(playerList);
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
         miniMapController.SetTarget(miniMapTarget);
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerNickname);
