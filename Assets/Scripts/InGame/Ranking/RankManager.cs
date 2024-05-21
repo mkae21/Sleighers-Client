@@ -8,15 +8,14 @@ public struct RankInfo
     public string nickname;                 // 플레이어 닉네임
     public int checkpoint;                  // 완료된 체크포인트 수
     public float distanceToNextCheckpoint;  // 다음 체크포인트까지의 거리
-    public int rank;                        // 랭킹
 }
 
 public class RankManager : MonoBehaviour
 {
 #region PrivateVariables
     private Finish finish;
-    private Dictionary<string, RankInfo> rankInfoDictionary; // 모든 플레이어의의 랭킹에 관련된 정보를 포함하는 딕셔너리
-    private int ranking = 0; // 들어온 플레이어의 랭킹
+    private Dictionary<string, RankInfo> rankInfoDictionary;    // 모든 플레이어의의 랭킹에 관련된 정보를 포함하는 딕셔너리
+    private int checkpointWeight = 50;                          // 피니시 라인에 들어온 플레이어들 간의 랭킹을 매기기 위한 가중치
 #endregion
 
 #region PublicVariables
@@ -55,16 +54,18 @@ public class RankManager : MonoBehaviour
             rankInfoDictionary.Add(nickname, new RankInfo { 
                 nickname = nickname,
                 checkpoint = 0,
-                rank = 0
             });
         }
 
         // 랭킹 업데이트
         RankInfo rankInfo = rankInfoDictionary[nickname];
-        rankInfo.rank = ranking++;
+        rankInfo.checkpoint += checkpointWeight;
+        checkpointWeight -= 10;
         rankInfoDictionary[nickname] = rankInfo;
 
         OnFinish?.Invoke(_player, rankInfo);
+        List<RankInfo> rankInfos = GetRanking();
+        InGameUI.instance.UpdateRankUI(rankInfos);
     }
     private void UpdatePlayersDistanceAtSameCheckpoint()
     {
@@ -119,7 +120,6 @@ public class RankManager : MonoBehaviour
             {
                 nickname = _player.nickname,
                 checkpoint = 0,
-                rank = 0,
             };
             rankInfoDictionary.Add(nickname, newRankInfo);
             InGameUI.instance.CreateRankUI(_player.nickname);
@@ -140,8 +140,7 @@ public class RankManager : MonoBehaviour
     {
         // 업데이트된 정보를 기반으로 플레이어들을 정렬하고 랭킹 매김
         List<RankInfo> sortedRanking = rankInfoDictionary.Values
-            .OrderByDescending(info => info.rank)
-            .ThenByDescending(info => info.checkpoint)
+            .OrderByDescending(info => info.checkpoint)
             .ThenBy(info => info.distanceToNextCheckpoint)
             .ToList();
 

@@ -53,17 +53,12 @@ public class Finish : MonoBehaviour
         return checkpoints[(index + 1) % checkpoints.Count];
     }
 
+    // 플레이어가 결승선에 진입할 때 호출되는 콜백
     private void OnTriggerEnter(Collider _other)
     {
         var player = _other.GetComponentInParent<Player>();
         if(_other.attachedRigidbody != null && player != null)
-            OnPlayerEnterFinish(player);
-    }
-
-    // 플레이어가 결승선에 진입할 때 호출되는 콜백
-    private void OnPlayerEnterFinish(Player _player)
-    {
-        OnPlayerEnter?.Invoke(_player);
+            OnPlayerEnter?.Invoke(player);
     }
 #endregion
 }
