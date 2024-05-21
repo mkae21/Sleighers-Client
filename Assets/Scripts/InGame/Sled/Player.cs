@@ -385,8 +385,8 @@ public class Player : MonoBehaviour
     {
         float checkSpeed = GetSpeed();
         
-        if(checkSpeed > 60)
-            RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,2f * NormalizedForwardSpeed,Time.fixedDeltaTime);
+        if(checkSpeed > 80)
+            RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,1.5f * NormalizedForwardSpeed,Time.fixedDeltaTime);
         else
             RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,0f,Time.fixedDeltaTime);
     }
