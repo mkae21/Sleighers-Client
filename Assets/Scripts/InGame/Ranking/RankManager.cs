@@ -140,7 +140,7 @@ public class RankManager : MonoBehaviour
     {
         // 업데이트된 정보를 기반으로 플레이어들을 정렬하고 랭킹 매김
         List<RankInfo> sortedRanking = rankInfoDictionary.Values
-            .OrderBy(info => info.rank)
+            .OrderByDescending(info => info.rank)
             .ThenByDescending(info => info.checkpoint)
             .ThenBy(info => info.distanceToNextCheckpoint)
             .ToList();
