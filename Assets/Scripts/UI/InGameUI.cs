@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Protocol;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 /* InGameUI.cs
  * - 인게임 UI 관리
  * - 타이머, 속도계, 랭킹, 결과창 등을 관리
@@ -47,12 +45,6 @@ public class InGameUI : MonoBehaviour
     // 게임 결과 저장 변수
     private List<PlayerResult> playerResults;
     private bool isGoal = false;
-    // Blink 코루틴 변수
-    private float blinkDuration = 0.1f;         // 블링크 지속 시간 (초)
-    private Color originalColor = Color.white;  // 원래 색상
-    private Color blinkColor = Color.gray;      // 블링크 색상
-    private float blinkInterval = 0.02f;        // 블링크 간격
-    private const float highlightScale = 1.5f;  // 블링크 크기
     // ResultElem 텍스트 인덱스
     private const int rankIndex = 0;
     private const int nicknameIndex = 2;
