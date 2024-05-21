@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf119559e933854dbc4256168dde221, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerList: []
   opaqueMaterials:
   - {fileID: 2100000, guid: 35010977fddd2694790e1bf63e4d1eb6, type: 2}
   - {fileID: 2100000, guid: 35e1c5427f235f043a24defc45933a1f, type: 2}
@@ -65,6 +66,9 @@ MonoBehaviour:
   sledModel: {fileID: 1124282087261648207}
   sled: {fileID: 8019215902595706464}
   playerModel: {fileID: 5482736996447002876}
+  playerRightArm: {fileID: 4043868116298479379}
+  playerLeftArm: {fileID: 5111757766962605156}
+  playerHead: {fileID: 7459008361921905728}
   acceleration: 50
   steering: 20
   gravity: 5
@@ -559,9 +563,27 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26626d58048d9b54fbee5c299a5636c3, type: 3}
+--- !u!1 &4043868116298479379 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8309182835443906848, guid: 26626d58048d9b54fbee5c299a5636c3,
+    type: 3}
+  m_PrefabInstance: {fileID: 5426434457799724595}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5111757766962605156 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 990244329483264599, guid: 26626d58048d9b54fbee5c299a5636c3,
+    type: 3}
+  m_PrefabInstance: {fileID: 5426434457799724595}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5482736996447002876 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 529183248300519119, guid: 26626d58048d9b54fbee5c299a5636c3,
+    type: 3}
+  m_PrefabInstance: {fileID: 5426434457799724595}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7459008361921905728 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3228282646095301235, guid: 26626d58048d9b54fbee5c299a5636c3,
     type: 3}
   m_PrefabInstance: {fileID: 5426434457799724595}
   m_PrefabAsset: {fileID: 0}

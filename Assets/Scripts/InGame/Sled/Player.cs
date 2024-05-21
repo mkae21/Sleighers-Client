@@ -55,6 +55,9 @@ public class Player : MonoBehaviour
     public Transform sledModel;
     public Transform sled;
     public Transform playerModel;
+    public GameObject playerRightArm;
+    public GameObject playerLeftArm;
+    public GameObject playerHead;
 
     [Header("Parameters")]
     public float acceleration = 50f;
@@ -67,6 +70,7 @@ public class Player : MonoBehaviour
     public GameObject nameObject;
     public MiniMapComponent miniMapComponent;
     public int myRank = 1;
+    public int playerIndex;
 #endregion
 
 
@@ -89,7 +93,7 @@ public class Player : MonoBehaviour
         if (WorldManager.instance.isGameStart && !isMe)
             Polation();
 
-        if (alphaCount >= 5) {
+        if (alphaCount >= 3) {
             StopCoroutine(respawnCoroutine);
             alphaCount = 0;
             ChangeMaterial("Opaque");
@@ -428,13 +432,19 @@ public class Player : MonoBehaviour
         string myPlayerNickname = ServerManager.instance.myNickname;
         if (materialName == "Opaque")
         {
-            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = opaqueMaterials[GetPlayerIndex(myPlayerNickname)];
-            sledModel.GetComponent<Renderer>().material = opaqueMaterials[GetPlayerIndex(myPlayerNickname)];
+            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            sledModel.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            playerLeftArm.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            playerRightArm.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            playerHead.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
         }
         else if (materialName == "Fade")
         {
-            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = fadeMaterials[GetPlayerIndex(myPlayerNickname)];
-            sledModel.GetComponent<Renderer>().material = fadeMaterials[GetPlayerIndex(myPlayerNickname)];
+            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            sledModel.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            playerLeftArm.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            playerRightArm.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            playerHead.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
         }
     }
     public void Respawn()
@@ -456,8 +466,6 @@ public class Player : MonoBehaviour
         StartCoroutine(respawnCoroutine);
     }
     
-    public float changeSpeed = 60;
-    float tt = 60;
     bool change = false;
     private int alphaCount = 0;
 
@@ -473,12 +481,18 @@ public class Player : MonoBehaviour
                 change = true;
                 myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
                 mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                playerLeftArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                playerRightArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                playerHead.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
             }
             else
             {
                 change = false;
                 myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
                 mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                playerLeftArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                playerRightArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                playerHead.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
                 alphaCount++;
             }
 
