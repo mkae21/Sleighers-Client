@@ -8,20 +8,15 @@ public class Checkpoint : MonoBehaviour
 #endregion
 
 #region PublicVariables
-    // 플레이어가 체크포인트에 진입할 때 호출되는 콜백
-    public UnityAction<Player, Checkpoint> OnPlayerEnterCheckpoint;
+    public UnityAction<Player, Checkpoint> OnPlayerEnterCheckpoint; // 플레이어가 체크포인트에 진입할 때 호출되는 콜백
+    public int checkpointIndex { get; private set; } = 0; // 체크포인트 인덱스
 #endregion
 
 #region PrivateMethod
     private void Awake()
     {
         collider = GetComponent<Collider>();
-    }
-
-    private void Start()
-    {
-        // 콜라이더가 트리거인지 확인
-        collider.isTrigger = true;
+        collider.isTrigger = true; // 콜라이더가 트리거인지 확인
     }
 
     private void OnTriggerEnter(Collider _other)
@@ -30,6 +25,13 @@ public class Checkpoint : MonoBehaviour
 
         if (player != null)
             OnPlayerEnterCheckpoint?.Invoke(player, this);
+    }
+#endregion
+
+#region PublicMethod
+    public void SetCheckpointIndex(int _index)
+    {
+        checkpointIndex = _index;
     }
 #endregion
 }

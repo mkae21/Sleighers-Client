@@ -363,7 +363,7 @@ public class Player : MonoBehaviour
         return sphere.velocity.magnitude * 3.6f;
     }
     
-    public float UpdateDistanceToNextCheckpoint()
+    public float GetDistanceToNextCheckpoint()
     {
         return Vector3.Distance(sphere.transform.position, nextCheckpoint.position);
     }
