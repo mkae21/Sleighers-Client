@@ -42,6 +42,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private Material[] fadeMaterials;
     private IEnumerator respawnCoroutine;
+    private bool change = false;
+    private int alphaCount = 0;
 
 #endregion
 
@@ -277,6 +279,57 @@ public class Player : MonoBehaviour
         // Interpolation Rotation
         sled.transform.rotation = Quaternion.Slerp(sled.transform.rotation, toRotation, lerpAmount);
     }
+
+    private void ChangeMaterial(string materialName)
+    {
+        string myPlayerNickname = ServerManager.instance.myNickname;
+        if (materialName == "Opaque")
+        {
+            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            sledModel.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            playerLeftArm.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            playerRightArm.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            playerHead.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+        }
+        else if (materialName == "Fade")
+        {
+            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            sledModel.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            playerLeftArm.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            playerRightArm.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            playerHead.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+        }
+    }
+    private IEnumerator RespawnEffect()
+    {
+        GameObject myModel = gameObject.transform.Find("Sled").Find("Character").Find("Character_Male").gameObject;
+        GameObject mySled = sledModel.gameObject;
+        
+        while(true)
+        {
+            if (!change)
+            {
+                change = true;
+                myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                playerLeftArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                playerRightArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                playerHead.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+            }
+            else
+            {
+                change = false;
+                myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                playerLeftArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                playerRightArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                playerHead.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                alphaCount++;
+            }
+
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
 #endregion
 
 
@@ -408,45 +461,7 @@ public class Player : MonoBehaviour
         else
             RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,0f,Time.fixedDeltaTime);
     }
-    public void SetPlayerList(List<PlayerInfo> playerList)
-    {
-        for (int i = 0; i < playerList.Count; i++)
-        {
-            this.playerList.Add(playerList[i].nickname);
-        }
-    }
-    private int GetPlayerIndex(string nickname)
-    {
-        for (int i = 0; i < playerList.Count; i++)
-        {
-            if (playerList[i] == nickname)
-            {
-                myRank = i;
-                break;
-            }
-        }
-        return myRank;
-    }
-    private void ChangeMaterial(string materialName)
-    {
-        string myPlayerNickname = ServerManager.instance.myNickname;
-        if (materialName == "Opaque")
-        {
-            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
-            sledModel.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
-            playerLeftArm.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
-            playerRightArm.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
-            playerHead.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
-        }
-        else if (materialName == "Fade")
-        {
-            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = fadeMaterials[playerIndex];
-            sledModel.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
-            playerLeftArm.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
-            playerRightArm.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
-            playerHead.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
-        }
-    }
+    
     public void Respawn()
     {
         if (isMe)
@@ -464,40 +479,6 @@ public class Player : MonoBehaviour
 
         ChangeMaterial("Fade");
         StartCoroutine(respawnCoroutine);
-    }
-    
-    bool change = false;
-    private int alphaCount = 0;
-
-    private IEnumerator RespawnEffect()
-    {
-        GameObject myModel = gameObject.transform.Find("Sled").Find("Character").Find("Character_Male").gameObject;
-        GameObject mySled = sledModel.gameObject;
-        
-        while(true)
-        {
-            if (!change)
-            {
-                change = true;
-                myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
-                mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
-                playerLeftArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
-                playerRightArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
-                playerHead.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
-            }
-            else
-            {
-                change = false;
-                myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
-                mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
-                playerLeftArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
-                playerRightArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
-                playerHead.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
-                alphaCount++;
-            }
-
-            yield return new WaitForSeconds(0.5f);
-        }
     }
 #endregion
 }

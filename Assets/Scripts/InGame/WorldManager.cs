@@ -234,7 +234,6 @@ public class WorldManager : MonoBehaviour
         myModel.GetComponent<Renderer>().material = playerMaterials[myidx];
         players.Add(myPlayerNickname, myPlayer.GetComponent<Player>());
         myPlayer.GetComponent<Player>().Initialize(true, ServerManager.instance.myNickname, sp.position, sp.rotation.eulerAngles.y);
-        //myPlayer.GetComponent<Player>().SetPlayerList(playerList);
         myPlayer.GetComponent<Player>().playerIndex = myidx;
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
         miniMapController.SetTarget(miniMapTarget);
