@@ -69,7 +69,6 @@ public class Player : MonoBehaviour
 
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
-    public GameObject nameObject;
     public MiniMapComponent miniMapComponent;
     public int myRank = 1;
     public int playerIndex;
@@ -79,7 +78,6 @@ public class Player : MonoBehaviour
 #region PrivateMethod
     private void Awake()
     {
-        nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
         animator = playerModel.GetComponent<Animator>();
         respawnCoroutine = RespawnEffect();
     }
@@ -341,10 +339,6 @@ public class Player : MonoBehaviour
         this.nickname = _nickName;
 
         miniMapComponent.Init(sled.gameObject);
-
-        nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, sledModel);
-        nameObject.GetComponent<TMP_Text>().text = this.nickname;
-        nameObject.transform.position = GetNameUIPos();
 
         sled.transform.position = position;
         sphere.transform.position = position;
