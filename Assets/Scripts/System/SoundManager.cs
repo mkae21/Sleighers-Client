@@ -86,7 +86,7 @@ public class SoundManager
         // 효과음 Dictionary 비우기
         audioClips.Clear();
     }
-    public void Play(AudioClip audioClip, SoundType type = SoundType.EFFECT, float pitch = 1.0f)
+    public void Play(AudioClip audioClip, SoundType type = SoundType.EFFECT, float pitch = 1.0f, float volume = 1.0f)
 	{
         if (audioClip == null)
             return;
@@ -99,6 +99,7 @@ public class SoundManager
 
 			audioSource.pitch = pitch;
 			audioSource.clip = audioClip;
+            audioSource.volume = volume;
 			audioSource.Play();
 		}
 		else // Effect 효과음 재생
@@ -109,10 +110,10 @@ public class SoundManager
 		}
 	}
 
-    public void Play(string path, SoundType type = SoundType.EFFECT, float pitch = 1.0f)
+    public void Play(string path, SoundType type = SoundType.EFFECT, float pitch = 1.0f, float volume = 1.0f)
     {
         AudioClip audioClip = GetOrAddAudioClip(path, type);
-        Play(audioClip, type, pitch);
+        Play(audioClip, type, pitch, volume);
     }
 
     public void Stop(AudioClip audioClip, SoundType type = SoundType.EFFECT)
