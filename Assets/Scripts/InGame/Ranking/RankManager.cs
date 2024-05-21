@@ -8,15 +8,15 @@ public struct RankInfo
     public string nickname;                 // 플레이어 닉네임
     public int checkpoint;                  // 완료된 체크포인트 수
     public float distanceToNextCheckpoint;  // 다음 체크포인트까지의 거리
+    public int rank;                        // 랭킹
 }
 
 public class RankManager : MonoBehaviour
 {
 #region PrivateVariables
     private Finish finish;
-
-    // 모든 플레이어의의 랭킹에 관련된 정보를 포함하는 딕셔너리
-    private Dictionary<string, RankInfo> rankInfoDictionary;
+    private Dictionary<string, RankInfo> rankInfoDictionary; // 모든 플레이어의의 랭킹에 관련된 정보를 포함하는 딕셔너리
+    private int ranking = 0; // 들어온 플레이어의 랭킹
 #endregion
 
 #region PublicVariables
@@ -54,12 +54,14 @@ public class RankManager : MonoBehaviour
         {
             rankInfoDictionary.Add(nickname, new RankInfo { 
                 nickname = nickname,
-                checkpoint = 0
+                checkpoint = 0,
+                rank = 0
             });
         }
 
-        // 완료한 랩 수 증가 및 업데이트
+        // 랭킹 업데이트
         RankInfo rankInfo = rankInfoDictionary[nickname];
+        rankInfo.rank = ranking++;
         rankInfoDictionary[nickname] = rankInfo;
 
         OnFinish?.Invoke(_player, rankInfo);
@@ -116,7 +118,8 @@ public class RankManager : MonoBehaviour
             RankInfo newRankInfo = new RankInfo()
             {
                 nickname = _player.nickname,
-                checkpoint = 0
+                checkpoint = 0,
+                rank = 0,
             };
             rankInfoDictionary.Add(nickname, newRankInfo);
             InGameUI.instance.CreateRankUI(_player.nickname);
@@ -137,16 +140,19 @@ public class RankManager : MonoBehaviour
     {
         // 업데이트된 정보를 기반으로 플레이어들을 정렬하고 랭킹 매김
         List<RankInfo> sortedRanking = rankInfoDictionary.Values
-            .OrderByDescending(info => info.checkpoint)
+            .OrderBy(info => info.rank)
+            .ThenByDescending(info => info.checkpoint)
             .ThenBy(info => info.distanceToNextCheckpoint)
             .ToList();
 
         for (int i = 0; i < sortedRanking.Count; i++)
         {
             string nickname = sortedRanking[i].nickname;
-            if (nickname == WorldManager.instance.GetMyPlayer().nickname)
+            Player myPlayer = WorldManager.instance.GetMyPlayer();
+            string myNickname = myPlayer.nickname;
+            if (nickname == myNickname)
             {
-                WorldManager.instance.GetMyPlayer().myRank = i + 1;
+                myPlayer.myRank = i + 1;
                 break;
             }
         }
