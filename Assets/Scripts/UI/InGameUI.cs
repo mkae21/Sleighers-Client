@@ -133,8 +133,7 @@ public class InGameUI : MonoBehaviour
         for (int i = 0; i < totalPlayer; i++)
         {
             string nickname = _ranking[i].nickname;
-            int checkpoint = _ranking[i].checkpoint;
-            rankElements[nickname].GetComponent<RankElement>().SetRankElement(i + 1, nickname + "-" + checkpoint);
+            rankElements[nickname].GetComponent<RankElement>().SetRankElement(i + 1, nickname);
             rankElements[nickname].transform.SetSiblingIndex(i);
 
             // 내 등수 업데이트
