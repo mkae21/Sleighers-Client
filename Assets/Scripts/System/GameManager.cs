@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case GameState.Login:
-                soundManager.Play("BGM/Lobby", SoundType.BGM);
+                soundManager.Play("BGM/Lobby", SoundType.BGM, 1.0f, 0.4f);
                 Login();
                 break;
             case GameState.Lobby:
@@ -100,8 +100,8 @@ public class GameManager : MonoBehaviour
             case GameState.Ready:
                 SceneManager.LoadScene("InGame");
                 soundManager.Stop("BGM/Lobby", SoundType.BGM);
-                soundManager.Play("BGM/Wind", SoundType.WIND);
-                soundManager.Play("BGM/InGame", SoundType.BGM);
+                soundManager.Play("BGM/Wind", SoundType.WIND, 1.0f, 0.3f);
+                soundManager.Play("BGM/InGame", SoundType.BGM, 1.0f, 0.4f);
                 Ready();
                 break;
             case GameState.InGame:

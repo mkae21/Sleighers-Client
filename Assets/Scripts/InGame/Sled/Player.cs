@@ -385,15 +385,15 @@ public class Player : MonoBehaviour
     {
         float checkSpeed = GetSpeed();
         
-        if(checkSpeed > 60)
-            RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,2f * NormalizedForwardSpeed,Time.fixedDeltaTime);
+        if(checkSpeed > 80)
+            RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,1.5f * NormalizedForwardSpeed,Time.fixedDeltaTime);
         else
             RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,0f,Time.fixedDeltaTime);
     }
     public void Respawn()
     {
         if (isMe)
-            GameManager.Instance().soundManager.Play("Effect/Reset", SoundType.EFFECT);
+            GameManager.Instance().soundManager.Play("Effect/Reset", SoundType.EFFECT, 1.0f, 0.4f);
         sphere.velocity = Vector3.zero;
         sphere.angularVelocity = Vector3.zero;
         sphere.transform.position = curCheckpoint.position;
