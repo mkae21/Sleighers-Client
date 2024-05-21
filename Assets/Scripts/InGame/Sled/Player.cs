@@ -6,6 +6,7 @@ using System.Collections;
 using Protocol;
 using System.Collections.Generic;
 using UnityEngine.Rendering.PostProcessing;
+using System.Collections;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
@@ -151,8 +152,9 @@ public class Player : MonoBehaviour
             float weight = (myRank - 1) * 3f; // 등수에 따른 속도 가중치
             sphere.AddForce(sledModel.forward * (currentSpeed + weight), ForceMode.Acceleration);
             sled.eulerAngles = Vector3.Lerp(sled.eulerAngles, new Vector3(0, sled.eulerAngles.y + currentRotate, 0), Time.fixedDeltaTime * 3f);
-            
-            if(hitNear.collider.gameObject.tag == "Ramp")
+
+            sphere.drag = 1;
+            if (hitNear.collider.gameObject.tag == "Ramp")
             {
                 onRamp = true;
                 sphere.AddForce(sledModel.forward * currentSpeed, ForceMode.Acceleration);
@@ -166,17 +168,31 @@ public class Player : MonoBehaviour
                 
                 sphere.AddForce(sledModel.forward * sphere.velocity.magnitude * 20f, ForceMode.Acceleration);
                 sphere.AddForce(launchDirection.normalized * sphere.velocity.magnitude * 45f, ForceMode.Impulse);
-                sphere.AddForce( -sledModel.up * gravity * 20f, ForceMode.Acceleration);
+                sphere.drag = 0;
+                StartCoroutine(MaintainVelocityAfterJump());
                 onRamp = false;
             }
         }
-        
         sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration);//중력 작용
 
         isMove = false;
         isDrifting = false;
         animator.SetBool("isMove", false);
     }
+
+    private IEnumerator MaintainVelocityAfterJump()
+    {
+        float duration = 0.6f; // 속도를 유지할 시간
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            sphere.AddForce(sledModel.forward * sphere.velocity.magnitude * 0.1f, ForceMode.Acceleration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+    }
+
     public void Steer(int direction, float amount)
     {
         rotate = (steering * direction) * amount;
@@ -250,7 +266,7 @@ public class Player : MonoBehaviour
 
         if (toPosition != fromPosition)
         {
-            Vector3 extrapolatedPosition = toPosition + (toVelocity * latency * extrapolationWeight);
+            Vector3 extrapolatedPosition = toPosition + (toVelocity * Mathf.Clamp01(latency) * extrapolationWeight);
             sphere.transform.position = Vector3.Slerp(fromPosition, extrapolatedPosition, lerpAmount);
         }
 
@@ -383,8 +399,8 @@ public class Player : MonoBehaviour
     {
         float checkSpeed = GetSpeed();
         
-        if(checkSpeed > 60)
-            RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,2f * NormalizedForwardSpeed,Time.fixedDeltaTime);
+        if(checkSpeed > 80)
+            RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,1.5f * NormalizedForwardSpeed,Time.fixedDeltaTime);
         else
             RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,0f,Time.fixedDeltaTime);
     }
@@ -424,7 +440,7 @@ public class Player : MonoBehaviour
     public void Respawn()
     {
         if (isMe)
-            GameManager.Instance().soundManager.Play("Effect/Reset", SoundType.EFFECT);
+            GameManager.Instance().soundManager.Play("Effect/Reset", SoundType.EFFECT, 1.0f, 0.4f);
         sphere.velocity = Vector3.zero;
         sphere.angularVelocity = Vector3.zero;
         sphere.transform.position = curCheckpoint.position;

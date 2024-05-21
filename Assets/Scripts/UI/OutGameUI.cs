@@ -1,6 +1,7 @@
 using UnityEngine.UI;
 using UnityEngine;
 using TMPro;
+using System.Collections;
 
 public class OutGameUI : MonoBehaviour
 {
@@ -20,7 +21,9 @@ public class OutGameUI : MonoBehaviour
     public Button matchMakingBtn;
     public GameObject loadingObject;
     public TMP_Text matchMakingBtnText;
+    public TMP_Text matchMakingText;
     public GameObject PlayerMatchList;
+
 
     [Space(10), Header("===== Login =====")]
     public TMP_InputField loginID;
@@ -38,6 +41,7 @@ public class OutGameUI : MonoBehaviour
     [Space(10), Header("===== Store =====")]
     public GameObject[] sledList;
     public int sledListCnt;
+
 #endregion
 
 #region PrivateVariables
@@ -114,6 +118,27 @@ public class OutGameUI : MonoBehaviour
         if (ServerManager.Instance().myNickname != string.Empty)
             OnLobbyPanel();
     }
+
+    //텍스트 타이핑 효과
+    private IEnumerator RepeatingTypingEffect(TMP_Text text, string message, float delay)
+    {
+        while (true)
+        {
+            yield return StartCoroutine(TypingEffect(text, message, delay));
+            yield return new WaitForSeconds(1.0f);
+        }
+    }
+
+    private IEnumerator TypingEffect(TMP_Text text, string message, float delay)
+    {
+        text.text = "";
+        foreach (char letter in message.ToCharArray())
+        {
+            text.text += letter;
+            yield return new WaitForSeconds(delay);
+        }
+    }
+
 #endregion
 
 #region PublicMethod
@@ -124,15 +149,23 @@ public class OutGameUI : MonoBehaviour
         topBar.SetActive(true);
     }
 
-    public void MatchMakingUI()
+    public void MatchMakingStartUI()
     {
-        matchMakingBtnText.text = "매칭중";
-        loadingObject.SetActive(true);
+        panels[0].SetActive(false);
+        panels[1].SetActive(false); 
+        panels[6].SetActive(true);
+        topBar.SetActive(false);
+
+        //텍스트 타이핑 효과
+        StartCoroutine(RepeatingTypingEffect(matchMakingText, "매칭중..", 0.5f));
     }
-    public void ReturnMatchMakingUI()
+
+    public void MatchMakingSuccessUI()
     {
-        matchMakingBtnText.text = "매치메이킹";
+        StopAllCoroutines();    
         loadingObject.SetActive(false);
+        matchMakingText.text = "매칭 성공";
+        Invoke("PopupMatchMakingPanel", 1.5f);
     }
 
     public void DrawMatchPlayer(string name)
@@ -153,7 +186,7 @@ public class OutGameUI : MonoBehaviour
     {
         for (int i = 0; i < panels.Length; i++)
         {
-            if (i == 6)
+            if (i == 7)
                 panels[i].SetActive(true);
             else
                 panels[i].SetActive(false);

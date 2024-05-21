@@ -35,10 +35,10 @@ public class BackGroundSnowParticle : MonoBehaviour
             var velocityOverLifetime = particleSystem.velocityOverLifetime;
 
             float targetYVelocity = player.NormalizedForwardSpeed * -70f;
-            float targetZVelocity = player.NormalizedForwardSpeed * 230f;
+            float targetZVelocity = player.NormalizedForwardSpeed * 100f;
 
             // Use Lerp to gradually change the velocity values
-            if(player.GetSpeed() > 60)
+            if(player.GetSpeed() > 80)
             {
                 currentYVelocity = Mathf.Lerp(currentYVelocity, targetYVelocity, Time.deltaTime);
                 currentZVelocity = Mathf.Lerp(currentZVelocity, targetZVelocity, Time.deltaTime);
