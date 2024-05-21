@@ -25,7 +25,7 @@ public class Finish : MonoBehaviour
         for (int i = 0; i < totalCheckpoints; i++)
         {
             checkpoints.Add(checkpointHolder.transform.GetChild(i).GetComponent<Checkpoint>()); 
-            checkpoints[i].SetCheckpointIndex(i);
+            checkpoints[i].checkpointIndex = i;
             checkpoints[i].OnPlayerEnterCheckpoint += OnPlayerEnterCheckpoint;
         }
     }

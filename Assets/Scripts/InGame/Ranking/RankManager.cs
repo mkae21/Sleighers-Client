@@ -6,7 +6,6 @@ using System.Linq;
 public struct RankInfo
 {
     public string nickname;                 // 플레이어 닉네임
-    public int lap;                         // 완료된 랩 수
     public int checkpoint;                  // 완료된 체크포인트 수
     public float distanceToNextCheckpoint;  // 다음 체크포인트까지의 거리
 }
@@ -21,11 +20,9 @@ public class RankManager : MonoBehaviour
 #endregion
 
 #region PublicVariables
-    public int previousRank = 1;    // 갱신된 랭킹에 비해 나의 이전 랭킹
-    // 차량이 한 바퀴를 완료하면 액션이 호출
-    public UnityAction<Player, RankInfo> OnLapComplete { get; set; }
+    public int previousRank = 1;                                // 갱신된 랭킹에 비해 나의 이전 랭킹
+    public UnityAction<Player, RankInfo> OnFinish { get; set; } // 차량이 피니시 라인에 도착하면 호출
     public static RankManager instance;
-    public int laps { get; set; } = 1;
 #endregion
 
 #region PrivateMethod
@@ -46,7 +43,7 @@ public class RankManager : MonoBehaviour
         UpdatePlayersDistanceAtSameCheckpoint();
     }
 
-    // 차량이 결승선에 진입할 때(한 바퀴 완료 후) 호출되는 콜백
+    // 차량이 결승선에 진입할 때 호출되는 콜백
     private void OnPlayerEnterFinish(Player _player)
     {   
         if (_player == null)
@@ -57,19 +54,15 @@ public class RankManager : MonoBehaviour
         {
             rankInfoDictionary.Add(nickname, new RankInfo { 
                 nickname = nickname,
-                lap = 0, 
                 checkpoint = 0
             });
         }
 
         // 완료한 랩 수 증가 및 업데이트
         RankInfo rankInfo = rankInfoDictionary[nickname];
-        rankInfo.lap = Mathf.Clamp(rankInfo.lap + 1, 0, laps);
         rankInfoDictionary[nickname] = rankInfo;
 
-        OnLapComplete?.Invoke(_player, rankInfo);
-        // List<RankInfo> ranking = GetRanking();
-        // InGameUI.instance.UpdateRankUI(ranking);
+        OnFinish?.Invoke(_player, rankInfo);
     }
     private void UpdatePlayersDistanceAtSameCheckpoint()
     {
@@ -123,7 +116,6 @@ public class RankManager : MonoBehaviour
             RankInfo newRankInfo = new RankInfo()
             {
                 nickname = _player.nickname,
-                lap = 0,
                 checkpoint = 0
             };
             rankInfoDictionary.Add(nickname, newRankInfo);
@@ -145,8 +137,7 @@ public class RankManager : MonoBehaviour
     {
         // 업데이트된 정보를 기반으로 플레이어들을 정렬하고 랭킹 매김
         List<RankInfo> sortedRanking = rankInfoDictionary.Values
-            .OrderByDescending(info => info.lap)
-            .ThenByDescending(info => info.checkpoint)
+            .OrderByDescending(info => info.checkpoint)
             .ThenBy(info => info.distanceToNextCheckpoint)
             .ToList();
 
@@ -167,9 +158,9 @@ public class RankManager : MonoBehaviour
         string nickname = _player.nickname;
         if (rankInfoDictionary.ContainsKey(nickname))
         {
-            RankInfo lapInfo = rankInfoDictionary[nickname];
-            lapInfo.checkpoint = _checkpointCount;
-            rankInfoDictionary[nickname] = lapInfo;
+            RankInfo rankInfo = rankInfoDictionary[nickname];
+            rankInfo.checkpoint = _checkpointCount;
+            rankInfoDictionary[nickname] = rankInfo;
         }
     }
 

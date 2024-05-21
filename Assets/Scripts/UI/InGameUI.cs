@@ -21,12 +21,10 @@ public class InGameUI : MonoBehaviour
     [Space(10), Header("속도계")]
     public TextMeshProUGUI text_speedLabel;
 
-    [Space(10), Header("랭킹 관련"), Tooltip("1/2 LAP")] 
-    public TextMeshProUGUI text_lab;
+    [Space(10), Header("랭킹 관련")] 
     [Tooltip("1/5 (등수)")]
     public TextMeshProUGUI text_rank;
     public Transform rankHolder;        // 랭킹 요소를 가지고 있는 부모
-    public RankManager rankManager;
 
     [Space(10), Header("결과창 관련")]
     public GameObject resultPanel;      // 결과창 패널
@@ -55,18 +53,10 @@ public class InGameUI : MonoBehaviour
     private void Awake()
     {
         instance = this;
-    }
-    private void Start()
-    {
         GameManager.InGame += UpdateTimer;
         GameManager.InGame += UpdateSpeedometer;
-        if (rankManager != null)
-            rankManager.OnLapComplete += OnLapComplete;
-        else
-            Debug.Log("[InGameUI] LapManager가 없습니다.");
-        UpdateLapText(1);
-        rankElements = new Dictionary<string, GameObject>();
         GameManager.End += GameResultUI;
+        rankElements = new Dictionary<string, GameObject>();
         rankElementPrefab = Resources.Load<GameObject>("UI/RankElement");
     }
 
@@ -83,23 +73,7 @@ public class InGameUI : MonoBehaviour
         if(text_gameEndCountDown.text == "Game End")
             text_gameEndCountDown.gameObject.SetActive(false);
     }
-    // 플레이어가 랩을 통과하면 호출
-    private void OnLapComplete(Player _player, RankInfo _lapInfo)
-    {
-        // 다른 플레이어가 랩을 완료하면 반환
-        if (WorldManager.instance.GetMyPlayer() != _player)
-            return;      
-        // Lap 텍스트 업데이트
-        int lapsCompleted = rankManager.AddOrGetRankInfo(_player).lap;
-        int currentLap = Mathf.Min(lapsCompleted + 1, rankManager.laps);
-        UpdateLapText(currentLap);
-    }
 
-    private void UpdateLapText(int _currentLap)
-    {
-        if (rankManager != null)
-            text_lab.text = $"<size=160>{_currentLap}</size=160>/{rankManager.laps} LAP";
-    }
 
     private void GameResultUI(List<PlayerResult> _playerResults)
     {
@@ -159,7 +133,6 @@ public class InGameUI : MonoBehaviour
         for (int i = 0; i < totalPlayer; i++)
         {
             string nickname = _ranking[i].nickname;
-            int lap = _ranking[i].lap;
             int checkpoint = _ranking[i].checkpoint;
             rankElements[nickname].GetComponent<RankElement>().SetRankElement(i + 1, nickname + "-" + checkpoint);
             rankElements[nickname].transform.SetSiblingIndex(i);
