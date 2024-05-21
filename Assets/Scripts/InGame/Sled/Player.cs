@@ -6,7 +6,6 @@ using System.Collections;
 using Protocol;
 using System.Collections.Generic;
 using UnityEngine.Rendering.PostProcessing;
-using System.Collections;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
