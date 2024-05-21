@@ -136,7 +136,6 @@ public class WorldManager : MonoBehaviour
             if (msg.type != Protocol.Type.Sync)
             {
                 Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
-                LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
             }
             switch (msg.type)
             {
@@ -379,7 +378,6 @@ public class WorldManager : MonoBehaviour
         if (_type != Protocol.Type.Sync)
         {
             Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
-            LogManager.instance.Log("[OnSend] 메세지 타입 : " + _type.ToString());
         }
         switch (_type)
         {
