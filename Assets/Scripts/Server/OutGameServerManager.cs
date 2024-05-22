@@ -35,6 +35,8 @@ public partial class ServerManager : MonoBehaviour
         {
             isConnectOutGame = false;
             Debug.LogFormat("[OutGameServerManager] {0}", OnSocketDisconnected);
+            if (isConnectInGame)
+                return;
             UnityThread.executeInLateUpdate (() =>
             {
                 OutGameUI.instance.OnLoginPanel();
