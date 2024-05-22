@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
-using UnityEngine.Events;
 using Protocol;
 using System.Threading.Tasks;
 using System;
@@ -38,7 +37,6 @@ public class WorldManager : MonoBehaviour
     public GameObject playerPool;
     public Transform startingPointHolder;
     public MiniMapController miniMapController;
-    public UnityAction OnRaceFinished { get; set; }     // 레이스가 종료되면 호출되는 액션
 #endregion
 
 #region PrivateMethod
@@ -54,8 +52,7 @@ public class WorldManager : MonoBehaviour
         instance = this;
         rankManager = GetComponent<RankManager>();
         players = new Dictionary<string, Player>();
-        rankManager.OnLapComplete += OnLapComplete;
-        OnRaceFinished += FinishRace;
+        rankManager.OnFinish += OnFinish;
     }
     private void Start()
     {
@@ -103,26 +100,18 @@ public class WorldManager : MonoBehaviour
         Timeline.instance.StartTimeline();
     }
     // 플레이어가 한 바퀴를 완주했을 때 호출되는 콜백
-    private void OnLapComplete(Player _player, RankInfo _lapInfo)
+    private void OnFinish(Player _player, RankInfo _rankInfo)
     {
-        // 플레이어가 레이스를 완료했나 확인
-        if (_player.isMe && _lapInfo.lap == rankManager.laps)
+        if (!_player.isMe)
+            return;
+
+        // 아직 완료하지 못했다면 레이스를 완료하고 아웃트로 타임라인을 재생
+        if (!isRaceFinish)
         {
-            // 아직 완료하지 못했다면 레이스를 완료
-            if (!isRaceFinish)
-            {
-                OnRaceFinished?.Invoke(); 
-            }
+            isRaceFinish = true;
+            OnSendInGame(Protocol.Type.PlayerGoal);
         }
     }
-
-    // 레이스를 완료하고 아웃트로 타임라인을 재생
-    private void FinishRace()
-    {
-        isRaceFinish = true;
-        OnSendInGame(Protocol.Type.PlayerGoal);
-    }
-
 #region Receive 프로토콜 처리
     // 서버로부터 받은 데이터 처리 핸들러
     private void OnReceive()
@@ -147,7 +136,6 @@ public class WorldManager : MonoBehaviour
             if (msg.type != Protocol.Type.Sync)
             {
                 Debug.LogFormat("[OnReceive] 메세지 타입 : {0}", msg.type);
-                LogManager.instance.Log("[OnReceive] 메세지 타입 :" + msg.type.ToString());
             }
             switch (msg.type)
             {
@@ -234,6 +222,7 @@ public class WorldManager : MonoBehaviour
         myModel.GetComponent<Renderer>().material = playerMaterials[myidx];
         players.Add(myPlayerNickname, myPlayer.GetComponent<Player>());
         myPlayer.GetComponent<Player>().Initialize(true, ServerManager.instance.myNickname, sp.position, sp.rotation.eulerAngles.y);
+        myPlayer.GetComponent<Player>().playerIndex = myidx;
         Transform miniMapTarget = myPlayer.transform.Find("Sled");
         miniMapController.SetTarget(miniMapTarget);
         Debug.LogFormat("[WorldManager] 내 플레이어 생성 완료 : {0}", myPlayerNickname);
@@ -249,6 +238,7 @@ public class WorldManager : MonoBehaviour
             characterModel.GetComponent<Renderer>().material = playerMaterials[i];
             players.Add(playerNickname, Player.GetComponent<Player>());
             Player.GetComponent<Player>().Initialize(false, playerNickname, _sp.position, _sp.rotation.eulerAngles.y);
+            Player.GetComponent<Player>().playerIndex = i;
         }
     }
 
@@ -388,7 +378,6 @@ public class WorldManager : MonoBehaviour
         if (_type != Protocol.Type.Sync)
         {
             Debug.LogFormat("[OnSend] 메세지 타입 : {0}", _type);
-            LogManager.instance.Log("[OnSend] 메세지 타입 : " + _type.ToString());
         }
         switch (_type)
         {

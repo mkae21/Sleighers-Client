@@ -23,6 +23,10 @@ public class InputManager : MonoBehaviour
 
     private void KeyInput()
     {
+        if (Input.GetKey(KeyCode.T))
+        {
+            WorldManager.instance.GetMyPlayer().transform.Find("Sphere").position = new Vector3(338, -184, 230);
+        }
         if (Input.GetKey(KeyCode.G))
             WorldManager.instance.OnSendInGame(Protocol.Type.PlayerGoal);
         if (Input.GetKey(KeyCode.Escape))

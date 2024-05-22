@@ -9,6 +9,8 @@ public partial class ServerManager : MonoBehaviour
     private SocketIOUnity socket;
     private string outGameServerIP = string.Empty;
     private int outGameServerPort = 0;
+    private const string OnSocketDisconnected = "서버와의 연결이 종료되었습니다.";
+    private const string OnEnterRoomFail = "서버와 연결이 좋지 않아 매치메이킹에 실패했습니다.";
 #endregion
 
 #region PublicVariables
@@ -32,7 +34,14 @@ public partial class ServerManager : MonoBehaviour
         socket.OnDisconnected += (sender, e) =>
         {
             isConnectOutGame = false;
-            Debug.LogFormat("[OutGameServerManager] 서버 접속 해제 {0}:{1} {2}", outGameServerIP, outGameServerPort, e.ToString());
+            Debug.LogFormat("[OutGameServerManager] {0}", OnSocketDisconnected);
+            if (isConnectInGame)
+                return;
+            UnityThread.executeInLateUpdate (() =>
+            {
+                OutGameUI.instance.OnLoginPanel();
+                OutGameUI.instance.OnErrorPanel(OnSocketDisconnected);
+            });
         };
 
         // 에러 이벤트 핸들러
@@ -89,7 +98,12 @@ public partial class ServerManager : MonoBehaviour
 
         socket.On("enterRoomFail", (res) =>
         {
-            Debug.Log("enterRoomFail: " + res);
+            Debug.Log($"enterRoomFail - {OnEnterRoomFail} : {res}");
+            UnityThread.executeInLateUpdate (() =>
+            {
+                OutGameUI.instance.OnLoginPanel();
+                OutGameUI.instance.OnErrorPanel(OnEnterRoomFail);
+            });
         });
 
         socket.On("enterRoomSucc", (res) =>
@@ -128,7 +142,10 @@ public partial class ServerManager : MonoBehaviour
     private void MatchMaking()
     {
         if (!isConnectOutGame)
+        {
+            OutGameUI.instance.OnErrorPanel(OnSocketDisconnected);
             return;
+        }
         PlayerInfo sendPacket = new PlayerInfo
         {
             nickname = myNickname

@@ -2,10 +2,10 @@ using UnityEngine;
 using TMPro;
 using Cinemachine;
 using System;
+using System.Collections;
 using Protocol;
 using System.Collections.Generic;
 using UnityEngine.Rendering.PostProcessing;
-using System.Collections;
 
 /* Player.cs
  * - 플레이어의 이동, 회전, 속도 조절
@@ -35,6 +35,14 @@ public class Player : MonoBehaviour
 
     private float currentRotate;
     private Animator animator;
+    public List<string> playerList = new List<string>();
+    [SerializeField]
+    private Material[] opaqueMaterials;
+    [SerializeField]
+    private Material[] fadeMaterials;
+    private IEnumerator respawnCoroutine;
+    private bool change = false;
+    private int alphaCount = 0;
 
 #endregion
 
@@ -48,6 +56,9 @@ public class Player : MonoBehaviour
     public Transform sledModel;
     public Transform sled;
     public Transform playerModel;
+    public GameObject playerRightArm;
+    public GameObject playerLeftArm;
+    public GameObject playerHead;
 
     [Header("Parameters")]
     public float acceleration = 50f;
@@ -57,17 +68,17 @@ public class Player : MonoBehaviour
 
     [field: SerializeField] public Vector3 moveVector { get; private set; }
     [field: SerializeField] public bool isMove { get; private set; }
-    public GameObject nameObject;
     public MiniMapComponent miniMapComponent;
     public int myRank = 1;
+    public int playerIndex;
 #endregion
 
 
 #region PrivateMethod
     private void Awake()
     {
-        nameObject = Resources.Load("Prefabs/PlayerName") as GameObject;
         animator = playerModel.GetComponent<Animator>();
+        respawnCoroutine = RespawnEffect();
     }
     private void Update()
     {
@@ -80,6 +91,12 @@ public class Player : MonoBehaviour
             BlurEffect();
         if (WorldManager.instance.isGameStart && !isMe)
             Polation();
+
+        if (alphaCount >= 3) {
+            StopCoroutine(respawnCoroutine);
+            alphaCount = 0;
+            ChangeMaterial("Opaque");
+        }
     }
 
     private void FixedUpdate()
@@ -259,6 +276,57 @@ public class Player : MonoBehaviour
         // Interpolation Rotation
         sled.transform.rotation = Quaternion.Slerp(sled.transform.rotation, toRotation, lerpAmount);
     }
+
+    private void ChangeMaterial(string materialName)
+    {
+        string myPlayerNickname = ServerManager.instance.myNickname;
+        if (materialName == "Opaque")
+        {
+            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            sledModel.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            playerLeftArm.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            playerRightArm.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+            playerHead.GetComponent<Renderer>().material = opaqueMaterials[playerIndex];
+        }
+        else if (materialName == "Fade")
+        {
+            playerModel.transform.Find("Character_Male").GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            sledModel.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            playerLeftArm.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            playerRightArm.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+            playerHead.GetComponent<Renderer>().material = fadeMaterials[playerIndex];
+        }
+    }
+    private IEnumerator RespawnEffect()
+    {
+        GameObject myModel = gameObject.transform.Find("Sled").Find("Character").Find("Character_Male").gameObject;
+        GameObject mySled = sledModel.gameObject;
+        
+        while(true)
+        {
+            if (!change)
+            {
+                change = true;
+                myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                playerLeftArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                playerRightArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+                playerHead.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 0.65f);
+            }
+            else
+            {
+                change = false;
+                myModel.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                mySled.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                playerLeftArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                playerRightArm.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                playerHead.GetComponent<Renderer>().material.color = new Color(1, 1, 1, 1);
+                alphaCount++;
+            }
+
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
 #endregion
 
 
@@ -270,10 +338,6 @@ public class Player : MonoBehaviour
         this.nickname = _nickName;
 
         miniMapComponent.Init(sled.gameObject);
-
-        nameObject = Instantiate(nameObject, Vector3.zero, Quaternion.identity, sledModel);
-        nameObject.GetComponent<TMP_Text>().text = this.nickname;
-        nameObject.transform.position = GetNameUIPos();
 
         sled.transform.position = position;
         sphere.transform.position = position;
@@ -363,7 +427,7 @@ public class Player : MonoBehaviour
         return sphere.velocity.magnitude * 3.6f;
     }
     
-    public float UpdateDistanceToNextCheckpoint()
+    public float GetDistanceToNextCheckpoint()
     {
         return Vector3.Distance(sphere.transform.position, nextCheckpoint.position);
     }
@@ -390,6 +454,7 @@ public class Player : MonoBehaviour
         else
             RadialBlur.instance.blurStrength = Mathf.Lerp(RadialBlur.instance.blurStrength,0f,Time.fixedDeltaTime);
     }
+    
     public void Respawn()
     {
         if (isMe)
@@ -404,6 +469,9 @@ public class Player : MonoBehaviour
         rot.x = 0;
         rot.z = 0;
         sled.transform.rotation = rot;
+
+        ChangeMaterial("Fade");
+        StartCoroutine(respawnCoroutine);
     }
 #endregion
 }
