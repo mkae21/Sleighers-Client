@@ -12,8 +12,8 @@ using UnityEngine;
 public class RadialBlur : MonoBehaviour
 {
     public Shader shader;
-
-    public float blurStrength = 2f;
+    public float maxBlurStrength = 1.8f;
+    public float blurStrength = 1.5f;
     public float blurWidth = 1.0f;
     public static RadialBlur instance;
 
