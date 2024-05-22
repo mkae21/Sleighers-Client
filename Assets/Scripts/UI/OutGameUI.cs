@@ -31,6 +31,8 @@ public class OutGameUI : MonoBehaviour
     public Button defaultLoginBtn;
     public Button defaultSignupBtn;
     public Button googleLoginBtn;
+    public GameObject loadingPanel;
+    public GameObject loginPanel;
 
     [Space(10), Header("===== SignUp =====")]
     public TMP_InputField signupID;
@@ -88,8 +90,11 @@ public class OutGameUI : MonoBehaviour
             ServerManager.instance.OnSendOutGame(API.Type.setName, playerInfo);
             setNicknameField.text = "";
         });
-        googleLoginBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.Lobby));
-        googleLoginBtn.onClick.AddListener(() => GoogleAuth.GoogleOAuth());
+        googleLoginBtn.onClick.AddListener(() => {
+            loadingPanel.SetActive(true);
+            loginPanel.SetActive(false);
+            GoogleAuth.GoogleOAuth();
+        });
         matchMakingBtn.onClick.AddListener(() => GameManager.Instance().ChangeState(GameManager.GameState.MatchMaking));
 
         volumeToggle.onValueChanged.AddListener((value) => SettingManager.VolumeToggle(value));

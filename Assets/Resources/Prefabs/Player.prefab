@@ -75,11 +75,9 @@ MonoBehaviour:
   amount: 0
   <moveVector>k__BackingField: {x: 0, y: 0, z: 0}
   <isMove>k__BackingField: 0
-  nameObject: {fileID: 6711063065380186699, guid: 288abb305934d2b4cba29bea79a9c247,
-    type: 3}
   miniMapComponent: {fileID: 8107605259051616390}
   myRank: 1
-  changeSpeed: 60
+  playerIndex: 0
 --- !u!114 &8107605259051616390
 MonoBehaviour:
   m_ObjectHideFlags: 0
