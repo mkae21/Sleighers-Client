@@ -15,6 +15,11 @@ public class Player : MonoBehaviour
 {
 #region PrivateVariables
     private bool isDrifting;
+    // 현재 프레임에서 플레이어가 지면에 닿아 있는지 여부
+    private bool isGround;
+    // 이전 프레임에서 플레이어가 지면에 닿아 있었는지 여부
+    private bool wasGround;
+
     // Polation
     private bool onRamp = false;
     private float timeToReachTarget = 1f;
@@ -43,6 +48,8 @@ public class Player : MonoBehaviour
     private IEnumerator respawnCoroutine;
     private bool change = false;
     private int alphaCount = 0;
+    [SerializeField]
+    private ParticleSystem landingEffect;
 
 #endregion
 
@@ -97,6 +104,8 @@ public class Player : MonoBehaviour
             alphaCount = 0;
             ChangeMaterial("Opaque");
         }
+
+        CheckLanding();
     }
 
     private void FixedUpdate()
@@ -140,11 +149,6 @@ public class Player : MonoBehaviour
         speed = 0f; // Reset for next frame
         currentRotate = Mathf.Lerp(currentRotate, rotate, Time.deltaTime * 2f);
         rotate = 0f; // Reset for next frame
-    }
-
-    private Vector3 GetNameUIPos()
-    {
-        return this.transform.position + (Vector3.up * 2.0f);
     }
 
     private void ApplyPhysics(RaycastHit hitNear)
@@ -216,6 +220,8 @@ public class Player : MonoBehaviour
         playerModel.up = Vector3.Lerp(playerModel.up, hitNear.normal, Time.deltaTime * 8.0f);
         playerModel.Rotate(0, sled.eulerAngles.y, 0);
         
+        isGround = hitNear.collider != null;
+
         return hitNear;
     }
     private void OnTriggerEnter(Collider other)
@@ -236,6 +242,17 @@ public class Player : MonoBehaviour
             sphere.velocity = sphere.velocity.normalized * maxSpeed;
         }
     }
+
+    private void CheckLanding()
+    {
+        // 착지 이펙트 재생
+        if (!wasGround && isGround)
+        {
+            landingEffect.Play();
+        }
+        wasGround = isGround;
+    }
+
     private void SetCamera()
     {
         CinemachineCore.Instance.GetVirtualCamera(0).Follow = sled.transform;
