@@ -98,8 +98,7 @@ public class GameManager : MonoBehaviour
                 MatchResult();
                 break;
             case GameState.Ready:
-                //SceneManager.LoadScene("InGame");
-                SceneManager.LoadScene("KYR");
+                SceneManager.LoadScene("InGame");
                 soundManager.Stop("BGM/Lobby", SoundType.BGM);
                 soundManager.Play("BGM/Wind", SoundType.WIND, 1.0f, 0.3f);
                 soundManager.Play("BGM/InGame", SoundType.BGM, 1.0f, 0.4f);
