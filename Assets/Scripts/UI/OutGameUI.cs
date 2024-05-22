@@ -142,11 +142,23 @@ public class OutGameUI : MonoBehaviour
 #endregion
 
 #region PublicMethod
+    public void OnErrorPanel(string _error)
+    {
+        StopAllCoroutines();
+        panels[8].SetActive(true);
+        panels[8].transform.Find("Error Text").GetComponent<TMP_Text>().text = _error;
+    }
+    public void OnLoginPanel()
+    {
+        ClosePanels();
+        panels[0].SetActive(true);  // login panel
+        topBar.SetActive(false);
+    }
     public void OnLobbyPanel()
     {
-        panels[0].SetActive(false);  // auth panel
-        panels[1].SetActive(true);   // lobby panel
-        topBar.SetActive(true);
+        ClosePanels();
+        panels[1].SetActive(true);  // lobby panel
+        topBar.SetActive(true);     // top bar
     }
 
     public void MatchMakingStartUI()
