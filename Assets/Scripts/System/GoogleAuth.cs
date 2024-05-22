@@ -39,12 +39,17 @@ public class GoogleAuth : MonoBehaviour
             {
                 email = profile.EmailAddress
             };
+            OutGameUI.instance.loadingPanel.SetActive(true);
+            OutGameUI.instance.loginPanel.SetActive(false);
             ServerManager.instance.OnSendOutGame(API.Type.loginSucc, playerInfo);
             OutGameUI.instance.OnLobbyPanel();
+            GameManager.Instance().ChangeState(GameManager.GameState.Lobby);
         }
         else
         {
-            Debug.LogError("사용자의 이메일 주소를 가져오는데 실패했습니다.");
+            OutGameUI.instance.loadingPanel.SetActive(false);
+            OutGameUI.instance.loginPanel.SetActive(true);
+            Debug.LogWarning("구글 로그인 실패");
         }
     }
 #endregion
