@@ -12,6 +12,8 @@ public class InGameUI : MonoBehaviour
 {
 #region PublicVariables
     public static InGameUI instance;
+    [Space(10), Header("대기 중 텍스트")]
+    public GameObject text_waiting;
 
     [Space(10), Header("타이머 관련")]
     public TextMeshProUGUI text_timer;
