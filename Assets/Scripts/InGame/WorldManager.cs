@@ -37,7 +37,6 @@ public class WorldManager : MonoBehaviour
     public GameObject playerPool;
     public Transform startingPointHolder;
     public MiniMapController miniMapController;
-    // public List<GameObject> allPlayerList = new List<GameObject>();
 #endregion
 
 #region PrivateMethod
