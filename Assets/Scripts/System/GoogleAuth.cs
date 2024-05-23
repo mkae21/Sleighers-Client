@@ -31,6 +31,8 @@ public class GoogleAuth : MonoBehaviour
         });
 
         var profile = await service.Users.GetProfile("me").ExecuteAsync();
+        OutGameUI.instance.loadingPanel.SetActive(false);
+        OutGameUI.instance.loginPanel.SetActive(true);
 
         if (!string.IsNullOrEmpty(profile.EmailAddress))
         {
@@ -39,16 +41,12 @@ public class GoogleAuth : MonoBehaviour
             {
                 email = profile.EmailAddress
             };
-            OutGameUI.instance.loadingPanel.SetActive(true);
-            OutGameUI.instance.loginPanel.SetActive(false);
             ServerManager.instance.OnSendOutGame(API.Type.loginSucc, playerInfo);
             OutGameUI.instance.OnLobbyPanel();
             GameManager.Instance().ChangeState(GameManager.GameState.Lobby);
         }
         else
         {
-            OutGameUI.instance.loadingPanel.SetActive(false);
-            OutGameUI.instance.loginPanel.SetActive(true);
             Debug.LogWarning("구글 로그인 실패");
         }
     }
