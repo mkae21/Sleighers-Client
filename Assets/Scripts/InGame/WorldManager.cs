@@ -249,6 +249,8 @@ public class WorldManager : MonoBehaviour
     {
         int count = msg.count;
         InGameUI.instance.SetCountDown(count);
+        if (InGameUI.instance.text_waiting.activeSelf)
+            InGameUI.instance.text_waiting.SetActive(false);
     }
     // 게임 시작 이벤트 처리
     private void ReceiveGameStartEvent()
