@@ -37,6 +37,7 @@ public class WorldManager : MonoBehaviour
     public GameObject playerPool;
     public Transform startingPointHolder;
     public MiniMapController miniMapController;
+    // public List<GameObject> allPlayerList = new List<GameObject>();
 #endregion
 
 #region PrivateMethod
@@ -240,6 +241,8 @@ public class WorldManager : MonoBehaviour
             Player.GetComponent<Player>().Initialize(false, playerNickname, _sp.position, _sp.rotation.eulerAngles.y);
             Player.GetComponent<Player>().playerIndex = i;
         }
+        
+        ObstacleHolder.instance.SetObstacles(players);
     }
 
     // 게임 시작 카운트 다운 이벤트 처리
