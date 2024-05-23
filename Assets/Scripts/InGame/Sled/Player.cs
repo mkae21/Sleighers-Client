@@ -213,14 +213,17 @@ public class Player : MonoBehaviour
     {
         RaycastHit hitNear;
 
-        Physics.Raycast(sled.position + (sled.up * .5f) + (sled.forward * 0.5f), Vector3.down, out hitNear, 2.0f);
+        Physics.Raycast(sled.position + (sled.up * .5f) + (sled.forward * 0.5f), Vector3.down, out hitNear, 1.0f);  
         sledModel.up = Vector3.Lerp(sledModel.up, hitNear.normal, Time.deltaTime * 8.0f);
         sledModel.Rotate(0, sled.eulerAngles.y, 0);
         
         playerModel.up = Vector3.Lerp(playerModel.up, hitNear.normal, Time.deltaTime * 8.0f);
         playerModel.Rotate(0, sled.eulerAngles.y, 0);
         
-        isGround = hitNear.collider != null;
+        if (hitNear.collider != null && hitNear.collider.gameObject.tag == "Terrain")
+            isGround = true;
+        else
+            isGround = false;
 
         return hitNear;
     }
