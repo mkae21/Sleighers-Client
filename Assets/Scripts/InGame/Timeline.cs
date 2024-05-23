@@ -30,6 +30,7 @@ public class Timeline : MonoBehaviour
 
         yield return null;
         WorldManager.instance.OnSendInGame(Type.PlayerReady);
+        InGameUI.instance.text_waiting.SetActive(true);
     }
 #endregion
 
