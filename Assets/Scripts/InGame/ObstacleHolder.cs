@@ -40,6 +40,7 @@ public class ObstacleHolder : MonoBehaviour
 
         foreach (Obstacle obstacle in obstacles)
         {
+            obstacle.OnPlayerEnterObstacle += OnPlayerEnterObstacle;
         }
     }
 
