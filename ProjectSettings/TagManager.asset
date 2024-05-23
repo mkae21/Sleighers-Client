@@ -8,7 +8,7 @@ TagManager:
   - Ramp
   - Obstacle
   - End
-  - Map2
+  - Terrain
   layers:
   - Default
   - TransparentFX
