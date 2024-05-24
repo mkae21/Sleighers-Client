@@ -240,6 +240,8 @@ public class WorldManager : MonoBehaviour
             Player.GetComponent<Player>().Initialize(false, playerNickname, _sp.position, _sp.rotation.eulerAngles.y);
             Player.GetComponent<Player>().playerIndex = i;
         }
+        
+        ObstacleHolder.instance.SetObstacles(players);
     }
 
     // 게임 시작 카운트 다운 이벤트 처리
@@ -247,6 +249,8 @@ public class WorldManager : MonoBehaviour
     {
         int count = msg.count;
         InGameUI.instance.SetCountDown(count);
+        if (InGameUI.instance.text_waiting.activeSelf)
+            InGameUI.instance.text_waiting.SetActive(false);
     }
     // 게임 시작 이벤트 처리
     private void ReceiveGameStartEvent()
